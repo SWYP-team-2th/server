@@ -19,4 +19,3 @@ spring:
     import: classpath:application-prod.yml
     activate:
       on-profile: prod
-
