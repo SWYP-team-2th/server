@@ -32,9 +32,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.gradle/caches
-      key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-      restore-keys: |
-          ${{ runner.os }}-gradle-
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+            ${{ runner.os }}-gradle-
 
     - name: Create directory resources
       run: mkdir -p ./src/test/resources
