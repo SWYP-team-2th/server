@@ -49,7 +49,7 @@ jobs:
         run: ./gradlew bootJar
 
       - name: Copy jar file
-        run: mv ./build/libs/*SNAPSHOT.jar ./photopic-prod.jar
+        run: mv ./build/libs/*SNAPSHOT.jar ./chooz-prod.jar
         
       - name: (SCP) transfer build file 
         uses: appleboy/scp-action@v0.1.7
@@ -57,7 +57,7 @@ jobs:
           host: ${{ secrets.AWS_EC2_URL_PROD }}
           username: ${{ secrets.AWS_EC2_USER }}
           key: ${{ secrets.AWS_EC2_KEY }}
-          source: photopic-prod.jar
+          source: chooz-prod.jar
           target: /home/${{ secrets.AWS_EC2_USER }}
 
       - name: (SSH) connect EC2
@@ -69,4 +69,4 @@ jobs:
           script_stop: true
           script: |
             sudo fuser -k -n tcp 8080 || true
-            nohup java -Xms256m -Xmx742m -jar -Dspring.profiles.active=prod photopic-prod.jar > ./output.log 2>&1 &
+            nohup java -Xms256m -Xmx742m -jar -Dspring.profiles.active=prod chooz-prod.jar > ./output.log 2>&1 &
