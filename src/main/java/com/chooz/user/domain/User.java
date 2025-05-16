@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-    public static final String DEFAULT_PROFILE_URL = "https://image.photopic.site/default_profile.png";
+    public static final String DEFAULT_PROFILE_URL = "https://image.chooz.site/default_profile.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

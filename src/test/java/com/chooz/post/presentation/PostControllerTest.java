@@ -99,14 +99,14 @@ class PostControllerTest extends RestDocsTest {
                 new AuthorDto(
                         1L,
                         "author",
-                        "https://image.photopic.site/profile-image"
+                        "https://image.chooz.site/profile-image"
                 ),
                 "description",
                 List.of(
-                        new PostImageResponse(1L, "뽀또A", "https://image.photopic.site/image/1", "https://image.photopic.site/image/resize/1", 1L),
-                        new PostImageResponse(2L, "뽀또B", "https://image.photopic.site/image/2", "https://image.photopic.site/image/resize/2", null)
+                        new PostImageResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
+                        new PostImageResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
                 ),
-                "https://photopic.site/shareurl",
+                "https://chooz.site/shareurl",
                 true,
                 Status.PROGRESS,
                 LocalDateTime.of(2025, 2, 13, 12, 0)
@@ -173,8 +173,8 @@ class PostControllerTest extends RestDocsTest {
                 List.of(
                         new SimplePostResponse(
                                 1L,
-                                "https://image.photopic.site/1",
-                                "https://photopic.site/shareurl",
+                                "https://image.chooz.site/1",
+                                "https://chooz.site/shareurl",
                                 LocalDateTime.of(2025, 2, 13, 12, 0)
                         )
                 )
@@ -229,8 +229,8 @@ class PostControllerTest extends RestDocsTest {
                 List.of(
                         new SimplePostResponse(
                                 1L,
-                                "https://image.photopic.site/1",
-                                "https://photopic.site/shareurl",
+                                "https://image.chooz.site/1",
+                                "https://chooz.site/shareurl",
                                 LocalDateTime.of(2025, 2, 13, 12, 0)
                         )
                 )
@@ -356,11 +356,11 @@ class PostControllerTest extends RestDocsTest {
                                 new AuthorDto(
                                         1L,
                                         "author",
-                                        "https://image.photopic.site/profile-image"
+                                        "https://image.chooz.site/profile-image"
                                 ),
                                 List.of(
-                                        new PostImageResponse(1L, "뽀또A", "https://image.photopic.site/image/1", "https://image.photopic.site/image/resize/1", 1L),
-                                        new PostImageResponse(2L, "뽀또B", "https://image.photopic.site/image/2", "https://image.photopic.site/image/resize/2", null)
+                                        new PostImageResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
+                                        new PostImageResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
                                 ),
                                 Status.PROGRESS,
                                 "description",

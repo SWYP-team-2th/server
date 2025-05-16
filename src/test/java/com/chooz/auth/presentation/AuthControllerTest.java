@@ -50,7 +50,7 @@ class AuthControllerTest extends RestDocsTest {
         AuthResponse response = new AuthResponse(expectedTokenPair.accessToken(), 1L, Role.USER);
         given(authService.oauthSignIn(anyString(), anyString()))
                 .willReturn(new TokenResponse(expectedTokenPair, 1L, Role.USER));
-        OAuthSignInRequest request = new OAuthSignInRequest("code", "https://dev.photopic.site");
+        OAuthSignInRequest request = new OAuthSignInRequest("code", "https://dev.chooz.site");
 
         //when then
         mockMvc.perform(post("/auth/oauth2/code/kakao")

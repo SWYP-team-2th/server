@@ -51,7 +51,7 @@ class AuthServiceTest extends IntegrationTest {
                 .willReturn(expectedTokenPair);
 
         //when
-        TokenResponse tokenResponse = authService.oauthSignIn("code", "https://dev.photopic.site");
+        TokenResponse tokenResponse = authService.oauthSignIn("code", "https://dev.chooz.site");
 
         //then
         TokenPair tokenPair = tokenResponse.tokenPair();

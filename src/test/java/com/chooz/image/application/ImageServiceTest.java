@@ -49,7 +49,7 @@ public class ImageServiceTest {
     @DisplayName("ImageFile Entity 생성")
     void createImageFile() {
         // given
-        ImageFileDto dto = new ImageFileDto("test.jpg", "https://image.photopic.site/test.jpg", "https://image.photopic.site/thumb.jpg");
+        ImageFileDto dto = new ImageFileDto("test.jpg", "https://image.chooz.site/test.jpg", "https://image.chooz.site/thumb.jpg");
         ImageFile imageFile = ImageFile.create(dto);
 
         // when
@@ -113,8 +113,8 @@ public class ImageServiceTest {
         );
 
         List<ImageFileDto> imageFiles = List.of(
-                new ImageFileDto("test1.jpg", "https://image.photopic.site/test1.jpg", "https://image.photopic.site/thumb1.jpg"),
-                new ImageFileDto("test2.png", "https://image.photopic.site/test2.png", "https://image.photopic.site/thumb2.png")
+                new ImageFileDto("test1.jpg", "https://image.chooz.site/test1.jpg", "https://image.chooz.site/thumb1.jpg"),
+                new ImageFileDto("test2.png", "https://image.chooz.site/test2.png", "https://image.chooz.site/thumb2.png")
         );
 
         doNothing().when(fileValidator).validate(file1, file2);

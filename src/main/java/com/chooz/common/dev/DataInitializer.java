@@ -80,8 +80,8 @@ public class DataInitializer {
             User user = userRepository.save(User.create(userName, "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
             users.add(user);
             for (int j = 0; j < 30; j += 2) {
-                ImageFile imageFile1 = imageFileRepository.save(ImageFile.create(new ImageFileDto("202502240006030.png", "https://image.photopic.site/images-dev/202502240006030.png", "https://image.photopic.site/images-dev/resized_202502240006030.png")));
-                ImageFile imageFile2 = imageFileRepository.save(ImageFile.create(new ImageFileDto("202502240006030.png", "https://image.photopic.site/images-dev/202502240006030.png", "https://image.photopic.site/images-dev/resized_202502240006030.png")));
+                ImageFile imageFile1 = imageFileRepository.save(ImageFile.create(new ImageFileDto("202502240006030.png", "https://image.chooz.site/images-dev/202502240006030.png", "https://image.chooz.site/images-dev/resized_202502240006030.png")));
+                ImageFile imageFile2 = imageFileRepository.save(ImageFile.create(new ImageFileDto("202502240006030.png", "https://image.chooz.site/images-dev/202502240006030.png", "https://image.chooz.site/images-dev/resized_202502240006030.png")));
                 Post post = postRepository.save(Post.create(user.getId(), "description" + j, List.of(PostImage.create("뽀또A", imageFile1.getId()), PostImage.create("뽀또B", imageFile2.getId())), Scope.PUBLIC, VoteType.SINGLE));
                 post.setShareUrl(shaereUrlShareUrlService.encrypt(String.valueOf(post.getId())));
                 posts.add(post);
