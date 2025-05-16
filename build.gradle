@@ -5,7 +5,7 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
-group = 'com.swyp8team2'
+group = 'com.chooz'
 version = '0.0.1-SNAPSHOT'
 
 java {
