@@ -1,6 +1,6 @@
 package com.chooz.post.presentation.dto;
 
-public record PostImageResponse(
+public record PollChoiceResponse(
         Long id,
         String imageName,
         String imageUrl,

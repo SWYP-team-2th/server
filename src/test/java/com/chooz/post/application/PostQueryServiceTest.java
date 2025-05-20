@@ -9,7 +9,7 @@ import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.presentation.dto.FeedResponse;
-import com.chooz.post.presentation.dto.PostImageResponse;
+import com.chooz.post.presentation.dto.PollChoiceResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.support.IntegrationTest;
 import com.chooz.user.domain.User;
@@ -60,7 +60,7 @@ class PostQueryServiceTest extends IntegrationTest {
         PostResponse response = postService.findById(user.getId(), post.getId());
 
         //then
-        List<PostImageResponse> votes = response.images();
+        List<PollChoiceResponse> votes = response.images();
         assertAll(
                 () -> assertThat(response.description()).isEqualTo(post.getDescription()),
                 () -> assertThat(response.id()).isEqualTo(post.getId()),
@@ -131,7 +131,7 @@ class PostQueryServiceTest extends IntegrationTest {
         List<Post> posts = createPosts(user, Scope.PRIVATE);
         for (int i = 0; i < 15; i++) {
             Post post = posts.get(i);
-            voteRepository.save(Vote.of(post.getId(), post.getImages().get(0).getId(), user.getId()));
+            voteRepository.save(Vote.of(post.getId(), post.getPollChoices().get(0).getId(), user.getId()));
         }
         int size = 10;
 

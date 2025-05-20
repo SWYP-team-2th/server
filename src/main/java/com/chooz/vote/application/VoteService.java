@@ -3,10 +3,10 @@ package com.chooz.vote.application;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostImage;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.domain.VoteType;
-import com.chooz.vote.presentation.dto.PostImageVoteStatusResponse;
+import com.chooz.vote.presentation.dto.PollChoiceStatusResponse;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
@@ -30,8 +30,8 @@ public class VoteService {
     private final RatioCalculator ratioCalculator;
 
     @Transactional
-    public Long vote(Long voterId, Long postId, Long imageId) {
-        Optional<Vote> existsVote = voteRepository.findByUserIdAndPostImageId(voterId, imageId);
+    public Long vote(Long voterId, Long postId, Long pollChoiceId) {
+        Optional<Vote> existsVote = voteRepository.findByUserIdAndPollChoiceId(voterId, pollChoiceId);
         if (existsVote.isPresent()) {
             return existsVote.get().getId();
         }
@@ -46,7 +46,7 @@ public class VoteService {
         if (VoteType.SINGLE.equals(voteType)) {
             deleteVoteIfExisting(post, voter.getId());
         }
-        Vote vote = createVote(post, imageId, voter.getId());
+        Vote vote = createVote(post, pollChoiceId, voter.getId());
         return vote.getId();
     }
 
@@ -54,13 +54,13 @@ public class VoteService {
         List<Vote> votes = voteRepository.findByUserIdAndPostId(userId, post.getId());
         for (Vote vote : votes) {
             voteRepository.delete(vote);
-            post.cancelVote(vote.getPostImageId());
+            post.cancelVote(vote.getPollChoiceId());
         }
     }
 
-    private Vote createVote(Post post, Long imageId, Long userId) {
-        Vote vote = voteRepository.save(Vote.of(post.getId(), imageId, userId));
-        post.vote(imageId);
+    private Vote createVote(Post post, Long pollChoiceId, Long userId) {
+        Vote vote = voteRepository.save(Vote.of(post.getId(), pollChoiceId, userId));
+        post.vote(pollChoiceId);
         return vote;
     }
 
@@ -74,20 +74,20 @@ public class VoteService {
         voteRepository.delete(vote);
         Post post = postRepository.findById(vote.getPostId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        post.cancelVote(vote.getPostImageId());
+        post.cancelVote(vote.getPollChoiceId());
     }
 
-    public List<PostImageVoteStatusResponse> findVoteStatus(Long userId, Long postId) {
-        Post post = postRepository.findByIdFetchPostImage(postId)
+    public List<PollChoiceStatusResponse> findVoteStatus(Long userId, Long postId) {
+        Post post = postRepository.findByIdFetchPollChoices(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         validateVoteStatus(userId, post);
-        int totalVoteCount = getTotalVoteCount(post.getImages());
-        return post.getImages().stream()
+        int totalVoteCount = getTotalVoteCount(post.getPollChoices());
+        return post.getPollChoices().stream()
                 .map(image -> {
                     String ratio = ratioCalculator.calculate(totalVoteCount, image.getVoteCount());
-                    return new PostImageVoteStatusResponse(image.getId(), image.getName(), image.getVoteCount(), ratio);
+                    return new PollChoiceStatusResponse(image.getId(), image.getName(), image.getVoteCount(), ratio);
                 })
-                .sorted(Comparator.comparingInt(PostImageVoteStatusResponse::voteCount).reversed())
+                .sorted(Comparator.comparingInt(PollChoiceStatusResponse::voteCount).reversed())
                 .toList();
     }
 
@@ -98,9 +98,9 @@ public class VoteService {
         }
     }
 
-    private int getTotalVoteCount(List<PostImage> images) {
+    private int getTotalVoteCount(List<PollChoice> images) {
         int totalVoteCount = 0;
-        for (PostImage image : images) {
+        for (PollChoice image : images) {
             totalVoteCount += image.getVoteCount();
         }
         return totalVoteCount;

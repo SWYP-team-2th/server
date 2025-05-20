@@ -22,19 +22,19 @@ public class Vote extends BaseEntity {
 
     private Long postId;
 
-    private Long postImageId;
+    private Long pollChoiceId;
 
     private Long userId;
 
-    public Vote(Long id, Long postId, Long postImageId, Long userId) {
+    public Vote(Long id, Long postId, Long pollChoiceId, Long userId) {
         this.id = id;
         this.postId = postId;
-        this.postImageId = postImageId;
+        this.pollChoiceId = pollChoiceId;
         this.userId = userId;
     }
 
-    public static Vote of(Long postId, Long postImageId, Long userId) {
-        return new Vote(null, postId, postImageId, userId);
+    public static Vote of(Long postId, Long pollChoiceId, Long userId) {
+        return new Vote(null, postId, pollChoiceId, userId);
     }
 
     public boolean isVoter(Long userId) {

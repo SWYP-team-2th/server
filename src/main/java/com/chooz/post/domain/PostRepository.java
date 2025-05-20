@@ -37,11 +37,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
             SELECT p
             FROM Post p
-            JOIN FETCH p.images
+            JOIN FETCH p.pollChoices
             WHERE p.id = :postId
             """
     )
-    Optional<Post> findByIdFetchPostImage(@Param("postId") Long postId);
+    Optional<Post> findByIdFetchPollChoices(@Param("postId") Long postId);
 
     @Query(""" 
             SELECT new com.chooz.post.presentation.dto.FeedDto(

@@ -8,7 +8,7 @@ import java.util.List;
 public record FeedResponse(
         Long id,
         AuthorDto author,
-        List<PostImageResponse> images,
+        List<PollChoiceResponse> images,
         Status status,
         String description,
         String shareUrl,
@@ -18,7 +18,7 @@ public record FeedResponse(
 
 ) implements CursorDto {
 
-    public static FeedResponse of(FeedDto feedDto, AuthorDto author, List<PostImageResponse> images, boolean isAuthor) {
+    public static FeedResponse of(FeedDto feedDto, AuthorDto author, List<PollChoiceResponse> images, boolean isAuthor) {
         return new FeedResponse(
                 feedDto.postId(),
                 author,

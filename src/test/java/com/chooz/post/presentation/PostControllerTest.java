@@ -42,7 +42,7 @@ class PostControllerTest extends RestDocsTest {
         //given
         CreatePostRequest request = new CreatePostRequest(
                 "제목",
-                List.of(new PostImageRequestDto(1L), new PostImageRequestDto(2L)),
+                List.of(new PollChoiceRequestDto(1L), new PollChoiceRequestDto(2L)),
                 Scope.PRIVATE,
                 VoteType.SINGLE
         );
@@ -103,8 +103,8 @@ class PostControllerTest extends RestDocsTest {
                 ),
                 "description",
                 List.of(
-                        new PostImageResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
-                        new PostImageResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
+                        new PollChoiceResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
+                        new PollChoiceResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
                 ),
                 "https://chooz.site/shareurl",
                 true,
@@ -359,8 +359,8 @@ class PostControllerTest extends RestDocsTest {
                                         "https://image.chooz.site/profile-image"
                                 ),
                                 List.of(
-                                        new PostImageResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
-                                        new PostImageResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
+                                        new PollChoiceResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
+                                        new PollChoiceResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
                                 ),
                                 Status.PROGRESS,
                                 "description",

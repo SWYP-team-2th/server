@@ -13,7 +13,7 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     Slice<Vote> findByUserId(Long userId);
 
-    Optional<Vote> findByUserIdAndPostImageId(Long voterId, Long imageId);
+    Optional<Vote> findByUserIdAndPollChoiceId(Long voterId, Long pollChoiceId);
 
     Optional<Vote> findByIdAndUserId(Long voteId, Long userId);
 

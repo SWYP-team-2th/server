@@ -4,7 +4,7 @@ import com.chooz.comment.domain.Comment;
 import com.chooz.image.domain.ImageFile;
 import com.chooz.image.presentation.dto.ImageFileDto;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostImage;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.domain.VoteType;
 import com.chooz.user.domain.User;
@@ -19,8 +19,8 @@ public abstract class FixtureGenerator {
                 userId,
                 "description" + key,
                 List.of(
-                        PostImage.create("뽀또A", imageFile1.getId()),
-                        PostImage.create("뽀또B", imageFile2.getId())
+                        PollChoice.create("뽀또A", imageFile1.getId()),
+                        PollChoice.create("뽀또B", imageFile2.getId())
                 ),
                 scope,
                 VoteType.SINGLE
@@ -32,7 +32,7 @@ public abstract class FixtureGenerator {
                 userId,
                 "description" + key,
                 imageFiles.stream()
-                        .map(imageFile -> PostImage.create("뽀또"+key, imageFile.getId()))
+                        .map(imageFile -> PollChoice.create("뽀또"+key, imageFile.getId()))
                         .toList(),
                 scope,
                 VoteType.SINGLE
@@ -44,8 +44,8 @@ public abstract class FixtureGenerator {
                 userId,
                 "description" + key,
                 List.of(
-                        PostImage.create("뽀또A", imageFile1.getId()),
-                        PostImage.create("뽀또B", imageFile2.getId())
+                        PollChoice.create("뽀또A", imageFile1.getId()),
+                        PollChoice.create("뽀또B", imageFile2.getId())
                 ),
                 scope,
                 VoteType.MULTIPLE

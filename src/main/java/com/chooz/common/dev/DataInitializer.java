@@ -11,7 +11,7 @@ import com.chooz.image.domain.ImageFile;
 import com.chooz.image.domain.ImageFileRepository;
 import com.chooz.image.presentation.dto.ImageFileDto;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostImage;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.domain.VoteType;
@@ -82,7 +82,7 @@ public class DataInitializer {
             for (int j = 0; j < 30; j += 2) {
                 ImageFile imageFile1 = imageFileRepository.save(ImageFile.create(new ImageFileDto("202502240006030.png", "https://image.chooz.site/images-dev/202502240006030.png", "https://image.chooz.site/images-dev/resized_202502240006030.png")));
                 ImageFile imageFile2 = imageFileRepository.save(ImageFile.create(new ImageFileDto("202502240006030.png", "https://image.chooz.site/images-dev/202502240006030.png", "https://image.chooz.site/images-dev/resized_202502240006030.png")));
-                Post post = postRepository.save(Post.create(user.getId(), "description" + j, List.of(PostImage.create("뽀또A", imageFile1.getId()), PostImage.create("뽀또B", imageFile2.getId())), Scope.PUBLIC, VoteType.SINGLE));
+                Post post = postRepository.save(Post.create(user.getId(), "description" + j, List.of(PollChoice.create("뽀또A", imageFile1.getId()), PollChoice.create("뽀또B", imageFile2.getId())), Scope.PUBLIC, VoteType.SINGLE));
                 post.setShareUrl(shaereUrlShareUrlService.encrypt(String.valueOf(post.getId())));
                 posts.add(post);
             }
@@ -92,7 +92,7 @@ public class DataInitializer {
             for (Post post : posts) {
                 Random random = new Random();
                 int num = random.nextInt(2);
-                voteService.vote(user.getId(), post.getId(), post.getImages().get(num).getId());
+                voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(num).getId());
                 commentRepository.save(new Comment(post.getId(), user.getId(), "댓글 내용" + random.nextInt(100)));
             }
         }

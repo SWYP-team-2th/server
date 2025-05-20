@@ -7,11 +7,11 @@ import com.chooz.common.exception.InternalServerException;
 import com.chooz.image.domain.ImageFile;
 import com.chooz.image.domain.ImageFileRepository;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostImage;
-import com.chooz.post.domain.PostImageRepository;
+import com.chooz.post.domain.PollChoice;
+import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.FeedResponse;
-import com.chooz.post.presentation.dto.PostImageResponse;
+import com.chooz.post.presentation.dto.PollChoiceResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.SimplePostResponse;
 import com.chooz.post.presentation.dto.AuthorDto;
@@ -35,7 +35,7 @@ import java.util.List;
 public class PostQueryService {
 
     private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
+    private final PollChoiceRepository pollChoiceRepository;
     private final UserRepository userRepository;
     private final ImageFileRepository imageFileRepository;
     private final VoteRepository voteRepository;
@@ -47,26 +47,26 @@ public class PostQueryService {
     }
 
     public PostResponse findById(Long userId, Long postId) {
-        Post post = postRepository.findByIdFetchPostImage(postId)
+        Post post = postRepository.findByIdFetchPollChoices(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         User author = userRepository.findById(post.getUserId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        List<PostImageResponse> votes = createPostImageResponse(userId, post);
+        List<PollChoiceResponse> votes = createPollChoiceResponse(userId, post);
         boolean isAuthor = post.getUserId().equals(userId);
         return PostResponse.of(post, author, votes, isAuthor);
     }
 
-    private List<PostImageResponse> createPostImageResponse(Long userId, Post post) {
-        List<PostImage> images = post.getImages();
+    private List<PollChoiceResponse> createPollChoiceResponse(Long userId, Post post) {
+        List<PollChoice> images = post.getPollChoices();
         return images.stream()
                 .map(image -> createVoteResponseDto(image, userId))
                 .toList();
     }
 
-    private PostImageResponse createVoteResponseDto(PostImage image, Long userId) {
+    private PollChoiceResponse createVoteResponseDto(PollChoice image, Long userId) {
         ImageFile imageFile = imageFileRepository.findById(image.getImageFileId())
                 .orElseThrow(() -> new InternalServerException(ErrorCode.IMAGE_FILE_NOT_FOUND));
-        return new PostImageResponse(
+        return new PollChoiceResponse(
                 image.getId(),
                 image.getName(),
                 imageFile.getImageUrl(),
@@ -75,8 +75,8 @@ public class PostQueryService {
         );
     }
 
-    private Long getVoteId(PostImage image, Long userId) {
-        return voteRepository.findByUserIdAndPostImageId(userId, image.getId())
+    private Long getVoteId(PollChoice image, Long userId) {
+        return voteRepository.findByUserIdAndPollChoiceId(userId, image.getId())
                 .map(Vote::getId)
                 .orElse(null);
     }
@@ -100,7 +100,7 @@ public class PostQueryService {
     private CursorBasePaginatedResponse<SimplePostResponse> getCursorPaginatedResponse(Slice<Post> postSlice) {
         List<Long> bestPickedImageIds = postSlice.getContent().stream()
                 .map(Post::getBestPickedImage)
-                .map(PostImage::getImageFileId)
+                .map(PollChoice::getImageFileId)
                 .toList();
         List<ImageFile> imageIds = imageFileRepository.findByIdIn(bestPickedImageIds);
 
@@ -130,8 +130,8 @@ public class PostQueryService {
 
     private FeedResponse createFeedResponse(Long userId, FeedDto dto) {
         AuthorDto author = new AuthorDto(dto.postUserId(), dto.nickname(), dto.profileUrl());
-        List<PostImageResponse> postImages = postImageRepository.findByPostId(userId, dto.postId());
+        List<PollChoiceResponse> pollChoices = pollChoiceRepository.findByPostId(userId, dto.postId());
         boolean isAuthor = dto.postUserId().equals(userId);
-        return FeedResponse.of(dto, author, postImages, isAuthor);
+        return FeedResponse.of(dto, author, pollChoices, isAuthor);
     }
 }

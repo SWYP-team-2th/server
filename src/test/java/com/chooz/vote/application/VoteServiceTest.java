@@ -51,7 +51,7 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
 
         // when
-        Long voteId = voteService.vote(user.getId(), post.getId(), post.getImages().get(0).getId());
+        Long voteId = voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId());
 
         // then
         Vote vote = voteRepository.findById(voteId).get();
@@ -59,8 +59,8 @@ class VoteServiceTest extends IntegrationTest {
         assertAll(
                 () -> assertThat(vote.getUserId()).isEqualTo(user.getId()),
                 () -> assertThat(vote.getPostId()).isEqualTo(post.getId()),
-                () -> assertThat(vote.getPostImageId()).isEqualTo(post.getImages().get(0).getId()),
-                () -> assertThat(findPost.getImages().get(0).getVoteCount()).isEqualTo(1)
+                () -> assertThat(vote.getPollChoiceId()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(findPost.getPollChoices().get(0).getVoteCount()).isEqualTo(1)
         );
     }
 
@@ -72,10 +72,10 @@ class VoteServiceTest extends IntegrationTest {
         ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
         ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
         Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-        voteService.vote(user.getId(), post.getId(), post.getImages().get(0).getId());
+        voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId());
 
         // when
-        Long voteId = voteService.vote(user.getId(), post.getId(), post.getImages().get(1).getId());
+        Long voteId = voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(1).getId());
 
         // then
         Vote vote = voteRepository.findById(voteId).get();
@@ -83,9 +83,9 @@ class VoteServiceTest extends IntegrationTest {
         assertAll(
                 () -> assertThat(vote.getUserId()).isEqualTo(user.getId()),
                 () -> assertThat(vote.getPostId()).isEqualTo(post.getId()),
-                () -> assertThat(vote.getPostImageId()).isEqualTo(post.getImages().get(1).getId()),
-                () -> assertThat(findPost.getImages().get(0).getVoteCount()).isEqualTo(0),
-                () -> assertThat(findPost.getImages().get(1).getVoteCount()).isEqualTo(1)
+                () -> assertThat(vote.getPollChoiceId()).isEqualTo(post.getPollChoices().get(1).getId()),
+                () -> assertThat(findPost.getPollChoices().get(0).getVoteCount()).isEqualTo(0),
+                () -> assertThat(findPost.getPollChoices().get(1).getVoteCount()).isEqualTo(1)
         );
     }
 
@@ -99,8 +99,8 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(createMultiplePost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
 
         // when
-        Long voteId1 = voteService.vote(user.getId(), post.getId(), post.getImages().get(0).getId());
-        Long voteId2 = voteService.vote(user.getId(), post.getId(), post.getImages().get(1).getId());
+        Long voteId1 = voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId());
+        Long voteId2 = voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(1).getId());
 
         // then
         Vote vote1 = voteRepository.findById(voteId1).get();
@@ -109,14 +109,14 @@ class VoteServiceTest extends IntegrationTest {
         assertAll(
                 () -> assertThat(vote1.getUserId()).isEqualTo(user.getId()),
                 () -> assertThat(vote1.getPostId()).isEqualTo(post.getId()),
-                () -> assertThat(vote1.getPostImageId()).isEqualTo(post.getImages().get(0).getId()),
+                () -> assertThat(vote1.getPollChoiceId()).isEqualTo(post.getPollChoices().get(0).getId()),
 
                 () -> assertThat(vote2.getUserId()).isEqualTo(user.getId()),
                 () -> assertThat(vote2.getPostId()).isEqualTo(post.getId()),
-                () -> assertThat(vote2.getPostImageId()).isEqualTo(post.getImages().get(1).getId()),
+                () -> assertThat(vote2.getPollChoiceId()).isEqualTo(post.getPollChoices().get(1).getId()),
 
-                () -> assertThat(findPost.getImages().get(0).getVoteCount()).isEqualTo(1),
-                () -> assertThat(findPost.getImages().get(1).getVoteCount()).isEqualTo(1)
+                () -> assertThat(findPost.getPollChoices().get(0).getVoteCount()).isEqualTo(1),
+                () -> assertThat(findPost.getPollChoices().get(1).getVoteCount()).isEqualTo(1)
         );
     }
 
@@ -134,15 +134,15 @@ class VoteServiceTest extends IntegrationTest {
                 Status.CLOSED,
                 Scope.PRIVATE,
                 List.of(
-                        PostImage.create("뽀또A", imageFile1.getId()),
-                        PostImage.create("뽀또B", imageFile2.getId())
+                        PollChoice.create("뽀또A", imageFile1.getId()),
+                        PollChoice.create("뽀또B", imageFile2.getId())
                 ),
                 "shareUrl",
                 VoteType.SINGLE
         ));
 
         // when
-        assertThatThrownBy(() -> voteService.vote(user.getId(), post.getId(), post.getImages().get(0).getId()))
+        assertThatThrownBy(() -> voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.POST_ALREADY_CLOSED.getMessage());
     }
@@ -155,7 +155,7 @@ class VoteServiceTest extends IntegrationTest {
         ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
         ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
         Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-        Long voteId = voteService.vote(user.getId(), post.getId(), post.getImages().get(0).getId());
+        Long voteId = voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId());
 
         // when
         voteService.cancelVote(user.getId(), voteId);
@@ -165,7 +165,7 @@ class VoteServiceTest extends IntegrationTest {
         Post findPost = postRepository.findById(post.getId()).get();
         assertAll(
                 () -> assertThat(res).isEqualTo(true),
-                () -> assertThat(findPost.getImages().get(0).getVoteCount()).isEqualTo(0)
+                () -> assertThat(findPost.getPollChoices().get(0).getVoteCount()).isEqualTo(0)
         );
     }
 
@@ -177,7 +177,7 @@ class VoteServiceTest extends IntegrationTest {
         ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
         ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
         Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-        Long voteId = voteService.vote(user.getId(), post.getId(), post.getImages().get(0).getId());
+        Long voteId = voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId());
 
         // when then
         assertThatThrownBy(() -> voteService.cancelVote(2L, voteId))
@@ -194,7 +194,7 @@ class VoteServiceTest extends IntegrationTest {
         ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
         ImageFile imageFile3 = imageFileRepository.save(createImageFile(3));
         Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, List.of(imageFile1, imageFile2, imageFile3), 1));
-        voteService.vote(user.getId(), post.getId(), post.getImages().get(1).getId());
+        voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(1).getId());
 
         //when
         var response = voteService.findVoteStatus(user.getId(), post.getId());
@@ -202,18 +202,18 @@ class VoteServiceTest extends IntegrationTest {
         //then
         assertAll(
                 () -> assertThat(response).hasSize(3),
-                () -> assertThat(response.get(0).id()).isEqualTo(post.getImages().get(1).getId()),
-                () -> assertThat(response.get(0).imageName()).isEqualTo(post.getImages().get(1).getName()),
+                () -> assertThat(response.get(0).id()).isEqualTo(post.getPollChoices().get(1).getId()),
+                () -> assertThat(response.get(0).imageName()).isEqualTo(post.getPollChoices().get(1).getName()),
                 () -> assertThat(response.get(0).voteCount()).isEqualTo(1),
                 () -> assertThat(response.get(0).voteRatio()).isEqualTo("100.0"),
 
-                () -> assertThat(response.get(1).id()).isEqualTo(post.getImages().get(0).getId()),
-                () -> assertThat(response.get(1).imageName()).isEqualTo(post.getImages().get(0).getName()),
+                () -> assertThat(response.get(1).id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(response.get(1).imageName()).isEqualTo(post.getPollChoices().get(0).getName()),
                 () -> assertThat(response.get(1).voteCount()).isEqualTo(0),
                 () -> assertThat(response.get(1).voteRatio()).isEqualTo("0.0"),
 
-                () -> assertThat(response.get(2).id()).isEqualTo(post.getImages().get(2).getId()),
-                () -> assertThat(response.get(2).imageName()).isEqualTo(post.getImages().get(2).getName()),
+                () -> assertThat(response.get(2).id()).isEqualTo(post.getPollChoices().get(2).getId()),
+                () -> assertThat(response.get(2).imageName()).isEqualTo(post.getPollChoices().get(2).getName()),
                 () -> assertThat(response.get(2).voteCount()).isEqualTo(0),
                 () -> assertThat(response.get(2).voteRatio()).isEqualTo("0.0")
         );
@@ -228,7 +228,7 @@ class VoteServiceTest extends IntegrationTest {
         ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
         ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
         Post post = postRepository.save(createPost(author.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-        voteService.vote(voter.getId(), post.getId(), post.getImages().get(0).getId());
+        voteService.vote(voter.getId(), post.getId(), post.getPollChoices().get(0).getId());
 
         //when
         var response = voteService.findVoteStatus(voter.getId(), post.getId());
@@ -236,12 +236,12 @@ class VoteServiceTest extends IntegrationTest {
         //then
         assertAll(
                 () -> assertThat(response).hasSize(2),
-                () -> assertThat(response.get(0).id()).isEqualTo(post.getImages().get(0).getId()),
-                () -> assertThat(response.get(0).imageName()).isEqualTo(post.getImages().get(0).getName()),
+                () -> assertThat(response.get(0).id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(response.get(0).imageName()).isEqualTo(post.getPollChoices().get(0).getName()),
                 () -> assertThat(response.get(0).voteCount()).isEqualTo(1),
                 () -> assertThat(response.get(0).voteRatio()).isEqualTo("100.0"),
-                () -> assertThat(response.get(1).id()).isEqualTo(post.getImages().get(1).getId()),
-                () -> assertThat(response.get(1).imageName()).isEqualTo(post.getImages().get(1).getName()),
+                () -> assertThat(response.get(1).id()).isEqualTo(post.getPollChoices().get(1).getId()),
+                () -> assertThat(response.get(1).imageName()).isEqualTo(post.getPollChoices().get(1).getName()),
                 () -> assertThat(response.get(1).voteCount()).isEqualTo(0),
                 () -> assertThat(response.get(1).voteRatio()).isEqualTo("0.0")
         );

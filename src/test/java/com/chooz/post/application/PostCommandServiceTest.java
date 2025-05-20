@@ -7,7 +7,7 @@ import com.chooz.image.domain.ImageFileRepository;
 import com.chooz.post.domain.*;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
-import com.chooz.post.presentation.dto.PostImageRequestDto;
+import com.chooz.post.presentation.dto.PollChoiceRequestDto;
 import com.chooz.support.IntegrationTest;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
@@ -53,8 +53,8 @@ public class PostCommandServiceTest extends IntegrationTest {
         CreatePostRequest request = new CreatePostRequest(
                 "description",
                 List.of(
-                        new PostImageRequestDto(1L),
-                        new PostImageRequestDto(2L)
+                        new PollChoiceRequestDto(1L),
+                        new PollChoiceRequestDto(2L)
                 ),
                 Scope.PRIVATE,
                 VoteType.SINGLE
@@ -68,7 +68,7 @@ public class PostCommandServiceTest extends IntegrationTest {
 
         //then
         Post post = postRepository.findById(response.postId()).get();
-        List<PostImage> images = post.getImages();
+        List<PollChoice> images = post.getPollChoices();
         assertAll(
                 () -> assertThat(post.getDescription()).isEqualTo("description"),
                 () -> assertThat(post.getUserId()).isEqualTo(userId),
@@ -87,13 +87,13 @@ public class PostCommandServiceTest extends IntegrationTest {
 
     @Test
     @DisplayName("게시글 작성 - 이미지가 2개 미만인 경우")
-    void create_invalidPostImageCount() throws Exception {
+    void create_invalidPollChoiceCount() throws Exception {
         //given
         long userId = 1L;
         CreatePostRequest request = new CreatePostRequest(
                 "description",
                 List.of(
-                        new PostImageRequestDto(1L)
+                        new PollChoiceRequestDto(1L)
                 ),
                 Scope.PRIVATE,
                 VoteType.SINGLE
@@ -101,7 +101,7 @@ public class PostCommandServiceTest extends IntegrationTest {
         //when then
         assertThatThrownBy(() -> postService.create(userId, request))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_POST_IMAGE_COUNT.getMessage());
+                .hasMessage(ErrorCode.INVALID_POLL_CHOICE_COUNT.getMessage());
     }
 
     @Test
@@ -112,8 +112,8 @@ public class PostCommandServiceTest extends IntegrationTest {
         CreatePostRequest request = new CreatePostRequest(
                 "a".repeat(101),
                 List.of(
-                        new PostImageRequestDto(1L),
-                        new PostImageRequestDto(2L)
+                        new PollChoiceRequestDto(1L),
+                        new PollChoiceRequestDto(2L)
                 ),
                 Scope.PRIVATE,
                 VoteType.SINGLE

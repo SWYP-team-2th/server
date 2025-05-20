@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PostImageNameGeneratorTest {
+class PollChoiceNameGeneratorTest {
 
-    PostImageNameGenerator postImageNameGenerator;
+    PollChoiceNameGenerator pollChoiceNameGenerator;
 
     @BeforeEach
     void setUp() {
-        postImageNameGenerator = new PostImageNameGenerator();
+        pollChoiceNameGenerator = new PollChoiceNameGenerator();
     }
 
     @Test
@@ -21,8 +21,8 @@ class PostImageNameGeneratorTest {
         //given
 
         //when
-        String generate1 = postImageNameGenerator.generate();
-        String generate2 = postImageNameGenerator.generate();
+        String generate1 = pollChoiceNameGenerator.generate();
+        String generate2 = pollChoiceNameGenerator.generate();
 
         //then
         assertThat(generate1).isEqualTo("뽀또A");

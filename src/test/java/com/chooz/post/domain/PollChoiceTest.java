@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class PostImageTest {
+class PollChoiceTest {
 
     @Test
     @DisplayName("게시글 이미지 생성")
@@ -16,13 +16,13 @@ class PostImageTest {
         long imageFileId = 1L;
 
         //when
-        PostImage postImage = PostImage.create(name, imageFileId);
+        PollChoice pollChoice = PollChoice.create(name, imageFileId);
 
         //then
         assertAll(
-                () -> assertThat(postImage.getName()).isEqualTo(name),
-                () -> assertThat(postImage.getImageFileId()).isEqualTo(imageFileId),
-                () -> assertThat(postImage.getVoteCount()).isEqualTo(0)
+                () -> assertThat(pollChoice.getName()).isEqualTo(name),
+                () -> assertThat(pollChoice.getImageFileId()).isEqualTo(imageFileId),
+                () -> assertThat(pollChoice.getVoteCount()).isEqualTo(0)
         );
     }
 }

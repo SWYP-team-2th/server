@@ -1,6 +1,6 @@
 package com.chooz.vote.presentation.dto;
 
-public record PostImageVoteStatusResponse(
+public record PollChoiceStatusResponse(
         Long id,
         String imageName,
         int voteCount,

@@ -19,16 +19,16 @@ class PostTest {
         //given
         long userId = 1L;
         String description = "description";
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
 
         //when
-        Post post = Post.create(userId, description, postImages, Scope.PRIVATE, VoteType.SINGLE);
+        Post post = Post.create(userId, description, pollChoices, Scope.PRIVATE, VoteType.SINGLE);
 
         //then
-        List<PostImage> images = post.getImages();
+        List<PollChoice> images = post.getPollChoices();
         assertAll(
                 () -> assertThat(post.getUserId()).isEqualTo(userId),
                 () -> assertThat(post.getDescription()).isEqualTo(description),
@@ -45,16 +45,16 @@ class PostTest {
 
     @Test
     @DisplayName("게시글 생성 - 이미지가 2개 미만인 경우")
-    void create_invalidPostImageCount() throws Exception {
+    void create_invalidPollChoiceCount() throws Exception {
         //given
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L)
         );
 
         //when then
-        assertThatThrownBy(() -> Post.create(1L, "description", postImages, Scope.PRIVATE, VoteType.SINGLE))
+        assertThatThrownBy(() -> Post.create(1L, "description", pollChoices, Scope.PRIVATE, VoteType.SINGLE))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_POST_IMAGE_COUNT.getMessage());
+                .hasMessage(ErrorCode.INVALID_POLL_CHOICE_COUNT.getMessage());
     }
 
     @Test
@@ -62,13 +62,13 @@ class PostTest {
     void create_descriptionCountExceeded() throws Exception {
         //given
         String description = "a".repeat(101);
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
 
         //when then
-        assertThatThrownBy(() -> Post.create(1L, description, postImages, Scope.PRIVATE, VoteType.SINGLE))
+        assertThatThrownBy(() -> Post.create(1L, description, pollChoices, Scope.PRIVATE, VoteType.SINGLE))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED.getMessage());
     }
@@ -78,11 +78,11 @@ class PostTest {
     void close() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
+        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
 
         //when
         post.close(userId);
@@ -96,11 +96,11 @@ class PostTest {
     void close_alreadyClosed() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.CLOSED, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
+        Post post = new Post(null, userId, "description", Status.CLOSED, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
 
         //when then
         assertThatThrownBy(() -> post.close(userId))
@@ -113,11 +113,11 @@ class PostTest {
     void close_notPostAuthor() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
+        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
 
         //when then
         assertThatThrownBy(() -> post.close(2L))
@@ -130,11 +130,11 @@ class PostTest {
     void toggleScope() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
+        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
 
         //when then
         post.toggleScope(userId);
@@ -150,11 +150,11 @@ class PostTest {
     void toggleScope_notPostAuthor() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
+        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
 
         //when then
         assertThatThrownBy(() -> post.toggleScope(2L))
@@ -167,17 +167,17 @@ class PostTest {
     void getBestPickedImage() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
-        post.getImages().get(0).increaseVoteCount();
-        post.getImages().get(0).increaseVoteCount();
-        post.getImages().get(1).increaseVoteCount();
+        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
+        post.getPollChoices().get(0).increaseVoteCount();
+        post.getPollChoices().get(0).increaseVoteCount();
+        post.getPollChoices().get(1).increaseVoteCount();
 
         //when
-        PostImage bestPickedImage = post.getBestPickedImage();
+        PollChoice bestPickedImage = post.getBestPickedImage();
 
         //then
         assertThat(bestPickedImage.getName()).isEqualTo("뽀또A");
@@ -188,16 +188,16 @@ class PostTest {
     void getBestPickedImage_saveVoteCount() throws Exception {
         //given
         long userId = 1L;
-        List<PostImage> postImages = List.of(
-                PostImage.create("뽀또A", 1L),
-                PostImage.create("뽀또B", 2L)
+        List<PollChoice> pollChoices = List.of(
+                PollChoice.create("뽀또A", 1L),
+                PollChoice.create("뽀또B", 2L)
         );
-        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, postImages, "shareUrl", VoteType.SINGLE);
-        post.getImages().get(0).increaseVoteCount();
-        post.getImages().get(1).increaseVoteCount();
+        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
+        post.getPollChoices().get(0).increaseVoteCount();
+        post.getPollChoices().get(1).increaseVoteCount();
 
         //when
-        PostImage bestPickedImage = post.getBestPickedImage();
+        PollChoice bestPickedImage = post.getBestPickedImage();
 
         //then
         assertThat(bestPickedImage.getName()).isEqualTo("뽀또A");

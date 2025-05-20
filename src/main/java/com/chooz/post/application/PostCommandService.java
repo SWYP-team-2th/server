@@ -3,7 +3,7 @@ package com.chooz.post.application;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostImage;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
@@ -22,17 +22,17 @@ public class PostCommandService {
     private final ShareUrlService shareUrlShareUrlService;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
-        List<PostImage> postImages = createPostImages(request);
-        Post post = Post.create(userId, request.description(), postImages, request.scope(), request.voteType());
+        List<PollChoice> pollChoices = createPollChoices(request);
+        Post post = Post.create(userId, request.description(), pollChoices, request.scope(), request.voteType());
         Post save = postRepository.save(post);
         save.setShareUrl(shareUrlShareUrlService.encrypt(String.valueOf(save.getId())));
         return new CreatePostResponse(save.getId(), save.getShareUrl());
     }
 
-    private List<PostImage> createPostImages(CreatePostRequest request) {
-        PostImageNameGenerator nameGenerator = new PostImageNameGenerator();
+    private List<PollChoice> createPollChoices(CreatePostRequest request) {
+        PollChoiceNameGenerator nameGenerator = new PollChoiceNameGenerator();
         return request.images().stream()
-                .map(voteRequestDto -> PostImage.create(
+                .map(voteRequestDto -> PollChoice.create(
                         nameGenerator.generate(),
                         voteRequestDto.imageFileId()
                 )).toList();

@@ -15,7 +15,7 @@ import static com.chooz.common.util.Validator.validateNull;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostImage {
+public class PollChoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class PostImage {
 
     private int voteCount;
 
-    public PostImage(Long id, Post post, String name, Long imageFileId, int voteCount) {
+    public PollChoice(Long id, Post post, String name, Long imageFileId, int voteCount) {
         this.id = id;
         this.post = post;
         this.name = name;
@@ -38,14 +38,14 @@ public class PostImage {
         this.voteCount = voteCount;
     }
 
-    public PostImage(String name, Long imageFileId, int voteCount) {
+    public PollChoice(String name, Long imageFileId, int voteCount) {
         this.name = name;
         this.imageFileId = imageFileId;
         this.voteCount = voteCount;
     }
 
-    public static PostImage create(String name, Long imageFileId) {
-        return new PostImage(name, imageFileId, 0);
+    public static PollChoice create(String name, Long imageFileId) {
+        return new PollChoice(name, imageFileId, 0);
     }
 
     public void setPost(Post post) {

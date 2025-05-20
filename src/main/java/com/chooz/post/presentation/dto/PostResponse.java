@@ -11,13 +11,13 @@ public record PostResponse(
         Long id,
         AuthorDto author,
         String description,
-        List<PostImageResponse> images,
+        List<PollChoiceResponse> images,
         String shareUrl,
         boolean isAuthor,
         Status status,
         LocalDateTime createdAt
 ) {
-    public static PostResponse of(Post post, User user, List<PostImageResponse> images, boolean isAuthor) {
+    public static PostResponse of(Post post, User user, List<PollChoiceResponse> images, boolean isAuthor) {
         return new PostResponse(
                 post.getId(),
                 AuthorDto.of(user),

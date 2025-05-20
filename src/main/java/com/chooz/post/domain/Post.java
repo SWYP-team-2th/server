@@ -24,7 +24,7 @@ import java.util.Objects;
 
 @Getter
 @Entity
-@ToString(exclude = "images")
+@ToString(exclude = "pollChoices")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
 
@@ -43,7 +43,7 @@ public class Post extends BaseEntity {
     private Scope scope;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
-    private List<PostImage> images = new ArrayList<>();
+    private List<PollChoice> pollChoices = new ArrayList<>();
 
     private String shareUrl;
 
@@ -55,26 +55,26 @@ public class Post extends BaseEntity {
             String description,
             Status status,
             Scope scope,
-            List<PostImage> images,
+            List<PollChoice> pollChoices,
             String shareUrl,
             VoteType voteType
     ) {
         validateDescription(description);
-        validatePostImages(images);
+        validatePollChoices(pollChoices);
         this.id = id;
         this.description = description;
         this.userId = userId;
         this.status = status;
         this.scope = scope;
-        this.images = images;
-        images.forEach(image -> image.setPost(this));
+        this.pollChoices = pollChoices;
+        pollChoices.forEach(image -> image.setPost(this));
         this.shareUrl = shareUrl;
         this.voteType = voteType;
     }
 
-    private void validatePostImages(List<PostImage> images) {
+    private void validatePollChoices(List<PollChoice> images) {
         if (images.size() < 2 || images.size() > 9) {
-            throw new BadRequestException(ErrorCode.INVALID_POST_IMAGE_COUNT);
+            throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
         }
     }
 
@@ -84,29 +84,29 @@ public class Post extends BaseEntity {
         }
     }
 
-    public static Post create(Long userId, String description, List<PostImage> images, Scope scope, VoteType voteType) {
+    public static Post create(Long userId, String description, List<PollChoice> images, Scope scope, VoteType voteType) {
         return new Post(null, userId, description, Status.PROGRESS, scope, images, null, voteType);
     }
 
-    public PostImage getBestPickedImage() {
-        return images.stream()
-                .max(Comparator.comparing(PostImage::getVoteCount))
-                .orElseThrow(() -> new InternalServerException(ErrorCode.POST_IMAGE_NOT_FOUND));
+    public PollChoice getBestPickedImage() {
+        return pollChoices.stream()
+                .max(Comparator.comparing(PollChoice::getVoteCount))
+                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
     }
 
     public void vote(Long imageId) {
-        PostImage image = images.stream()
-                .filter(postImage -> postImage.getId().equals(imageId))
+        PollChoice image = pollChoices.stream()
+                .filter(pollChoice -> pollChoice.getId().equals(imageId))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_IMAGE_NOT_FOUND));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.POLL_CHOICE_NOT_FOUND));
         image.increaseVoteCount();
     }
 
     public void cancelVote(Long imageId) {
-        PostImage image = images.stream()
-                .filter(postImage -> postImage.getId().equals(imageId))
+        PollChoice image = pollChoices.stream()
+                .filter(pollChoice -> pollChoice.getId().equals(imageId))
                 .findFirst()
-                .orElseThrow(() -> new InternalServerException(ErrorCode.POST_IMAGE_NOT_FOUND));
+                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
         image.decreaseVoteCount();
     }
 

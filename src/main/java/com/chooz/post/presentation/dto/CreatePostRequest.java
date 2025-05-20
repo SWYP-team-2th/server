@@ -12,7 +12,7 @@ public record CreatePostRequest(
         String description,
 
         @Valid @NotNull
-        List<PostImageRequestDto> images,
+        List<PollChoiceRequestDto> images,
 
         @NotNull
         Scope scope,

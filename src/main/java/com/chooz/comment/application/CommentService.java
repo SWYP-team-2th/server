@@ -51,7 +51,7 @@ public class CommentService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
         List<Vote> votes = voteRepository.findByUserIdAndPostId(userId, comment.getPostId());
         List<Long> voteImageIds = votes.stream()
-                .map(Vote::getPostImageId)
+                .map(Vote::getPollChoiceId)
                 .collect(Collectors.toList());
         return CommentResponse.of(comment, author, author.getId().equals(userId), voteImageIds);
     }
