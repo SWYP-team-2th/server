@@ -17,6 +17,8 @@ public enum ErrorCode {
     EXCEED_MAX_FILE_SIZE("파일 크기가 초과했습니다."),
     POST_NOT_FOUND("존재하지 않는 게시글입니다."),
     DESCRIPTION_LENGTH_EXCEEDED("게시글 설명 길이가 초과했습니다."),
+    TITLE_IS_REQUIRED("게시글 제목은 필수입니다."),
+    TITLE_LENGTH_EXCEEDED("게시글 제목 길이가 초과했습니다."),
     INVALID_POLL_CHOICE_COUNT("투표 선택지 개수가 범위를 벗어났습니다."),
     NOT_POST_AUTHOR("게시글 작성자가 아닙니다."),
     POST_ALREADY_CLOSED("이미 마감된 게시글입니다."),
@@ -25,6 +27,10 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND("존재하지 않는 댓글입니다."),
     VOTE_NOT_FOUND("존재하지 않는 투표입니다."),
     NOT_VOTER("투표자가 아닙니다."),
+    CLOSED_AT_REQUIRED("마감 시간 설정이 필요합니다."),
+    MAX_VOTER_COUNT_REQUIRED("최대 투표자 수 설정이 필요합니다."),
+    INVALID_MAX_VOTER_COUNT("올바르지 않은 최대 투표자 수입니다."),
+    INVALID_DATE("잘못된 마감 시간입니다"),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

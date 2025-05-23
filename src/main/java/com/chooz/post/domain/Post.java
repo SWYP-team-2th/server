@@ -5,6 +5,7 @@ import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.common.exception.InternalServerException;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,10 +18,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import static com.chooz.common.util.Validator.validateNull;
 
 @Getter
 @Entity
@@ -32,6 +36,8 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
     private String description;
 
     private Long userId;
@@ -39,37 +45,42 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Enumerated(EnumType.STRING)
-    private Scope scope;
-
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<PollChoice> pollChoices = new ArrayList<>();
 
     private String shareUrl;
 
-    private VoteType voteType;
+    @Embedded
+    private PollOption pollOption;
+    
+    @Embedded
+    private CloseOption closeOption;
 
     public Post(
             Long id,
             Long userId,
+            String title,
             String description,
             Status status,
-            Scope scope,
             List<PollChoice> pollChoices,
             String shareUrl,
-            VoteType voteType
+            PollOption pollOption,
+            CloseOption closeOption
     ) {
+        validateNull(userId, title, description, status, pollChoices);
+        validateTitle(title);
         validateDescription(description);
         validatePollChoices(pollChoices);
         this.id = id;
+        this.title = title;
         this.description = description;
         this.userId = userId;
         this.status = status;
-        this.scope = scope;
         this.pollChoices = pollChoices;
-        pollChoices.forEach(image -> image.setPost(this));
+        pollChoices.forEach(pollChoice -> pollChoice.setPost(this));
         this.shareUrl = shareUrl;
-        this.voteType = voteType;
+        this.pollOption = pollOption;
+        this.closeOption = closeOption;
     }
 
     private void validatePollChoices(List<PollChoice> images) {
@@ -83,9 +94,32 @@ public class Post extends BaseEntity {
             throw new BadRequestException(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED);
         }
     }
+    
+    private void validateTitle(String title) {
+        if (title.length() > 50) {
+            throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
+        }
+    }
 
-    public static Post create(Long userId, String description, List<PollChoice> images, Scope scope, VoteType voteType) {
-        return new Post(null, userId, description, Status.PROGRESS, scope, images, null, voteType);
+    public static Post create(
+            Long userId, 
+            String title,
+            String description, 
+            List<PollChoice> pollChoices,
+            PollOption pollOption,
+            CloseOption closeOption
+    ) {
+        return new Post(
+                null, 
+                userId, 
+                title,
+                description, 
+                Status.PROGRESS, 
+                pollChoices,
+                null, 
+                pollOption,
+                closeOption
+        );
     }
 
     public PollChoice getBestPickedImage() {
@@ -141,6 +175,6 @@ public class Post extends BaseEntity {
         if (!isAuthor(userId)) {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
-        this.scope = scope.equals(Scope.PRIVATE) ? Scope.PUBLIC : Scope.PRIVATE;
+        pollOption.toggleScope();
     }
 }
