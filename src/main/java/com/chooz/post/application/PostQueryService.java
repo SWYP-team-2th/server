@@ -39,11 +39,10 @@ public class PostQueryService {
     private final UserRepository userRepository;
     private final ImageFileRepository imageFileRepository;
     private final VoteRepository voteRepository;
-    private final ShareUrlService shareUrlShareUrlService;
 
     public PostResponse findByShareUrl(Long userId, String shareUrl) {
-        String decrypt = shareUrlShareUrlService.decrypt(shareUrl);
-        return findById(userId, Long.valueOf(decrypt));
+//        String decrypt = shareUrlBase62Encryptor.decrypt(shareUrl);
+        return findById(userId, Long.valueOf("decrypt"));
     }
 
     public PostResponse findById(Long userId, Long postId) {

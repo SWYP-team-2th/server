@@ -2,6 +2,8 @@ package com.chooz.post.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.domain.CloseOption;
+import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
@@ -19,19 +21,35 @@ import java.util.List;
 public class PostCommandService {
 
     private final PostRepository postRepository;
-    private final ShareUrlService shareUrlShareUrlService;
+    private final ShareUrlService shareUrlService;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         List<PollChoice> pollChoices = createPollChoices(request);
-        Post post = Post.create(userId, request.description(), pollChoices, request.scope(), request.voteType());
+        Post post = Post.create(
+                userId,
+                request.title(),
+                request.description(),
+                pollChoices,
+                PollOption.create(
+                        request.pollOptionDto().pollType(),
+                        request.pollOptionDto().scope(),
+                        request.pollOptionDto().commentActive()
+                ),
+                CloseOption.create(
+                        request.closeOptionDto().closeType(),
+                        request.closeOptionDto().closedAt(),
+                        request.closeOptionDto().maxVoterCount()
+                )
+        );
+        String shareUrl = shareUrlService.generateShareUrl();
         Post save = postRepository.save(post);
-        save.setShareUrl(shareUrlShareUrlService.encrypt(String.valueOf(save.getId())));
+//        save.setShareUrl(shareUrlBase62Encryptor.encrypt(String.valueOf(save.getId())));
         return new CreatePostResponse(save.getId(), save.getShareUrl());
     }
 
     private List<PollChoice> createPollChoices(CreatePostRequest request) {
         PollChoiceNameGenerator nameGenerator = new PollChoiceNameGenerator();
-        return request.images().stream()
+        return request.pollChoices().stream()
                 .map(voteRequestDto -> PollChoice.create(
                         nameGenerator.generate(),
                         voteRequestDto.imageFileId()

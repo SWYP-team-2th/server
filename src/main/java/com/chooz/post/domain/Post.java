@@ -106,6 +106,7 @@ public class Post extends BaseEntity {
             String title,
             String description, 
             List<PollChoice> pollChoices,
+            String shareUrl,
             PollOption pollOption,
             CloseOption closeOption
     ) {
@@ -114,9 +115,9 @@ public class Post extends BaseEntity {
                 userId, 
                 title,
                 description, 
-                Status.PROGRESS, 
+                Status.PROGRESS,
                 pollChoices,
-                null, 
+                shareUrl,
                 pollOption,
                 closeOption
         );

@@ -16,7 +16,7 @@ public class ShareUrlKeyGenerator {
     private final Clock clock;
     
     public String generateKey() {
-        int currentCount = counter.getAndIncrement();
+        int currentCount = counter.getAndUpdate(i -> i > 100 ? i + 1 : 0);
         long now = LocalDateTime.now(clock)
                 .atZone(ZoneId.systemDefault())
                 .toInstant()

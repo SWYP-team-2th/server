@@ -34,7 +34,6 @@ public class PollOption {
         return new PollOption(pollType, scope, commentActive);
     }
 
-
     public void toggleScope() {
         this.scope = scope.equals(Scope.PRIVATE) ? Scope.PUBLIC : Scope.PRIVATE;
     }
