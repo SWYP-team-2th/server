@@ -9,10 +9,14 @@ import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
+import com.chooz.post.presentation.dto.PollChoiceRequestDto;
+import com.chooz.thumbnail.domain.Thumbnail;
+import com.chooz.thumbnail.domain.ThumbnailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,14 +26,23 @@ public class PostCommandService {
 
     private final PostRepository postRepository;
     private final ShareUrlService shareUrlService;
+    private final ThumbnailRepository thumbnailRepository;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
+        Post post = createPost(userId, request);
+        savePostThumbnail(post);
+        return new CreatePostResponse(post.getId(), post.getShareUrl());
+    }
+
+    private Post createPost(Long userId, CreatePostRequest request) {
         List<PollChoice> pollChoices = createPollChoices(request);
+        String shareUrl = shareUrlService.generateShareUrl();
         Post post = Post.create(
                 userId,
                 request.title(),
                 request.description(),
                 pollChoices,
+                shareUrl,
                 PollOption.create(
                         request.pollOptionDto().pollType(),
                         request.pollOptionDto().scope(),
@@ -41,19 +54,25 @@ public class PostCommandService {
                         request.closeOptionDto().maxVoterCount()
                 )
         );
-        String shareUrl = shareUrlService.generateShareUrl();
-        Post save = postRepository.save(post);
-//        save.setShareUrl(shareUrlBase62Encryptor.encrypt(String.valueOf(save.getId())));
-        return new CreatePostResponse(save.getId(), save.getShareUrl());
+        return postRepository.save(post);
     }
 
     private List<PollChoice> createPollChoices(CreatePostRequest request) {
-        PollChoiceNameGenerator nameGenerator = new PollChoiceNameGenerator();
-        return request.pollChoices().stream()
-                .map(voteRequestDto -> PollChoice.create(
-                        nameGenerator.generate(),
-                        voteRequestDto.imageFileId()
-                )).toList();
+        List<PollChoice> pollChoices = new ArrayList<>();
+        List<PollChoiceRequestDto> pollChoiceDtoList = request.pollChoices();
+        for (int orderSeq = 0; orderSeq < pollChoiceDtoList.size(); orderSeq++) {
+            PollChoiceRequestDto pollChoiceDto = pollChoiceDtoList.get(orderSeq);
+            PollChoice pollChoice = PollChoice.create(pollChoiceDto.title(), pollChoiceDto.imageUrl(), orderSeq);
+            pollChoices.add(pollChoice);
+        }
+        return pollChoices;
+    }
+
+    private void savePostThumbnail(Post post) {
+        PollChoice thumbnailPollChoice = post.getPollChoices().getFirst();
+        thumbnailRepository.save(
+                Thumbnail.create(post.getId(), thumbnailPollChoice.getId(), thumbnailPollChoice.getImageUrl())
+        );
     }
 
     @Transactional

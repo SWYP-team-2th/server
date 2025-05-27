@@ -1,9 +1,11 @@
 package com.chooz.post.presentation;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
+import com.chooz.post.domain.CloseType;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollType;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.domain.Status;
-import com.chooz.post.domain.VoteType;
 import com.chooz.post.presentation.dto.*;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
@@ -41,10 +43,14 @@ class PostControllerTest extends RestDocsTest {
     void createPost() throws Exception {
         //given
         CreatePostRequest request = new CreatePostRequest(
-                "제목",
-                List.of(new PollChoiceRequestDto(1L), new PollChoiceRequestDto(2L)),
-                Scope.PRIVATE,
-                VoteType.SINGLE
+                "title",
+                "description",
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new CreatePostRequest.PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CreatePostRequest.CloseOptionDto(CloseType.SELF, null, null)
         );
         CreatePostResponse response = new CreatePostResponse(1L, "shareUrl");
         given(postService.create(any(), any()))
@@ -60,23 +66,50 @@ class PostControllerTest extends RestDocsTest {
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
                         requestFields(
+                                fieldWithPath("title")
+                                        .type(JsonFieldType.STRING)
+                                        .description("게시글 제목")
+                                        .attributes(constraints("1~50자 사이")),
                                 fieldWithPath("description")
                                         .type(JsonFieldType.STRING)
                                         .description("설명")
                                         .attributes(constraints("0~100자 사이")),
-                                fieldWithPath("images")
+                                fieldWithPath("pollChoices")
                                         .type(JsonFieldType.ARRAY)
-                                        .description("투표 후보")
+                                        .description("투표 선택지")
                                         .attributes(constraints("최소 2개")),
-                                fieldWithPath("images[].imageFileId")
+                                fieldWithPath("pollChoices[].title")
+                                        .type(JsonFieldType.STRING)
+                                        .description("투표 선택지 제목"),
+                                fieldWithPath("pollChoices[].imageUrl")
+                                        .type(JsonFieldType.STRING)
+                                        .description("투표 선택지 이미지 url"),
+                                fieldWithPath("pollOptions")
+                                        .type(JsonFieldType.OBJECT)
+                                        .description("투표 옵션"),
+                                fieldWithPath("pollOptions.scope")
+                                        .type(JsonFieldType.STRING)
+                                        .description(enumDescription("투표 공개 범위", Scope.class)),
+                                fieldWithPath("pollOptions.pollType")
+                                        .type(JsonFieldType.STRING)
+                                        .description(enumDescription("투표 방식", PollType.class)),
+                                fieldWithPath("pollOptions.commentActive")
+                                        .type(JsonFieldType.STRING)
+                                        .description(enumDescription("게시글 댓글 활성화 여부", CommentActive.class)),
+                                fieldWithPath("closeOptions")
+                                        .type(JsonFieldType.OBJECT)
+                                        .description("투표 마감 옵션"),
+                                fieldWithPath("closeOptions.closeType")
+                                        .type(JsonFieldType.STRING)
+                                        .description(enumDescription("투표 마감 방식", CloseType.class)),
+                                fieldWithPath("closeOptions.closedAt")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("투표 마감 시간"),
+                                fieldWithPath("closeOptions.maxVoterCount")
                                         .type(JsonFieldType.NUMBER)
-                                        .description("투표 후보 이미지 ID"),
-                                fieldWithPath("scope")
-                                        .type(JsonFieldType.STRING)
-                                        .description("투표 공개범위 (PRIVATE, PUBLIC)"),
-                                fieldWithPath("voteType")
-                                        .type(JsonFieldType.STRING)
-                                        .description("투표 방식 (SINGLE, MULTIPLE)")
+                                        .optional()
+                                        .description("투표 최대 참여자 수")
                         ),
                         responseFields(
                                 fieldWithPath("postId")
@@ -129,12 +162,12 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("author.nickname").type(JsonFieldType.STRING).description("게시글 작성자 닉네임"),
                                 fieldWithPath("author.profileUrl").type(JsonFieldType.STRING).description("게시글 작성자 프로필 이미지"),
                                 fieldWithPath("description").type(JsonFieldType.STRING).description("설명"),
-                                fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
-                                fieldWithPath("images[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
-                                fieldWithPath("images[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
-                                fieldWithPath("images[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
-                                fieldWithPath("images[].thumbnailUrl").type(JsonFieldType.STRING).description("확대 사진 이미지"),
-                                fieldWithPath("images[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
+                                fieldWithPath("pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
+                                fieldWithPath("pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
+                                fieldWithPath("pollChoices[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
+                                fieldWithPath("pollChoices[].thumbnailUrl").type(JsonFieldType.STRING).description("확대 사진 이미지"),
+                                fieldWithPath("pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
                                 fieldWithPath("shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
                                 fieldWithPath("createdAt").type(JsonFieldType.STRING).description("게시글 생성 시간"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
@@ -390,12 +423,12 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].author.id").type(JsonFieldType.NUMBER).description("게시글 작성자 유저 ID"),
                                 fieldWithPath("data[].author.nickname").type(JsonFieldType.STRING).description("게시글 작성자 닉네임"),
                                 fieldWithPath("data[].author.profileUrl").type(JsonFieldType.STRING).description("게시글 작성자 프로필 이미지"),
-                                fieldWithPath("data[].images[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
-                                fieldWithPath("data[].images[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
-                                fieldWithPath("data[].images[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
-                                fieldWithPath("data[].images[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
-                                fieldWithPath("data[].images[].thumbnailUrl").type(JsonFieldType.STRING).description("나중에 없어질 예정"),
-                                fieldWithPath("data[].images[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
+                                fieldWithPath("data[].pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
+                                fieldWithPath("data[].pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
+                                fieldWithPath("data[].pollChoices[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("data[].pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
+                                fieldWithPath("data[].pollChoices[].thumbnailUrl").type(JsonFieldType.STRING).description("나중에 없어질 예정"),
+                                fieldWithPath("data[].pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
                                 fieldWithPath("data[].status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
                                 fieldWithPath("data[].description").type(JsonFieldType.STRING).description("설명"),
                                 fieldWithPath("data[].shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),

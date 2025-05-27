@@ -12,17 +12,17 @@ class PollChoiceTest {
     @DisplayName("게시글 이미지 생성")
     void create() throws Exception {
         //given
-        String name = "뽀또A";
-        long imageFileId = 1L;
+        String title = "title";
+        String imageUrl = "https://example.com/image.jpg";
 
         //when
-        PollChoice pollChoice = PollChoice.create(name, imageFileId);
+        PollChoice pollChoice = PollChoice.create(title, imageUrl, 0);
 
         //then
         assertAll(
-                () -> assertThat(pollChoice.getName()).isEqualTo(name),
-                () -> assertThat(pollChoice.getImageFileId()).isEqualTo(imageFileId),
-                () -> assertThat(pollChoice.getVoteCount()).isEqualTo(0)
+                () -> assertThat(pollChoice.getTitle()).isEqualTo(title),
+                () -> assertThat(pollChoice.getImageUrl()).isEqualTo(imageUrl),
+                () -> assertThat(pollChoice.getOrderSeq()).isEqualTo(0)
         );
     }
 }

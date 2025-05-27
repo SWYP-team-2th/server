@@ -13,10 +13,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +32,8 @@ import static com.chooz.common.util.Validator.validateNull;
 @Getter
 @Entity
 @ToString(exclude = "pollChoices")
+@Table(name = "posts")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
 
@@ -96,7 +101,7 @@ public class Post extends BaseEntity {
     }
     
     private void validateTitle(String title) {
-        if (title.length() > 50) {
+        if (StringUtils.hasText(title) && title.length() > 50) {
             throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
         }
     }
@@ -123,18 +128,18 @@ public class Post extends BaseEntity {
         );
     }
 
-    public PollChoice getBestPickedImage() {
-        return pollChoices.stream()
-                .max(Comparator.comparing(PollChoice::getVoteCount))
-                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-    }
+//    public PollChoice getBestPickedImage() {
+//        return pollChoices.stream()
+//                .max(Comparator.comparing(PollChoice::getVoteCount))
+//                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
+//    }
 
     public void vote(Long imageId) {
         PollChoice image = pollChoices.stream()
                 .filter(pollChoice -> pollChoice.getId().equals(imageId))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-        image.increaseVoteCount();
+//        image.increaseVoteCount();
     }
 
     public void cancelVote(Long imageId) {
@@ -142,7 +147,7 @@ public class Post extends BaseEntity {
                 .filter(pollChoice -> pollChoice.getId().equals(imageId))
                 .findFirst()
                 .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-        image.decreaseVoteCount();
+//        image.decreaseVoteCount();
     }
 
     public void close(Long userId) {

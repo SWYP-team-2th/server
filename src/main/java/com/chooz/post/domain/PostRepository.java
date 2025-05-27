@@ -58,10 +58,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             FROM Post p
             INNER JOIN User u on p.userId = u.id
             WHERE p.deleted = false
-            AND p.scope = 'PUBLIC'
+            AND p.pollOption.scope = 'PUBLIC'
             AND (:postId IS NULL OR p.id < :postId)
             ORDER BY p.createdAt DESC
             """
     )
     Slice<FeedDto> findFeedByScopeWithUser(@Param("userId") Long userId, @Param("postId") Long postId, Pageable pageable);
+
+    Optional<Post> findByShareUrl(String shareUrl);
 }
