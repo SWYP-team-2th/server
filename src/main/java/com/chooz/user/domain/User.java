@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,7 @@ public class User extends BaseEntity {
     @Enumerated(jakarta.persistence.EnumType.STRING)
     public Role role;
 
+    @Builder
     public User(Long id, String nickname, String profileUrl, Role role) {
         this.id = id;
         this.nickname = nickname;

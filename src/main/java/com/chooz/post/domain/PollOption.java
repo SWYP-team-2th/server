@@ -23,7 +23,7 @@ public class PollOption {
     @Enumerated(EnumType.STRING)
     private CommentActive commentActive;
     
-    private PollOption(PollType pollType, Scope scope, CommentActive commentActive) {
+    public PollOption(PollType pollType, Scope scope, CommentActive commentActive) {
         validateNull(pollType, scope, commentActive);
         this.pollType = pollType;
         this.scope = scope;

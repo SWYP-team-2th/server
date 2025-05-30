@@ -2,16 +2,17 @@ package com.chooz.vote.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.domain.PollType;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
-import com.chooz.post.domain.VoteType;
 import com.chooz.vote.presentation.dto.PollChoiceStatusResponse;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class VoteService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final RatioCalculator ratioCalculator;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long vote(Long voterId, Long postId, Long pollChoiceId) {
@@ -41,12 +43,23 @@ public class VoteService {
 
         User voter = userRepository.findById(voterId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-
-        VoteType voteType = post.getVoteType();
-        if (VoteType.SINGLE.equals(voteType)) {
+        PollType voteType = post.getPollOption().getPollType();
+        if (PollType.SINGLE.equals(voteType)) {
             deleteVoteIfExisting(post, voter.getId());
         }
-        Vote vote = createVote(post, pollChoiceId, voter.getId());
+
+        Vote vote = voteRepository.save(Vote.create(post.getId(), pollChoiceId, voterId));
+//        eventPublisher.publishEvent(
+//                new VoteEvent(this, post.getId(), pollChoiceId, voterId)
+//        );
+
+        //closetype이 date일 경우
+        //closeat 관리 테이블 따로 분리해야 할 듯
+        //분 주기로 스케줄링
+
+        //closeType이 maxVoterCount일 경우
+        //count 조회해서 처리
+
         return vote.getId();
     }
 
@@ -59,7 +72,7 @@ public class VoteService {
     }
 
     private Vote createVote(Post post, Long pollChoiceId, Long userId) {
-        Vote vote = voteRepository.save(Vote.of(post.getId(), pollChoiceId, userId));
+        Vote vote = voteRepository.save(Vote.create(post.getId(), pollChoiceId, userId));
         post.vote(pollChoiceId);
         return vote;
     }
@@ -78,17 +91,18 @@ public class VoteService {
     }
 
     public List<PollChoiceStatusResponse> findVoteStatus(Long userId, Long postId) {
-        Post post = postRepository.findByIdFetchPollChoices(postId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        validateVoteStatus(userId, post);
-        int totalVoteCount = getTotalVoteCount(post.getPollChoices());
-        return post.getPollChoices().stream()
-                .map(image -> {
-                    String ratio = ratioCalculator.calculate(totalVoteCount, image.getVoteCount());
-                    return new PollChoiceStatusResponse(image.getId(), image.getName(), image.getVoteCount(), ratio);
-                })
-                .sorted(Comparator.comparingInt(PollChoiceStatusResponse::voteCount).reversed())
-                .toList();
+//        Post post = postRepository.findByIdFetchPollChoices(postId)
+//                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+//        validateVoteStatus(userId, post);
+//        int totalVoteCount = getTotalVoteCount(post.getPollChoices());
+//        return post.getPollChoices().stream()
+//                .map(image -> {
+//                    String ratio = ratioCalculator.calculate(totalVoteCount, image.getVoteCount());
+//                    return new PollChoiceStatusResponse(image.getId(), image.getTitle(), image.getVoteCount(), ratio);
+//                })
+//                .sorted(Comparator.comparingInt(PollChoiceStatusResponse::voteCount).reversed())
+//                .toList();
+        return null;
     }
 
     private void validateVoteStatus(Long userId, Post post) {
@@ -98,11 +112,11 @@ public class VoteService {
         }
     }
 
-    private int getTotalVoteCount(List<PollChoice> images) {
-        int totalVoteCount = 0;
-        for (PollChoice image : images) {
-            totalVoteCount += image.getVoteCount();
-        }
-        return totalVoteCount;
-    }
+//    private int getTotalVoteCount(List<PollChoice> images) {
+//        int totalVoteCount = 0;
+//        for (PollChoice image : images) {
+//            totalVoteCount += image.getVoteCount();
+//        }
+//        return totalVoteCount;
+//    }
 }

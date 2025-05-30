@@ -1,6 +1,8 @@
 package com.chooz.vote.domain;
 
 import com.chooz.common.domain.BaseEntity;
+import com.chooz.post.domain.PollChoice;
+import com.chooz.post.domain.Post;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,7 +35,7 @@ public class Vote extends BaseEntity {
         this.userId = userId;
     }
 
-    public static Vote of(Long postId, Long pollChoiceId, Long userId) {
+    public static Vote create(Long postId, Long pollChoiceId, Long userId) {
         return new Vote(null, postId, pollChoiceId, userId);
     }
 
