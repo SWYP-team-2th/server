@@ -7,15 +7,15 @@ import java.time.LocalDateTime;
 
 public record SimplePostResponse(
         long id,
-        String bestPickedImageUrl,
+        String thumbnailImageUrl,
         String shareUrl,
         LocalDateTime createdAt
 ) implements CursorDto {
 
-    public static SimplePostResponse of(Post post, String bestPickedImageUrl) {
+    public static SimplePostResponse of(Post post, String thumbnailImageUrl) {
         return new SimplePostResponse(
                 post.getId(),
-                bestPickedImageUrl,
+                thumbnailImageUrl,
                 post.getShareUrl(),
                 post.getCreatedAt()
         );

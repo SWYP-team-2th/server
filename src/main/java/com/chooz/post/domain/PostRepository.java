@@ -46,17 +46,18 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(""" 
             SELECT new com.chooz.post.presentation.dto.FeedDto(
                     p.id,
-                   	p.status ,
-                   	p.description ,
-                   	p.shareUrl ,
-                   	p.userId ,
-                   	u.nickname, 
+                   	p.status,
+                   	p.title,
+                    t.thumbnailUrl,
+                   	p.userId,
+                   	u.nickname,
                    	u.profileUrl,
                    	cast((select count(distinct v.userId) from Vote v where p.id = v.postId) as long),
                    	cast((select count(*) from Comment c where p.id = c.postId and c.deleted = false) as long)
             )
             FROM Post p
             INNER JOIN User u on p.userId = u.id
+            LEFT JOIN Thumbnail t on p.id = t.postId
             WHERE p.deleted = false
             AND p.pollOption.scope = 'PUBLIC'
             AND (:postId IS NULL OR p.id < :postId)

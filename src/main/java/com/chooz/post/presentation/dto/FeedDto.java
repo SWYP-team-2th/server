@@ -5,11 +5,12 @@ import com.chooz.post.domain.Status;
 public record FeedDto(
         Long postId,
         Status status,
-        String description,
-        String shareUrl,
+        String title,
+        String thumbnailUrl,
         Long postUserId,
         String nickname,
         String profileUrl,
-        Long participantCount,
-        Long commentCount) {
+        Long voterCount,
+        Long commentCount
+) {
 }

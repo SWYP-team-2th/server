@@ -16,13 +16,12 @@ class PollChoiceTest {
         String imageUrl = "https://example.com/image.jpg";
 
         //when
-        PollChoice pollChoice = PollChoice.create(title, imageUrl, 0);
+        PollChoice pollChoice = PollChoice.create(title, imageUrl);
 
         //then
         assertAll(
                 () -> assertThat(pollChoice.getTitle()).isEqualTo(title),
-                () -> assertThat(pollChoice.getImageUrl()).isEqualTo(imageUrl),
-                () -> assertThat(pollChoice.getOrderSeq()).isEqualTo(0)
+                () -> assertThat(pollChoice.getImageUrl()).isEqualTo(imageUrl)
         );
     }
 }

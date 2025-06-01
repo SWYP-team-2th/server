@@ -243,7 +243,7 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("게시글 Id"),
-                                fieldWithPath("data[].bestPickedImageUrl")
+                                fieldWithPath("data[].thumbnailImageUrl")
                                         .type(JsonFieldType.STRING)
                                         .description("가장 많은 득표를 받은 이미지 URL"),
                                 fieldWithPath("data[].shareUrl")
@@ -299,7 +299,7 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("게시글 Id"),
-                                fieldWithPath("data[].bestPickedImageUrl")
+                                fieldWithPath("data[].thumbnailImageUrl")
                                         .type(JsonFieldType.STRING)
                                         .description("가장 많은 득표를 받은 이미지 URL"),
                                 fieldWithPath("data[].shareUrl")
@@ -396,13 +396,9 @@ class PostControllerTest extends RestDocsTest {
                                         "author",
                                         "https://image.chooz.site/profile-image"
                                 ),
-                                List.of(
-                                        new PollChoiceResponse(1L, "뽀또A", "https://image.chooz.site/image/1", 1L),
-                                        new PollChoiceResponse(2L, "뽀또B", "https://image.chooz.site/image/2", null)
-                                ),
                                 Status.PROGRESS,
-                                "description",
-                                "anioefw78f329jcs9",
+                                "title",
+                                "http://example.com/image/1",
                                 true,
                                 1L,
                                 2L
@@ -438,7 +434,7 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].description").type(JsonFieldType.STRING).description("설명"),
                                 fieldWithPath("data[].shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
                                 fieldWithPath("data[].isAuthor").type(JsonFieldType.BOOLEAN).description("게시글 작성자 여부"),
-                                fieldWithPath("data[].participantCount").type(JsonFieldType.NUMBER).description("투표 참여자 수"),
+                                fieldWithPath("data[].voterCount").type(JsonFieldType.NUMBER).description("투표 참여자 수"),
                                 fieldWithPath("data[].commentCount").type(JsonFieldType.NUMBER).description("투표 댓글 수")
                         )
                 ));

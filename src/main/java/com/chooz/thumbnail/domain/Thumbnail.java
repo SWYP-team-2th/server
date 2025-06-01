@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,7 @@ public class Thumbnail {
 
     private String thumbnailUrl;
 
+    @Builder
     public Thumbnail(Long id, Long postId, Long pollChoiceId, String thumbnailUrl) {
         validateNull(postId, pollChoiceId, thumbnailUrl);
         this.id = id;
@@ -37,5 +39,9 @@ public class Thumbnail {
 
     public static Thumbnail create(Long postId, Long pollChoiceId, String thumbnailUrl) {
         return new Thumbnail(null, postId, pollChoiceId, thumbnailUrl);
+    }
+
+    public boolean isThumbnailOf(Long postId) {
+        return this.postId.equals(postId);
     }
 }

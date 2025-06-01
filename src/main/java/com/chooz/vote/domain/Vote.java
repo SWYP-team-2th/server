@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,7 @@ public class Vote extends BaseEntity {
 
     private Long userId;
 
+    @Builder
     public Vote(Long id, Long postId, Long pollChoiceId, Long userId) {
         this.id = id;
         this.postId = postId;

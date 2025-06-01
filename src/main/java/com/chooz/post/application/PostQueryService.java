@@ -4,17 +4,19 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.image.domain.ImageFile;
-import com.chooz.image.domain.ImageFileRepository;
+import com.chooz.common.exception.InternalServerException;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.PostRepository;
+import com.chooz.post.presentation.dto.AuthorDto;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.PollChoiceResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.SimplePostResponse;
 import com.chooz.post.presentation.dto.FeedDto;
+import com.chooz.thumbnail.domain.Thumbnail;
+import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
@@ -22,6 +24,7 @@ import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,7 @@ public class PostQueryService {
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
+    private final ThumbnailRepository thumbnailRepository;
 
     public PostResponse findByShareUrl(Long userId, String shareUrl) {
         Post post = postRepository.findByShareUrlFetchPollChoices(shareUrl)
@@ -106,31 +110,30 @@ public class PostQueryService {
     }
 
     private CursorBasePaginatedResponse<SimplePostResponse> getCursorPaginatedResponse(Slice<Post> postSlice) {
-//        List<Long> bestPickedImageIds = postSlice.getContent().stream()
-//                .map(Post::getBestPickedImage)
-//                .map(PollChoice::getImageFileId)
-//                .toList();
-//        List<ImageFile> imageIds = imageFileRepository.findByIdIn(bestPickedImageIds);
-//
-//        List<SimplePostResponse> responseContent = postSlice.getContent().stream()
-//                .map(post -> getSimplePostResponse(post, imageIds))
-//                .toList();
-//
-//        return CursorBasePaginatedResponse.of(new SliceImpl<>(
-//                responseContent,
-//                postSlice.getPageable(),
-//                postSlice.hasNext()
-//        ));
-        return null;
+        List<Long> postIds = postSlice.getContent()
+                .stream()
+                .map(Post::getId)
+                .toList();
+
+        List<Thumbnail> thumbnails = thumbnailRepository.findByPostIdIn(postIds);
+
+        List<SimplePostResponse> responseContent = postSlice.getContent().stream()
+                .map(post -> getSimplePostResponse(post, thumbnails))
+                .toList();
+
+        return CursorBasePaginatedResponse.of(new SliceImpl<>(
+                responseContent,
+                postSlice.getPageable(),
+                postSlice.hasNext()
+        ));
     }
 
-    private SimplePostResponse getSimplePostResponse(Post post, List<ImageFile> imageIds) {
-//        ImageFile bestPickedImage = imageIds.stream()
-//                .filter(imageFile -> imageFile.getId().equals(post.getBestPickedImage().getImageFileId()))
-//                .findFirst()
-//                .orElseThrow(() -> new InternalServerException(ErrorCode.IMAGE_FILE_NOT_FOUND));
-//        return SimplePostResponse.of(post, bestPickedImage.getThumbnailUrl());
-        return null;
+    private SimplePostResponse getSimplePostResponse(Post post, List<Thumbnail> imageIds) {
+        Thumbnail postThumbnail = imageIds.stream()
+                .filter(thumbnail -> thumbnail.isThumbnailOf(post.getId()))
+                .findFirst()
+                .orElseThrow(() -> new InternalServerException(ErrorCode.THUMBNAIL_NOT_FOUND));
+        return SimplePostResponse.of(post, postThumbnail.getThumbnailUrl());
     }
 
     public CursorBasePaginatedResponse<FeedResponse> findFeed(Long userId, Long cursor, int size) {
@@ -138,11 +141,9 @@ public class PostQueryService {
         return CursorBasePaginatedResponse.of(postSlice.map(post -> createFeedResponse(userId, post)));
     }
 
-    private FeedResponse createFeedResponse(Long userId, FeedDto dto) {
-//        AuthorDto author = new AuthorDto(dto.postUserId(), dto.nickname(), dto.profileUrl());
-//        List<PollChoiceResponse> pollChoices = pollChoiceRepository.findByPostId(userId, dto.postId());
-//        boolean isAuthor = dto.postUserId().equals(userId);
-//        return FeedResponse.of(dto, author, pollChoices, isAuthor);
-        return null;
+    private FeedResponse createFeedResponse(Long userId, FeedDto feedDto) {
+        AuthorDto author = new AuthorDto(feedDto.postUserId(), feedDto.nickname(), feedDto.profileUrl());
+        boolean isAuthor = feedDto.postUserId().equals(userId);
+        return FeedResponse.of(feedDto, author, isAuthor);
     }
 }
