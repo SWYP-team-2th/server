@@ -1,6 +1,8 @@
 package com.chooz.post.domain;
 
+import com.chooz.post.presentation.dto.FeedDto;
 import com.chooz.support.RepositoryTest;
+import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
+import static com.chooz.support.fixture.PostFixture.createPostBuilder;
+import static com.chooz.support.fixture.UserFixture.createDefaultUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,7 +33,7 @@ class PostRepositoryTest extends RepositoryTest {
     void findByUserId1() throws Exception {
         //given
         long userId = 1L;
-        List<Post> posts = createPosts(userId);
+        List<Post> posts = createPosts(userId, 15);
         int size = 10;
 
         //when
@@ -50,7 +54,7 @@ class PostRepositoryTest extends RepositoryTest {
     void findByUserId2() throws Exception {
         //given
         long userId = 1L;
-        List<Post> posts = createPosts(userId);
+        List<Post> posts = createPosts(userId, 15);
         int size = 10;
         int cursorIndex = 5;
 
@@ -69,9 +73,9 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("id 리스트에 포함되는 게시글 조회")
-    void select_post_findByIdIn() throws Exception {
+    void findByIdIn() throws Exception {
         //given
-        List<Post> posts = createPosts(1L);
+        List<Post> posts = createPosts(1L, 15);
         List<Long> postIds = List.of(posts.get(0).getId(), posts.get(1).getId(), posts.get(2).getId());
 
         //when
@@ -87,33 +91,44 @@ class PostRepositoryTest extends RepositoryTest {
         );
     }
 
-    private List<Post> createPosts(long userId) {
+    @Test
+    @DisplayName("피드 조회")
+    void findByScopeAndDeletedFalse() {
+        //given
+        User user1 = userRepository.save(createDefaultUser());
+        User user2 = userRepository.save(createDefaultUser());
+        List<Post> myPosts = createPosts(user1.getId(), 5);
+        List<Post> privatePosts = createPostsWithScope(user2, Scope.PRIVATE, 5);
+        List<Post> publicPosts = createPostsWithScope(user2, Scope.PUBLIC, 5);
+        int size = 10;
+
+        //when
+        Slice<FeedDto> res = postRepository.findFeedByScopeWithUser(1L, null, PageRequest.ofSize(size));
+
+        //then
+        assertAll(
+                () -> assertThat(res.getContent().size()).isEqualTo(size),
+                () -> assertThat(res.hasNext()).isFalse()
+        );
+    }
+
+    private List<Post> createPosts(long userId, int size) {
         List<Post> posts = new ArrayList<>();
-        for (int i = 0; i < 30; i += 2) {
+        for (int i = 0; i < size; i++) {
             posts.add(postRepository.save(createDefaultPost(userId)));
         }
         return posts;
     }
 
-    @Test
-    @DisplayName("피드 조회")
-    @Disabled
-    void select_post_findByScopeAndDeletedFalse() {
-//        //given
-//        User user1 = userRepository.save(createUser(1));
-//        User user2 = userRepository.save(createUser(2));
-//        List<Post> myPosts = createPosts(user1.getId(), Scope.PRIVATE);
-//        List<Post> privatePosts = createPosts(user2.getId(), Scope.PRIVATE);
-//        List<Post> publicPosts = createPosts(user2.getId(), Scope.PUBLIC);
-//        int size = 10;
-//
-//        //when
-//        Slice<FeedDto> res = postRepository.findFeedByScopeWithUser(1L, null, PageRequest.ofSize(size));
-//
-//        //then
-//        assertAll(
-//                () -> assertThat(res.getContent().size()).isEqualTo(size),
-//                () -> assertThat(res.hasNext()).isTrue()
-//        );
+    private List<Post> createPostsWithScope(User user, Scope scope, int size) {
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < size; i ++) {
+            Post post = createPostBuilder()
+                    .userId(user.getId())
+                    .pollOption(new PollOption(PollType.SINGLE, scope, CommentActive.OPEN))
+                    .build();
+            posts.add(postRepository.save(post));
+        }
+        return posts;
     }
 }
