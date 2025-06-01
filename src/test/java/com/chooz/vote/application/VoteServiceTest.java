@@ -201,17 +201,17 @@ class VoteServiceTest extends IntegrationTest {
 //        assertAll(
 //                () -> assertThat(response).hasSize(3),
 //                () -> assertThat(response.get(0).id()).isEqualTo(post.getPollChoices().get(1).getId()),
-//                () -> assertThat(response.get(0).imageName()).isEqualTo(post.getPollChoices().get(1).getName()),
+//                () -> assertThat(response.get(0).title()).isEqualTo(post.getPollChoices().get(1).getName()),
 //                () -> assertThat(response.get(0).voteCount()).isEqualTo(1),
 //                () -> assertThat(response.get(0).voteRatio()).isEqualTo("100.0"),
 //
 //                () -> assertThat(response.get(1).id()).isEqualTo(post.getPollChoices().get(0).getId()),
-//                () -> assertThat(response.get(1).imageName()).isEqualTo(post.getPollChoices().get(0).getName()),
+//                () -> assertThat(response.get(1).title()).isEqualTo(post.getPollChoices().get(0).getName()),
 //                () -> assertThat(response.get(1).voteCount()).isEqualTo(0),
 //                () -> assertThat(response.get(1).voteRatio()).isEqualTo("0.0"),
 //
 //                () -> assertThat(response.get(2).id()).isEqualTo(post.getPollChoices().get(2).getId()),
-//                () -> assertThat(response.get(2).imageName()).isEqualTo(post.getPollChoices().get(2).getName()),
+//                () -> assertThat(response.get(2).title()).isEqualTo(post.getPollChoices().get(2).getName()),
 //                () -> assertThat(response.get(2).voteCount()).isEqualTo(0),
 //                () -> assertThat(response.get(2).voteRatio()).isEqualTo("0.0")
 //        );
@@ -235,11 +235,11 @@ class VoteServiceTest extends IntegrationTest {
 //        assertAll(
 //                () -> assertThat(response).hasSize(2),
 //                () -> assertThat(response.get(0).id()).isEqualTo(post.getPollChoices().get(0).getId()),
-//                () -> assertThat(response.get(0).imageName()).isEqualTo(post.getPollChoices().get(0).getName()),
+//                () -> assertThat(response.get(0).title()).isEqualTo(post.getPollChoices().get(0).getName()),
 //                () -> assertThat(response.get(0).voteCount()).isEqualTo(1),
 //                () -> assertThat(response.get(0).voteRatio()).isEqualTo("100.0"),
 //                () -> assertThat(response.get(1).id()).isEqualTo(post.getPollChoices().get(1).getId()),
-//                () -> assertThat(response.get(1).imageName()).isEqualTo(post.getPollChoices().get(1).getName()),
+//                () -> assertThat(response.get(1).title()).isEqualTo(post.getPollChoices().get(1).getName()),
 //                () -> assertThat(response.get(1).voteCount()).isEqualTo(0),
 //                () -> assertThat(response.get(1).voteRatio()).isEqualTo("0.0")
 //        );

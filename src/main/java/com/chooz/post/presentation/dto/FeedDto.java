@@ -2,6 +2,8 @@ package com.chooz.post.presentation.dto;
 
 import com.chooz.post.domain.Status;
 
+import java.time.LocalDateTime;
+
 public record FeedDto(
         Long postId,
         Status status,
@@ -11,6 +13,7 @@ public record FeedDto(
         String nickname,
         String profileUrl,
         Long voterCount,
-        Long commentCount
+        Long commentCount,
+        LocalDateTime createdAt
 ) {
 }

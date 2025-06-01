@@ -53,7 +53,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                    	u.nickname,
                    	u.profileUrl,
                    	cast((select count(distinct v.userId) from Vote v where p.id = v.postId) as long),
-                   	cast((select count(*) from Comment c where p.id = c.postId and c.deleted = false) as long)
+                   	cast((select count(*) from Comment c where p.id = c.postId and c.deleted = false) as long),
+                    p.createdAt
             )
             FROM Post p
             INNER JOIN User u on p.userId = u.id

@@ -126,7 +126,6 @@ class PostControllerTest extends RestDocsTest {
     @WithAnonymousUser
     @DisplayName("게시글 공유 url 상세 조회")
     void findPost_shareUrl() throws Exception {
-        //given
         PostResponse response = new PostResponse(
                 1L,
                 "title",
@@ -149,6 +148,7 @@ class PostControllerTest extends RestDocsTest {
                 1L,
                 LocalDateTime.of(2025, 2, 13, 12, 0)
         );
+        //given
         given(postService.findByShareUrl(any(), any()))
                 .willReturn(response);
 
@@ -162,21 +162,31 @@ class PostControllerTest extends RestDocsTest {
                         ),
                         responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 Id"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("게시글 설명"),
                                 fieldWithPath("author").type(JsonFieldType.OBJECT).description("게시글 작성자 정보"),
                                 fieldWithPath("author.id").type(JsonFieldType.NUMBER).description("게시글 작성자 유저 Id"),
                                 fieldWithPath("author.nickname").type(JsonFieldType.STRING).description("게시글 작성자 닉네임"),
                                 fieldWithPath("author.profileUrl").type(JsonFieldType.STRING).description("게시글 작성자 프로필 이미지"),
-                                fieldWithPath("description").type(JsonFieldType.STRING).description("설명"),
                                 fieldWithPath("pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
                                 fieldWithPath("pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
                                 fieldWithPath("pollChoices[].title").type(JsonFieldType.STRING).description("사진 이름"),
                                 fieldWithPath("pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
-                                fieldWithPath("pollChoices[].thumbnailUrl").type(JsonFieldType.STRING).description("확대 사진 이미지"),
                                 fieldWithPath("pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
                                 fieldWithPath("shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
-                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("게시글 생성 시간"),
+                                fieldWithPath("pollOptions").type(JsonFieldType.OBJECT).description("투표 설정"),
+                                fieldWithPath("pollOptions.pollType").type(JsonFieldType.STRING).description(enumDescription("단일/복수 투표", PollType.class)),
+                                fieldWithPath("pollOptions.scope").type(JsonFieldType.STRING).description(enumDescription("공개 여부", Scope.class)),
+                                fieldWithPath("pollOptions.commentActive").type(JsonFieldType.STRING).description(enumDescription("댓글 활성화 여부", CommentActive.class)),
+                                fieldWithPath("closeOptions").type(JsonFieldType.OBJECT).description("마감 설정"),
+                                fieldWithPath("closeOptions.closeType").type(JsonFieldType.STRING).description(enumDescription("마감 방식", CloseType.class)),
+                                fieldWithPath("closeOptions.closedAt").type(JsonFieldType.STRING).optional().description("마감 시간, (closeType이 DATE일 경우 NN)"),
+                                fieldWithPath("closeOptions.maxVoterCount").type(JsonFieldType.NUMBER).optional().description("남은 투표 참여자 수 (closeType이 VOTER_COUNT일 경우 NN)"),
+                                fieldWithPath("commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                                fieldWithPath("voterCount").type(JsonFieldType.NUMBER).description("투표 참여자 수"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
-                                fieldWithPath("isAuthor").type(JsonFieldType.BOOLEAN).description("게시글 작성자 여부")
+                                fieldWithPath("isAuthor").type(JsonFieldType.BOOLEAN).description("게시글 작성자 여부"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("게시글 작성 시간")
                         )
                 ));
     }
@@ -401,7 +411,8 @@ class PostControllerTest extends RestDocsTest {
                                 "http://example.com/image/1",
                                 true,
                                 1L,
-                                2L
+                                2L,
+                                LocalDateTime.now()
                         )
                 )
         );
@@ -424,18 +435,13 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].author.id").type(JsonFieldType.NUMBER).description("게시글 작성자 유저 ID"),
                                 fieldWithPath("data[].author.nickname").type(JsonFieldType.STRING).description("게시글 작성자 닉네임"),
                                 fieldWithPath("data[].author.profileUrl").type(JsonFieldType.STRING).description("게시글 작성자 프로필 이미지"),
-                                fieldWithPath("data[].pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
-                                fieldWithPath("data[].pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
-                                fieldWithPath("data[].pollChoices[].title").type(JsonFieldType.STRING).description("사진 이름"),
-                                fieldWithPath("data[].pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
-                                fieldWithPath("data[].pollChoices[].thumbnailUrl").type(JsonFieldType.STRING).description("나중에 없어질 예정"),
-                                fieldWithPath("data[].pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
                                 fieldWithPath("data[].status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
-                                fieldWithPath("data[].description").type(JsonFieldType.STRING).description("설명"),
-                                fieldWithPath("data[].shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
+                                fieldWithPath("data[].title").type(JsonFieldType.STRING).description("설명"),
+                                fieldWithPath("data[].thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 url"),
                                 fieldWithPath("data[].isAuthor").type(JsonFieldType.BOOLEAN).description("게시글 작성자 여부"),
                                 fieldWithPath("data[].voterCount").type(JsonFieldType.NUMBER).description("투표 참여자 수"),
-                                fieldWithPath("data[].commentCount").type(JsonFieldType.NUMBER).description("투표 댓글 수")
+                                fieldWithPath("data[].commentCount").type(JsonFieldType.NUMBER).description("투표 댓글 수"),
+                                fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("게시글 작성 날짜")
                         )
                 ));
     }

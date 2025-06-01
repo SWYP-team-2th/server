@@ -3,6 +3,8 @@ package com.chooz.post.presentation.dto;
 import com.chooz.common.dto.CursorDto;
 import com.chooz.post.domain.Status;
 
+import java.time.LocalDateTime;
+
 public record FeedResponse(
         Long id,
         AuthorDto author,
@@ -11,7 +13,8 @@ public record FeedResponse(
         String thumbnailUrl,
         boolean isAuthor,
         Long voterCount,
-        Long commentCount
+        Long commentCount,
+        LocalDateTime createdAt
 
 ) implements CursorDto {
 
@@ -24,7 +27,8 @@ public record FeedResponse(
                 feedDto.thumbnailUrl(),
                 isAuthor,
                 feedDto.voterCount(),
-                feedDto.commentCount()
+                feedDto.commentCount(),
+                feedDto.createdAt()
         );
     }
 
