@@ -47,7 +47,7 @@ public class CommentService {
     }
 
     private CommentResponse createCommentResponse(Comment comment, Long userId) {
-        User author = userRepository.findById(comment.getUserNo())
+        User author = userRepository.findById(comment.getUserId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
         List<Vote> votes = voteRepository.findByUserIdAndPostId(userId, comment.getPostId());
         List<Long> voteImageIds = votes.stream()
@@ -61,7 +61,7 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndNotDeleted(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
 
-        if (!comment.getUserNo().equals(userInfo.userId())) {
+        if (!comment.getUserId().equals(userInfo.userId())) {
             throw new ForbiddenException();
         }
 
@@ -73,7 +73,7 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndNotDeleted(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
 
-        if (!comment.getUserNo().equals(userInfo.userId())) {
+        if (!comment.getUserId().equals(userInfo.userId())) {
             throw new ForbiddenException();
         }
 

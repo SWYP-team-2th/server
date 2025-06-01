@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,26 +29,31 @@ public class Comment extends BaseEntity {
     private Long postId;
 
     @NotNull
-    private Long userNo;
+    private Long userId;
 
     @NotNull
     private String content;
 
-    public Comment(Long id, Long postId, Long userNo, String content) {
-        validateNull(postId, userNo);
+    @Builder
+    public Comment(Long id, Long postId, Long userId, String content) {
+        validateNull(postId, userId);
         validateEmptyString(content);
         this.id = id;
         this.postId = postId;
-        this.userNo = userNo;
+        this.userId = userId;
         this.content = content;
     }
 
-    public Comment(Long postId, Long userNo, String content) {
-        validateNull(postId, userNo);
+    public Comment(Long postId, Long userId, String content) {
+        validateNull(postId, userId);
         validateEmptyString(content);
         this.postId = postId;
-        this.userNo = userNo;
+        this.userId = userId;
         this.content = content;
+    }
+
+    public static Comment create(Long postId, Long userId, String content) {
+        return new Comment(null, postId, userId, content);
     }
 
     public void updateComment(String content) {

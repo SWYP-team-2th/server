@@ -79,8 +79,8 @@ class CommentServiceTest {
         SliceImpl<Comment> commentSlice = new SliceImpl<>(List.of(comment1, comment2), PageRequest.of(0, size), false);
         User user = new User(100L, "닉네임","http://example.com/profile.png", Role.USER);
         List<Vote> votes = List.of(
-                Vote.of(1L, 100L, 1L),
-                Vote.of(1L, 101L, 1L)
+                Vote.create(1L, 100L, 1L),
+                Vote.create(1L, 101L, 1L)
         );
 
         // Mock 설정
