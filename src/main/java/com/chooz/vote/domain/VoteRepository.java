@@ -15,7 +15,5 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     Optional<Vote> findByUserIdAndPollChoiceId(Long voterId, Long pollChoiceId);
 
-    Optional<Vote> findByIdAndUserId(Long voteId, Long userId);
-
-    List<Vote> findByPostIdAndDeletedFalse(Long postId);
+    List<Vote> findAllByPostId(Long postId);
 }

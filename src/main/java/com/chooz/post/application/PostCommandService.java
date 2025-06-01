@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -44,28 +45,26 @@ public class PostCommandService {
                 pollChoices,
                 shareUrl,
                 PollOption.create(
-                        request.pollOptionDto().pollType(),
-                        request.pollOptionDto().scope(),
-                        request.pollOptionDto().commentActive()
+                        request.pollOptions().pollType(),
+                        request.pollOptions().scope(),
+                        request.pollOptions().commentActive()
                 ),
                 CloseOption.create(
-                        request.closeOptionDto().closeType(),
-                        request.closeOptionDto().closedAt(),
-                        request.closeOptionDto().maxVoterCount()
+                        request.closeOptions().closeType(),
+                        request.closeOptions().closedAt(),
+                        request.closeOptions().maxVoterCount()
                 )
         );
         return postRepository.save(post);
     }
 
     private List<PollChoice> createPollChoices(CreatePostRequest request) {
-        List<PollChoice> pollChoices = new ArrayList<>();
-        List<PollChoiceRequestDto> pollChoiceDtoList = request.pollChoices();
-        for (int orderSeq = 0; orderSeq < pollChoiceDtoList.size(); orderSeq++) {
-            PollChoiceRequestDto pollChoiceDto = pollChoiceDtoList.get(orderSeq);
-            PollChoice pollChoice = PollChoice.create(pollChoiceDto.title(), pollChoiceDto.imageUrl(), orderSeq);
-            pollChoices.add(pollChoice);
-        }
-        return pollChoices;
+        return request.pollChoices()
+                .stream()
+                .map(pollChoiceDto -> PollChoice.create(
+                        pollChoiceDto.title(), pollChoiceDto.imageUrl()
+                ))
+                .collect(Collectors.toList());
     }
 
     private void savePostThumbnail(Post post) {

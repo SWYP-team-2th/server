@@ -102,7 +102,7 @@ class VoteControllerTest extends RestDocsTest {
                         responseFields(
                                 fieldWithPath("[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("이미지 Id"),
-                                fieldWithPath("[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("[].title").type(JsonFieldType.STRING).description("사진 이름"),
                                 fieldWithPath("[].voteCount").type(JsonFieldType.NUMBER).description("투표 수"),
                                 fieldWithPath("[].voteRatio").type(JsonFieldType.STRING).description("투표 비율")
                         )

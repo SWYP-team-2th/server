@@ -30,19 +30,16 @@ public class PollChoice {
 
     private String imageUrl;
 
-    private int orderSeq;
-
-    public PollChoice(Long id, Post post, String title, String imageUrl, int orderSeq) {
+    public PollChoice(Long id, Post post, String title, String imageUrl) {
         validateNull(title, imageUrl);
         this.id = id;
         this.post = post;
         this.title = title;
         this.imageUrl = imageUrl;
-        this.orderSeq = orderSeq;
     }
 
-    public static PollChoice create(String title, String imageUrl, int order) {
-        return new PollChoice(null, null, title, imageUrl, order);
+    public static PollChoice create(String title, String imageUrl) {
+        return new PollChoice(null, null, title, imageUrl);
     }
 
     public void setPost(Post post) {

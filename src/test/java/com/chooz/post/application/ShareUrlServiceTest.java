@@ -17,23 +17,21 @@ class ShareUrlServiceTest {
     @BeforeEach
     void setUp() {
         shareUrlKeyGenerator = mock(ShareUrlKeyGenerator.class);
-        Base62Encryptor encryptor = new Base62Encryptor("asdfd", "1541235432");
-        shareUrlService = new ShareUrlService(shareUrlKeyGenerator, encryptor);
+        shareUrlService = new ShareUrlService(shareUrlKeyGenerator);
     }
 
     @Test
     @DisplayName("공유 url 생성 및 키 조회")
     void generateShareUrl() throws Exception {
         //given
-        String shareUrlKey = "shareUrlKey";
+        String shareUrlKey = "174822695935299";
         given(shareUrlKeyGenerator.generateKey())
                 .willReturn(shareUrlKey);
 
         //when then
         String shareUrl = shareUrlService.generateShareUrl();
+        System.out.println("shareUrl = " + shareUrl);
+        System.out.println("shareUrl.length() = " + shareUrl.length());
         assertThat(shareUrl).isNotNull();
-
-        String key = shareUrlService.getShareUrlKey(shareUrl);
-        assertThat(key).isEqualTo(shareUrlKey);
     }
 }

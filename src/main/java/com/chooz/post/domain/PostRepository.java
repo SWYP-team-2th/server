@@ -65,5 +65,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     )
     Slice<FeedDto> findFeedByScopeWithUser(@Param("userId") Long userId, @Param("postId") Long postId, Pageable pageable);
 
-    Optional<Post> findByShareUrl(String shareUrl);
+    @Query("""
+            SELECT p
+            FROM Post p
+            JOIN FETCH p.pollChoices
+            WHERE p.shareUrl = :shareUrl
+            """
+    )
+    Optional<Post> findByShareUrlFetchPollChoices(@Param("shareUrl") String shareUrl);
 }

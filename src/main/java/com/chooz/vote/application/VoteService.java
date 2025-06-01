@@ -112,9 +112,9 @@ public class VoteService {
         }
     }
 
-//    private int getTotalVoteCount(List<PollChoice> images) {
+//    private int getTotalVoteCount(List<PollChoice> pollChoices) {
 //        int totalVoteCount = 0;
-//        for (PollChoice image : images) {
+//        for (PollChoice image : pollChoices) {
 //            totalVoteCount += image.getVoteCount();
 //        }
 //        return totalVoteCount;

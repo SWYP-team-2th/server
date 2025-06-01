@@ -30,8 +30,8 @@ public class PostFixture {
                 .closeOption(new CloseOption(CloseType.SELF, null, null))
                 .pollOption(new PollOption(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN))
                 .pollChoices(List.of(
-                        PollChoice.create("Choice A", "http://example.com/image/1", 0),
-                        PollChoice.create("Choice B", "http://example.com/image/1", 1)
+                        PollChoice.create("Choice A", "http://example.com/image/1"),
+                        PollChoice.create("Choice B", "http://example.com/image/1")
                 ));
     }
 }

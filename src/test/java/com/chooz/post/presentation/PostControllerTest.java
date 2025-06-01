@@ -129,19 +129,24 @@ class PostControllerTest extends RestDocsTest {
         //given
         PostResponse response = new PostResponse(
                 1L,
+                "title",
+                "description",
                 new AuthorDto(
                         1L,
                         "author",
                         "https://image.chooz.site/profile-image"
                 ),
-                "description",
                 List.of(
-                        new PollChoiceResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
-                        new PollChoiceResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
+                        new PollChoiceResponse(1L, "title1", "https://image.chooz.site/image/1", 1L),
+                        new PollChoiceResponse(2L, "title2", "https://image.chooz.site/image/2", null)
                 ),
                 "https://chooz.site/shareurl",
                 true,
                 Status.PROGRESS,
+                new PostResponse.PollOptionDto(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
+                new PostResponse.CloseOptionDto(CloseType.SELF, null, null),
+                0L,
+                1L,
                 LocalDateTime.of(2025, 2, 13, 12, 0)
         );
         given(postService.findByShareUrl(any(), any()))
@@ -164,7 +169,7 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("description").type(JsonFieldType.STRING).description("설명"),
                                 fieldWithPath("pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
                                 fieldWithPath("pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
-                                fieldWithPath("pollChoices[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("pollChoices[].title").type(JsonFieldType.STRING).description("사진 이름"),
                                 fieldWithPath("pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
                                 fieldWithPath("pollChoices[].thumbnailUrl").type(JsonFieldType.STRING).description("확대 사진 이미지"),
                                 fieldWithPath("pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
@@ -392,8 +397,8 @@ class PostControllerTest extends RestDocsTest {
                                         "https://image.chooz.site/profile-image"
                                 ),
                                 List.of(
-                                        new PollChoiceResponse(1L, "뽀또A", "https://image.chooz.site/image/1", "https://image.chooz.site/image/resize/1", 1L),
-                                        new PollChoiceResponse(2L, "뽀또B", "https://image.chooz.site/image/2", "https://image.chooz.site/image/resize/2", null)
+                                        new PollChoiceResponse(1L, "뽀또A", "https://image.chooz.site/image/1", 1L),
+                                        new PollChoiceResponse(2L, "뽀또B", "https://image.chooz.site/image/2", null)
                                 ),
                                 Status.PROGRESS,
                                 "description",
@@ -425,7 +430,7 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].author.profileUrl").type(JsonFieldType.STRING).description("게시글 작성자 프로필 이미지"),
                                 fieldWithPath("data[].pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
                                 fieldWithPath("data[].pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
-                                fieldWithPath("data[].pollChoices[].imageName").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("data[].pollChoices[].title").type(JsonFieldType.STRING).description("사진 이름"),
                                 fieldWithPath("data[].pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
                                 fieldWithPath("data[].pollChoices[].thumbnailUrl").type(JsonFieldType.STRING).description("나중에 없어질 예정"),
                                 fieldWithPath("data[].pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
