@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,7 +33,8 @@ public class SocialAccount extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
-    public SocialAccount(Long id, Long userId, String socialId, Provider provider) {
+    @Builder
+    private SocialAccount(Long id, Long userId, String socialId, Provider provider) {
         validateNull(userId, provider);
         validateEmptyString(socialId);
         this.id = id;

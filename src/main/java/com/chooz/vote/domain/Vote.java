@@ -30,7 +30,7 @@ public class Vote extends BaseEntity {
     private Long userId;
 
     @Builder
-    public Vote(Long id, Long postId, Long pollChoiceId, Long userId) {
+    private Vote(Long id, Long postId, Long pollChoiceId, Long userId) {
         this.id = id;
         this.postId = postId;
         this.pollChoiceId = pollChoiceId;

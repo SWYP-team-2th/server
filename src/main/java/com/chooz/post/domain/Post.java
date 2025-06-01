@@ -63,7 +63,7 @@ public class Post extends BaseEntity {
     private CloseOption closeOption;
 
     @Builder
-    public Post(
+    private Post(
             Long id,
             Long userId,
             String title,
