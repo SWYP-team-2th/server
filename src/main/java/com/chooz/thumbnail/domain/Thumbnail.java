@@ -1,8 +1,5 @@
-package com.chooz.vote.domain;
+package com.chooz.thumbnail.domain;
 
-import com.chooz.common.domain.BaseEntity;
-import com.chooz.post.domain.PollChoice;
-import com.chooz.post.domain.Post;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,11 +10,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.chooz.common.util.Validator.validateNull;
+
 @Getter
 @Entity
-@Table(name = "user_votes")
+@Table(name = "thumbnails")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Vote extends BaseEntity {
+public class Thumbnail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,21 +26,22 @@ public class Vote extends BaseEntity {
 
     private Long pollChoiceId;
 
-    private Long userId;
+    private String thumbnailUrl;
 
     @Builder
-    private Vote(Long id, Long postId, Long pollChoiceId, Long userId) {
+    public Thumbnail(Long id, Long postId, Long pollChoiceId, String thumbnailUrl) {
+        validateNull(postId, pollChoiceId, thumbnailUrl);
         this.id = id;
         this.postId = postId;
         this.pollChoiceId = pollChoiceId;
-        this.userId = userId;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
-    public static Vote create(Long postId, Long pollChoiceId, Long userId) {
-        return new Vote(null, postId, pollChoiceId, userId);
+    public static Thumbnail create(Long postId, Long pollChoiceId, String thumbnailUrl) {
+        return new Thumbnail(null, postId, pollChoiceId, thumbnailUrl);
     }
 
-    public boolean isVoter(Long userId) {
-        return this.userId.equals(userId);
+    public boolean isThumbnailOf(Long postId) {
+        return this.postId.equals(postId);
     }
 }

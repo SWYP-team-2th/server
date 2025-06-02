@@ -1,23 +1,54 @@
 package com.chooz.post.presentation.dto;
 
+import com.chooz.post.domain.CloseType;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollType;
 import com.chooz.post.domain.Scope;
-import com.chooz.post.domain.VoteType;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CreatePostRequest(
+
+        @NotBlank
+        String title,
+
         @NotNull
         String description,
 
-        @Valid @NotNull
-        List<PostImageRequestDto> images,
-
+        @Valid
         @NotNull
-        Scope scope,
+        List<PollChoiceRequestDto> pollChoices,
 
+        @Valid
         @NotNull
-        VoteType voteType
+        PollOptionDto pollOptions,
+
+        @Valid
+        @NotNull
+        CloseOptionDto closeOptions
 ) {
+
+        public record PollOptionDto(
+                @NotNull
+                Scope scope,
+
+                @NotNull
+                PollType pollType,
+
+                @NotNull
+                CommentActive commentActive
+        ) { }
+
+        public record CloseOptionDto(
+                @NotNull
+                CloseType closeType,
+
+                Integer maxVoterCount,
+
+                LocalDateTime closedAt
+        ) { }
 }

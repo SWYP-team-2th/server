@@ -2,50 +2,36 @@ package com.chooz.post.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.common.exception.InternalServerException;
+import com.chooz.post.domain.Post;
+import com.chooz.post.domain.PostRepository;
 import io.seruco.encoding.base62.Base62;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ShareUrlService {
 
-    private final AesBytesEncryptor encryptor;
+    private final ShareUrlKeyGenerator shareUrlKeyGenerator;
 
-    public ShareUrlService(
-            @Value("${crypto.secret-key.share-url}") String shareUrlSymmetricKey,
-            @Value("${crypto.salt}") String salt
-    ) {
-        this.encryptor = new AesBytesEncryptor(shareUrlSymmetricKey, salt);
+    private final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private final int BASE = ALPHABET.length();
+
+    public String generateShareUrl() {
+        String key = shareUrlKeyGenerator.generateKey();
+        return encodeBase62(key);
     }
 
-    public String encrypt(String data) {
-        try {
-            byte[] encrypt = encryptor.encrypt(data.getBytes(StandardCharsets.UTF_8));
-            return new String(Base62.createInstance().encode(encrypt), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.debug("encrypt error {}", e.getMessage());
-            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
-        }
-    }
+    private String encodeBase62(String key) {
+        long number = Long.parseLong(key);
 
-    public String decrypt(String encryptedData) {
-        try {
-            if (!StringUtils.hasText(encryptedData)) {
-                throw new InternalServerException(ErrorCode.INVALID_TOKEN);
-            }
-            byte[] decryptBytes = Base62.createInstance().decode(encryptedData.getBytes(StandardCharsets.UTF_8));
-            byte[] decrypt = encryptor.decrypt(decryptBytes);
-            return new String(decrypt, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            log.debug("decrypt error {}", e.getMessage());
-            throw new BadRequestException(ErrorCode.INVALID_TOKEN);
+        StringBuilder sb = new StringBuilder();
+        while (number > 0) {
+            sb.append(ALPHABET.charAt((int) (number % BASE)));
+            number /= BASE;
         }
+        return sb.reverse().toString();
     }
 }

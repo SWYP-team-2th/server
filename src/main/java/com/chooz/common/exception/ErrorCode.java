@@ -17,7 +17,9 @@ public enum ErrorCode {
     EXCEED_MAX_FILE_SIZE("파일 크기가 초과했습니다."),
     POST_NOT_FOUND("존재하지 않는 게시글입니다."),
     DESCRIPTION_LENGTH_EXCEEDED("게시글 설명 길이가 초과했습니다."),
-    INVALID_POST_IMAGE_COUNT("게시글 이미지 개수가 범위를 벗어났습니다."),
+    TITLE_IS_REQUIRED("게시글 제목은 필수입니다."),
+    TITLE_LENGTH_EXCEEDED("게시글 제목 길이가 초과했습니다."),
+    INVALID_POLL_CHOICE_COUNT("투표 선택지 개수가 범위를 벗어났습니다."),
     NOT_POST_AUTHOR("게시글 작성자가 아닙니다."),
     POST_ALREADY_CLOSED("이미 마감된 게시글입니다."),
     FILE_NAME_TOO_LONG("파일 이름이 너무 깁니다."),
@@ -25,6 +27,13 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND("존재하지 않는 댓글입니다."),
     VOTE_NOT_FOUND("존재하지 않는 투표입니다."),
     NOT_VOTER("투표자가 아닙니다."),
+    CLOSED_AT_REQUIRED("마감 시간 설정이 필요합니다."),
+    MAX_VOTER_COUNT_REQUIRED("최대 투표자 수 설정이 필요합니다."),
+    INVALID_VOTER_CLOSE_OPTION("올바르지 않은 최대 투표자 수입니다."),
+    INVALID_DATE_CLOSE_OPTION("잘못된 마감 시간입니다"),
+    INVALID_SELF_CLOSE_OPTION("잘못된 자체 마감 옵션입니다."),
+    INVALID_CLOSE_OPTION("잘못된 마감 옵션입니다."),
+    THUMBNAIL_NOT_FOUND("썸네일을 찾을 수 없습니다."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),
@@ -41,9 +50,9 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR("서버 내부 오류 발생"),
     INVALID_INPUT_VALUE("잘못된 입력 값입니다."),
     SOCIAL_AUTHENTICATION_FAILED("소셜 로그인이 실패했습니다."),
-    POST_IMAGE_NAME_GENERATOR_INDEX_OUT_OF_BOUND("이미지 이름 생성기 인덱스 초과"),
+    POLL_CHOICE_NAME_GENERATOR_INDEX_OUT_OF_BOUND("이미지 이름 생성기 인덱스 초과"),
     IMAGE_FILE_NOT_FOUND("존재하지 않는 이미지입니다."),
-    POST_IMAGE_NOT_FOUND("게시글 이미지가 없습니다."),
+    POLL_CHOICE_NOT_FOUND("투표 선택지가 없습니다."),
     SHARE_URL_ALREADY_EXISTS("공유 URL이 이미 존재합니다."),
 
     //503

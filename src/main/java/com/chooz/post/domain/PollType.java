@@ -1,5 +1,5 @@
 package com.chooz.post.domain;
 
-public enum VoteType {
+public enum PollType {
     SINGLE, MULTIPLE
-}
+} 

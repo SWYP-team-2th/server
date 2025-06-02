@@ -26,6 +26,8 @@ import org.springframework.data.domain.SliceImpl;
 import java.util.List;
 import java.util.Optional;
 
+import static com.chooz.support.fixture.UserFixture.createDefaultUser;
+import static com.chooz.support.fixture.UserFixture.createUserBuilder;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -77,10 +79,10 @@ class CommentServiceTest {
         Comment comment1 = new Comment(1L, postId, 100L, "첫 번째 댓글");
         Comment comment2 = new Comment(2L, postId, 100L, "두 번째 댓글");
         SliceImpl<Comment> commentSlice = new SliceImpl<>(List.of(comment1, comment2), PageRequest.of(0, size), false);
-        User user = new User(100L, "닉네임","http://example.com/profile.png", Role.USER);
+        User user = createUserBuilder().id(100L).nickname("닉네임").build();
         List<Vote> votes = List.of(
-                Vote.of(1L, 100L, 1L),
-                Vote.of(1L, 101L, 1L)
+                Vote.create(1L, 100L, 1L),
+                Vote.create(1L, 101L, 1L)
         );
 
         // Mock 설정

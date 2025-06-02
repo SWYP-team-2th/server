@@ -3,32 +3,32 @@ package com.chooz.post.presentation.dto;
 import com.chooz.common.dto.CursorDto;
 import com.chooz.post.domain.Status;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 public record FeedResponse(
         Long id,
         AuthorDto author,
-        List<PostImageResponse> images,
         Status status,
-        String description,
-        String shareUrl,
+        String title,
+        String thumbnailUrl,
         boolean isAuthor,
-        Long participantCount,
-        Long commentCount
+        Long voterCount,
+        Long commentCount,
+        LocalDateTime createdAt
 
 ) implements CursorDto {
 
-    public static FeedResponse of(FeedDto feedDto, AuthorDto author, List<PostImageResponse> images, boolean isAuthor) {
+    public static FeedResponse of(FeedDto feedDto, AuthorDto author, boolean isAuthor) {
         return new FeedResponse(
                 feedDto.postId(),
                 author,
-                images,
                 feedDto.status(),
-                feedDto.description(),
-                feedDto.shareUrl(),
+                feedDto.title(),
+                feedDto.thumbnailUrl(),
                 isAuthor,
-                feedDto.participantCount(),
-                feedDto.commentCount()
+                feedDto.voterCount(),
+                feedDto.commentCount(),
+                feedDto.createdAt()
         );
     }
 

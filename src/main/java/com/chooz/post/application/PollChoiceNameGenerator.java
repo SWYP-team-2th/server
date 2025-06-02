@@ -3,7 +3,7 @@ package com.chooz.post.application;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.common.exception.InternalServerException;
 
-public class PostImageNameGenerator {
+public class PollChoiceNameGenerator {
 
     private int index = 0;
     private final String[] alphabets = new String[]{
@@ -14,7 +14,7 @@ public class PostImageNameGenerator {
 
     public String generate() {
         if (index >= alphabets.length) {
-            throw new InternalServerException(ErrorCode.POST_IMAGE_NAME_GENERATOR_INDEX_OUT_OF_BOUND);
+            throw new InternalServerException(ErrorCode.POLL_CHOICE_NAME_GENERATOR_INDEX_OUT_OF_BOUND);
         }
         return "뽀또" + alphabets[index++];
     }

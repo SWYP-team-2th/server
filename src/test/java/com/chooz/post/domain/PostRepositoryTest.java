@@ -1,10 +1,10 @@
 package com.chooz.post.domain;
 
-import com.chooz.image.domain.ImageFile;
 import com.chooz.post.presentation.dto.FeedDto;
 import com.chooz.support.RepositoryTest;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,9 @@ import org.springframework.data.domain.Slice;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chooz.support.fixture.FixtureGenerator.*;
+import static com.chooz.support.fixture.PostFixture.createDefaultPost;
+import static com.chooz.support.fixture.PostFixture.createPostBuilder;
+import static com.chooz.support.fixture.UserFixture.createDefaultUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,10 +30,10 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("유저가 작성한 게시글 조회 - 게시글이 15개일 경우 15번쨰부터 10개 조회해야 함")
-    void select_post_findByUserId1() throws Exception {
+    void findByUserId1() throws Exception {
         //given
         long userId = 1L;
-        List<Post> posts = createPosts(userId, Scope.PRIVATE);
+        List<Post> posts = createPosts(userId, 15);
         int size = 10;
 
         //when
@@ -49,10 +51,10 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("유저가 작성한 게시글 조회 - 15개 중에 커서가 5번째 게시글의 id면 4번째부터 0번째까지 조회해야 함")
-    void select_post_findByUserId2() throws Exception {
+    void findByUserId2() throws Exception {
         //given
         long userId = 1L;
-        List<Post> posts = createPosts(userId, Scope.PRIVATE);
+        List<Post> posts = createPosts(userId, 15);
         int size = 10;
         int cursorIndex = 5;
 
@@ -71,9 +73,9 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("id 리스트에 포함되는 게시글 조회")
-    void select_post_findByIdIn() throws Exception {
+    void findByIdIn() throws Exception {
         //given
-        List<Post> posts = createPosts(1L, Scope.PRIVATE);
+        List<Post> posts = createPosts(1L, 15);
         List<Long> postIds = List.of(posts.get(0).getId(), posts.get(1).getId(), posts.get(2).getId());
 
         //when
@@ -89,25 +91,15 @@ class PostRepositoryTest extends RepositoryTest {
         );
     }
 
-    private List<Post> createPosts(long userId, Scope scope) {
-        List<Post> posts = new ArrayList<>();
-        for (int i = 0; i < 30; i += 2) {
-            ImageFile imageFile1 = createImageFile(i);
-            ImageFile imageFile2 = createImageFile(i + 1);
-            posts.add(postRepository.save(createPost(userId, scope, imageFile1, imageFile2, i)));
-        }
-        return posts;
-    }
-
     @Test
     @DisplayName("피드 조회")
-    void select_post_findByScopeAndDeletedFalse() {
+    void findByScopeAndDeletedFalse() {
         //given
-        User user1 = userRepository.save(createUser(1));
-        User user2 = userRepository.save(createUser(2));
-        List<Post> myPosts = createPosts(user1.getId(), Scope.PRIVATE);
-        List<Post> privatePosts = createPosts(user2.getId(), Scope.PRIVATE);
-        List<Post> publicPosts = createPosts(user2.getId(), Scope.PUBLIC);
+        User user1 = userRepository.save(createDefaultUser());
+        User user2 = userRepository.save(createDefaultUser());
+        List<Post> myPosts = createPosts(user1.getId(), 5);
+        List<Post> privatePosts = createPostsWithScope(user2, Scope.PRIVATE, 5);
+        List<Post> publicPosts = createPostsWithScope(user2, Scope.PUBLIC, 5);
         int size = 10;
 
         //when
@@ -116,7 +108,27 @@ class PostRepositoryTest extends RepositoryTest {
         //then
         assertAll(
                 () -> assertThat(res.getContent().size()).isEqualTo(size),
-                () -> assertThat(res.hasNext()).isTrue()
+                () -> assertThat(res.hasNext()).isFalse()
         );
+    }
+
+    private List<Post> createPosts(long userId, int size) {
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            posts.add(postRepository.save(createDefaultPost(userId)));
+        }
+        return posts;
+    }
+
+    private List<Post> createPostsWithScope(User user, Scope scope, int size) {
+        List<Post> posts = new ArrayList<>();
+        for (int i = 0; i < size; i ++) {
+            Post post = createPostBuilder()
+                    .userId(user.getId())
+                    .pollOption(new PollOption(PollType.SINGLE, scope, CommentActive.OPEN))
+                    .build();
+            posts.add(postRepository.save(post));
+        }
+        return posts;
     }
 }
