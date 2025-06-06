@@ -1,26 +1,32 @@
 package com.chooz.comment.application;
 
-import com.chooz.auth.domain.UserInfo;
 import com.chooz.comment.domain.Comment;
+import com.chooz.comment.domain.CommentLike;
+import com.chooz.comment.domain.CommentLikeRepository;
 import com.chooz.comment.domain.CommentRepository;
-import com.chooz.comment.presentation.dto.CommentResponse;
+import com.chooz.comment.presentation.dto.CommentAnchorResponse;
+import com.chooz.comment.presentation.dto.CommentLikeCountProjection;
 import com.chooz.comment.presentation.dto.CommentRequest;
+import com.chooz.comment.presentation.dto.CommentResponse;
+import com.chooz.comment.support.CommentValidator;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.common.exception.ForbiddenException;
+import com.chooz.post.domain.PostRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
-import com.chooz.vote.domain.Vote;
-import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,54 +35,101 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CommentService {
 
-    private final UserRepository userRepository;
     private final CommentRepository commentRepository;
-    private final VoteRepository voteRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final CommentValidator commentValidator;
 
-    @Transactional
-    public void createComment(Long postId, CommentRequest request, UserInfo userInfo) {
-        Comment comment = new Comment(postId, userInfo.userId(), request.content());
-        commentRepository.save(comment);
+
+    public CursorBasePaginatedResponse<CommentResponse> getComments(Long postId, Long userId, Long cursor, int size) {
+        //페이징, size+1개 조회
+        Pageable pageable = PageRequest.of(0, size + 1);
+        //투표상세 페이지의 댓글들 조회
+        List<Comment> comments = commentRepository.findCommentsByPostId(postId, userId, cursor, pageable);
+        //댓글 페이징할 거 더 있는지 확인
+        boolean hasNext = comments.size() > size;
+        if (hasNext) { //더 있으면 한개 제거 하고 리턴
+            comments.remove(comments.size() - 1); // 다음 페이지용 1개 제거
+        }
+
+        List<Long> commentIds = comments.stream()
+                .map(Comment::getId)
+                .toList();
+
+        Map<Long, Long> likeCountMap = commentLikeRepository.countByCommentIds(commentIds).stream()
+                .collect(Collectors.toMap(
+                        CommentLikeCountProjection::getCommentId,
+                        CommentLikeCountProjection::getLikeCount
+                ));
+
+        Map<Long, Boolean> likedMap = Optional.ofNullable(userId)
+                .map(id -> commentLikeRepository.findByCommentIdInAndUserId(commentIds, id).stream()
+                        .collect(Collectors.toMap(
+                                cl -> cl.getComment().getId(),
+                                cl -> true
+                        ))
+                ).orElse(Collections.emptyMap());
+
+        List<CommentResponse> responseContent = comments.stream()
+                .map(comment -> new CommentResponse(
+                        comment.getId(),
+                        comment.getUser().getId(),
+                        comment.getUser().getNickname(),
+                        comment.getUser().getProfileUrl(),
+                        comment.getContent(),
+                        comment.getEdited(),
+                        likeCountMap.getOrDefault(comment.getId(), 0L).intValue(),
+                        likedMap.getOrDefault(comment.getId(), false)
+                ))
+                .toList();
+
+        return CursorBasePaginatedResponse.of(new SliceImpl<>(
+                responseContent,
+                pageable,
+                hasNext));
     }
 
-    public CursorBasePaginatedResponse<CommentResponse> findComments(Long userId, Long postId, Long cursor, int size) {
-        Slice<Comment> commentSlice = commentRepository.findByPostId(postId, cursor, PageRequest.ofSize(size));
-        return CursorBasePaginatedResponse.of(
-                commentSlice.map(comment -> createCommentResponse(comment, userId))
+    @Transactional
+    public CommentAnchorResponse createComment(Long postId, CommentRequest commentRequest, Long userId) {
+        Comment commentForSave = Comment.of(commentRequest.content(),
+                userRepository.findById(userId).orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND)),
+                postRepository.findById(postId).orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND))
         );
-    }
-
-    private CommentResponse createCommentResponse(Comment comment, Long userId) {
-        User author = userRepository.findById(comment.getUserNo())
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        List<Vote> votes = voteRepository.findByUserIdAndPostId(userId, comment.getPostId());
-        List<Long> voteImageIds = votes.stream()
-                .map(Vote::getPostImageId)
-                .collect(Collectors.toList());
-        return CommentResponse.of(comment, author, author.getId().equals(userId), voteImageIds);
+        Comment commentFromSave = commentRepository.save(commentForSave);
+        return new CommentAnchorResponse(commentFromSave.getId(), commentFromSave.getContent(), "comment-"+ commentFromSave.getId());
     }
 
     @Transactional
-    public void updateComment(Long commentId, CommentRequest request, UserInfo userInfo) {
-        Comment comment = commentRepository.findByIdAndNotDeleted(commentId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
-
-        if (!comment.getUserNo().equals(userInfo.userId())) {
-            throw new ForbiddenException();
-        }
-
-        comment.updateComment(request.content());
+    public CommentAnchorResponse modifyComment(Long postId, Long commentId, CommentRequest commentRequest, Long userId) {
+        Comment commentForUpdate = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
+        commentValidator.validateCommentAccess(commentForUpdate, commentForUpdate.getPost().getId(), commentForUpdate.getUser().getId());
+        commentForUpdate.updateContent(commentRequest.content());
+        return new CommentAnchorResponse(commentForUpdate.getId(), commentForUpdate.getContent(),"comment-" + commentForUpdate.getId());
     }
 
     @Transactional
-    public void deleteComment(Long commentId, UserInfo userInfo) {
-        Comment comment = commentRepository.findByIdAndNotDeleted(commentId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
+    public void deleteComment(Long postId, Long commentId, Long userId) {
+        Comment commentForDelete = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
+        commentValidator.validateCommentAccess(commentForDelete, commentForDelete.getPost().getId(), commentForDelete.getUser().getId());
+        commentRepository.delete(commentForDelete);
+    }
 
-        if (!comment.getUserNo().equals(userInfo.userId())) {
-            throw new ForbiddenException();
+    @Transactional
+    public void createLikeComment(Long commentId, Long userId) {
+        boolean alreadyLiked = commentLikeRepository.existsByCommentIdAndUserId(commentId, userId);
+        if (alreadyLiked) {
+            return;
         }
+        Comment commentForLike = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
+        User userForLike = userRepository.getReferenceById(userId);
+        CommentLike like = new CommentLike(null, commentForLike, userForLike);
+        commentLikeRepository.save(like);
+    }
 
-        comment.delete();
+    @Transactional
+    public void deleteLikeComment(Long commentId, Long userId) {
+        commentLikeRepository.findByCommentIdInAndUserId(commentId, userId)
+                .ifPresent(commentLikeRepository::delete);
     }
 }

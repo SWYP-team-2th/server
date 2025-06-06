@@ -1,57 +1,48 @@
 package com.chooz.comment.domain;
 
 import com.chooz.common.domain.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
-import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import static com.chooz.common.util.Validator.validateEmptyString;
-import static com.chooz.common.util.Validator.validateNull;
+import com.chooz.post.domain.Post;
+import com.chooz.user.domain.User;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
 @Table(name = "comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private Long postId;
-
-    @NotNull
-    private Long userNo;
-
-    @NotNull
+    @Column(nullable = false, length = 200)
     private String content;
 
-    public Comment(Long id, Long postId, Long userNo, String content) {
-        validateNull(postId, userNo);
-        validateEmptyString(content);
-        this.id = id;
-        this.postId = postId;
-        this.userNo = userNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private int edited = 0;
+
+    public void updateContent(String content) {
         this.content = content;
+        this.edited = 1;
     }
 
-    public Comment(Long postId, Long userNo, String content) {
-        validateNull(postId, userNo);
-        validateEmptyString(content);
-        this.postId = postId;
-        this.userNo = userNo;
-        this.content = content;
-    }
-
-    public void updateComment(String content) {
-        validateEmptyString(content);
-        this.content = content;
+    public static Comment of(String content, User user, Post post) {
+        return Comment.builder()
+                .content(content)
+                .user(user)
+                .post(post)
+                .build();
     }
 }
