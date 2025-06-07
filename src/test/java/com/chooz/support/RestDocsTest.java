@@ -33,8 +33,16 @@ public abstract class RestDocsTest extends WebUnitTest {
         return headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token");
     }
 
-    protected static HeaderDescriptor guestHeader() {
-        return headerWithName(CustomHeader.GUEST_TOKEN).description("게스트 토큰");
+    protected static String enumDescription(String description, Class<? extends Enum<?>> enumClass) {
+        StringBuilder values = new StringBuilder(description + " (");
+        for (Enum<?> value : enumClass.getEnumConstants()) {
+            if (!values.isEmpty()) {
+                values.append(", ");
+            }
+            values.append(value.name());
+        }
+        values.append(")");
+        return values.toString();
     }
 
     protected static ParameterDescriptor[] cursorQueryParams() {

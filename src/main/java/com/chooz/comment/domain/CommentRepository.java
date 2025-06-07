@@ -12,12 +12,12 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
-        SELECT c FROM Comment c
-        JOIN FETCH c.user u
-        WHERE c.post.id = :postId
+        SELECT c 
+        FROM Comment c
+        WHERE c.postId = :postId
           AND (:cursor IS NULL OR c.id < :cursor)
         ORDER BY 
-             CASE WHEN c.user.id = :userId THEN 0 ELSE 1 END,
+             CASE WHEN c.userId = :userId THEN 0 ELSE 1 END,
              c.id DESC
     """)
     List<Comment> findCommentsByPostId(
@@ -26,5 +26,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         @Param("cursor") Long cursor,
         Pageable pageable
     );
-    List<Comment> findByPostId(Long postId);
+
+    List<Comment> findByPostIdAndDeletedFalse(Long postId);
+
+    long countByPostId(Long postId);
 }

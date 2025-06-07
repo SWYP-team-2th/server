@@ -37,31 +37,42 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
             SELECT p
             FROM Post p
-            JOIN FETCH p.images
+            JOIN FETCH p.pollChoices
             WHERE p.id = :postId
             """
     )
-    Optional<Post> findByIdFetchPostImage(@Param("postId") Long postId);
+    Optional<Post> findByIdFetchPollChoices(@Param("postId") Long postId);
 
     @Query(""" 
             SELECT new com.chooz.post.presentation.dto.FeedDto(
                     p.id,
-                   	p.status ,
-                   	p.description ,
-                   	p.shareUrl ,
-                   	p.userId ,
-                   	u.nickname, 
+                   	p.status,
+                   	p.title,
+                    t.thumbnailUrl,
+                   	p.userId,
+                   	u.nickname,
                    	u.profileUrl,
                    	cast((select count(distinct v.userId) from Vote v where p.id = v.postId) as long),
-                   	cast((select count(*) from Comment c where p.id = c.postId and c.deleted = false) as long)
+                   	cast((select count(*) from Comment c where p.id = c.postId and c.deleted = false) as long),
+                    p.createdAt
             )
             FROM Post p
             INNER JOIN User u on p.userId = u.id
+            LEFT JOIN Thumbnail t on p.id = t.postId
             WHERE p.deleted = false
-            AND p.scope = 'PUBLIC'
+            AND p.pollOption.scope = 'PUBLIC'
             AND (:postId IS NULL OR p.id < :postId)
             ORDER BY p.createdAt DESC
             """
     )
     Slice<FeedDto> findFeedByScopeWithUser(@Param("userId") Long userId, @Param("postId") Long postId, Pageable pageable);
+
+    @Query("""
+            SELECT p
+            FROM Post p
+            JOIN FETCH p.pollChoices
+            WHERE p.shareUrl = :shareUrl
+            """
+    )
+    Optional<Post> findByShareUrlFetchPollChoices(@Param("shareUrl") String shareUrl);
 }

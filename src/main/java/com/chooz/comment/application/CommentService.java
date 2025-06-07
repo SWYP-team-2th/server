@@ -50,7 +50,7 @@ public class CommentService {
         //댓글 페이징할 거 더 있는지 확인
         boolean hasNext = comments.size() > size;
         if (hasNext) { //더 있으면 한개 제거 하고 리턴
-            comments.remove(comments.size() - 1); // 다음 페이지용 1개 제거
+            comments.removeLast(); // 다음 페이지용 1개 제거
         }
 
         List<Long> commentIds = comments.stream()
@@ -72,16 +72,20 @@ public class CommentService {
                 ).orElse(Collections.emptyMap());
 
         List<CommentResponse> responseContent = comments.stream()
-                .map(comment -> new CommentResponse(
-                        comment.getId(),
-                        comment.getUser().getId(),
-                        comment.getUser().getNickname(),
-                        comment.getUser().getProfileUrl(),
-                        comment.getContent(),
-                        comment.getEdited(),
-                        likeCountMap.getOrDefault(comment.getId(), 0L).intValue(),
-                        likedMap.getOrDefault(comment.getId(), false)
-                ))
+                .map(   comment -> {
+                    User user = userRepository.findById(comment.getUserId()).orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+                    return new CommentResponse(
+                            comment.getId(),
+                            comment.getUserId(),
+                            user.getNickname(),
+                            user.getProfileUrl(),
+                            comment.getContent(),
+                            comment.getEdited() ? 1 : 0,
+                            likeCountMap.getOrDefault(comment.getId(), 0L).intValue(),
+                            likedMap.getOrDefault(comment.getId(), false)
+                    );
+                }
+                )
                 .toList();
 
         return CursorBasePaginatedResponse.of(new SliceImpl<>(
@@ -92,9 +96,10 @@ public class CommentService {
 
     @Transactional
     public CommentAnchorResponse createComment(Long postId, CommentRequest commentRequest, Long userId) {
-        Comment commentForSave = Comment.of(commentRequest.content(),
-                userRepository.findById(userId).orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND)),
-                postRepository.findById(postId).orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND))
+        Comment commentForSave = Comment.create(
+                postRepository.findById(postId).orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND)).getId(),
+                userRepository.findById(userId).orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND)).getId(),
+                commentRequest.content()
         );
         Comment commentFromSave = commentRepository.save(commentForSave);
         return new CommentAnchorResponse(commentFromSave.getId(), commentFromSave.getContent(), "comment-"+ commentFromSave.getId());
@@ -103,15 +108,15 @@ public class CommentService {
     @Transactional
     public CommentAnchorResponse modifyComment(Long postId, Long commentId, CommentRequest commentRequest, Long userId) {
         Comment commentForUpdate = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
-        commentValidator.validateCommentAccess(commentForUpdate, commentForUpdate.getPost().getId(), commentForUpdate.getUser().getId());
-        commentForUpdate.updateContent(commentRequest.content());
+        commentValidator.validateCommentAccess(commentForUpdate, postId, userId);
+        commentForUpdate.updateComment(commentRequest.content());
         return new CommentAnchorResponse(commentForUpdate.getId(), commentForUpdate.getContent(),"comment-" + commentForUpdate.getId());
     }
 
     @Transactional
     public void deleteComment(Long postId, Long commentId, Long userId) {
         Comment commentForDelete = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
-        commentValidator.validateCommentAccess(commentForDelete, commentForDelete.getPost().getId(), commentForDelete.getUser().getId());
+        commentValidator.validateCommentAccess(commentForDelete, postId, userId);
         commentRepository.delete(commentForDelete);
     }
 

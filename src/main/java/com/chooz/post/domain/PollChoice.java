@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +15,9 @@ import static com.chooz.common.util.Validator.validateNull;
 
 @Getter
 @Entity
+@Table(name = "poll_choices")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostImage {
+public class PollChoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,40 +26,24 @@ public class PostImage {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
-    private String name;
+    private String title;
 
-    private Long imageFileId;
+    private String imageUrl;
 
-    private int voteCount;
-
-    public PostImage(Long id, Post post, String name, Long imageFileId, int voteCount) {
+    public PollChoice(Long id, Post post, String title, String imageUrl) {
+        validateNull(title, imageUrl);
         this.id = id;
         this.post = post;
-        this.name = name;
-        this.imageFileId = imageFileId;
-        this.voteCount = voteCount;
+        this.title = title;
+        this.imageUrl = imageUrl;
     }
 
-    public PostImage(String name, Long imageFileId, int voteCount) {
-        this.name = name;
-        this.imageFileId = imageFileId;
-        this.voteCount = voteCount;
-    }
-
-    public static PostImage create(String name, Long imageFileId) {
-        return new PostImage(name, imageFileId, 0);
+    public static PollChoice create(String title, String imageUrl) {
+        return new PollChoice(null, null, title, imageUrl);
     }
 
     public void setPost(Post post) {
         validateNull(post);
         this.post = post;
-    }
-
-    public void increaseVoteCount() {
-        this.voteCount++;
-    }
-
-    public void decreaseVoteCount() {
-        this.voteCount = this.voteCount == 0 ? 0 : this.voteCount - 1;
     }
 }

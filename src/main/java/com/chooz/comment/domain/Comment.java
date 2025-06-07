@@ -1,10 +1,12 @@
 package com.chooz.comment.domain;
 
 import com.chooz.common.domain.BaseEntity;
-import com.chooz.post.domain.Post;
-import com.chooz.user.domain.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import static com.chooz.common.util.Validator.validateEmptyString;
+import static com.chooz.common.util.Validator.validateNull;
 
 @Entity
 @Getter
@@ -18,31 +20,33 @@ public class Comment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
+    @NotNull
+    private Long postId;
+
+    @NotNull
+    private Long userId;
+
+    @NotNull
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @NotNull
+    private Boolean edited;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private int edited = 0;
-
-    public void updateContent(String content) {
+    public Comment(Long postId, Long userId, String content) {
+        validateNull(postId, userId);
+        validateEmptyString(content);
+        this.postId = postId;
+        this.userId = userId;
         this.content = content;
-        this.edited = 1;
     }
 
-    public static Comment of(String content, User user, Post post) {
-        return Comment.builder()
-                .content(content)
-                .user(user)
-                .post(post)
-                .build();
+    public static Comment create(Long postId, Long userId, String content) {
+        return new Comment(null, postId, userId, content, false);
+    }
+
+    public void updateComment(String content) {
+        validateEmptyString(content);
+        this.content = content;
+        this.edited = true;
     }
 }

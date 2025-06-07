@@ -2,14 +2,18 @@ package com.chooz.post.presentation.dto;
 
 import com.chooz.post.domain.Status;
 
+import java.time.LocalDateTime;
+
 public record FeedDto(
         Long postId,
         Status status,
-        String description,
-        String shareUrl,
+        String title,
+        String thumbnailUrl,
         Long postUserId,
         String nickname,
         String profileUrl,
-        Long participantCount,
-        Long commentCount) {
+        Long voterCount,
+        Long commentCount,
+        LocalDateTime createdAt
+) {
 }
