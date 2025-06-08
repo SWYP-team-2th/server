@@ -38,6 +38,7 @@ public class Comment extends BaseEntity {
         this.postId = postId;
         this.userId = userId;
         this.content = content;
+        this.edited = false;
     }
 
     public static Comment create(Long postId, Long userId, String content) {

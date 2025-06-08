@@ -4,19 +4,29 @@
 [[댓글-생성]]
 === `POST` 댓글 생성
 
-operation::comment-controller-test/create-comment[snippets='http-request,curl-request,path-parameters,request-headers,request-fields,http-response']
+operation::comment-controller-test/create-comments[snippets='http-request,curl-request,path-parameters,request-headers,request-fields,http-response,response-fields']
 
 [[댓글-조회]]
 === `GET` 댓글 조회
 
-operation::comment-controller-test/find-comments[snippets='http-request,curl-request,path-parameters,http-response,response-fields']
+operation::comment-controller-test/get-comments[snippets='http-request,curl-request,path-parameters,request-headers,query-parameters,http-response,response-fields']
 
 [[댓글-수정]]
-=== `POST` 댓글 수정
+=== `PATCH` 댓글 수정
 
-operation::comment-controller-test/update-comment[snippets='http-request,curl-request,path-parameters,request-headers,request-fields,http-response']
+operation::comment-controller-test/modify-comment[snippets='http-request,curl-request,path-parameters,request-headers,request-fields,http-response,response-fields']
 
 [[댓글-삭제]]
 === `DELETE` 댓글 삭제
 
 operation::comment-controller-test/delete-comment[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
+
+[[댓글-좋아요]]
+=== `POST` 댓글 좋아요
+
+operation::comment-controller-test/create-like-comment[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
+
+[[댓글-좋아요-취소]]
+=== `DELETE` 댓글 좋아요 취소
+
+operation::comment-controller-test/delete-like-comment[snippets='http-request,curl-request,path-parameters,request-headers,http-response']

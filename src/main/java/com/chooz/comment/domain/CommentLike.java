@@ -1,7 +1,7 @@
 package com.chooz.comment.domain;
 
-import com.chooz.user.domain.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -19,11 +19,9 @@ public class CommentLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id", nullable = false)
-    private Comment comment;
+    @NotNull
+    private Long commentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @NotNull
+    private Long userId;
 }

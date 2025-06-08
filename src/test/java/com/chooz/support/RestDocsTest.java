@@ -1,6 +1,5 @@
 package com.chooz.support;
 
-import com.chooz.common.presentation.CustomHeader;
 import com.chooz.support.config.RestDocsConfiguration;
 import com.chooz.support.config.TestSecurityConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +47,8 @@ public abstract class RestDocsTest extends WebUnitTest {
     protected static ParameterDescriptor[] cursorQueryParams() {
         return new ParameterDescriptor[]{
                 parameterWithName("cursor").optional().description("페이지 조회 커서 값"),
-                parameterWithName("size").optional().attributes(defaultValue("10")).description("페이지 크기 (기본 값 10)")
+                parameterWithName("size").optional().attributes(defaultValue("10")).description("페이지 크기 (기본 값 10)"),
+                parameterWithName("priority").description("정렬 기준 (0: 내가남긴댓글, 1: 다른사람댓글)")
         };
     }
 

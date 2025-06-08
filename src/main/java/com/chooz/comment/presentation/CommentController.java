@@ -3,6 +3,7 @@ package com.chooz.comment.presentation;
 import com.chooz.auth.domain.UserInfo;
 import com.chooz.comment.application.CommentService;
 import com.chooz.comment.presentation.dto.CommentAnchorResponse;
+import com.chooz.comment.presentation.dto.CommentCursor;
 import com.chooz.comment.presentation.dto.CommentRequest;
 import com.chooz.comment.presentation.dto.CommentResponse;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
@@ -26,11 +27,11 @@ public class CommentController {
     public ResponseEntity<CursorBasePaginatedResponse<CommentResponse>> getComments(
             @PathVariable("postId") Long postId,
             @RequestParam(value = "cursor", required = false) @Min(0) Long cursor,
+            @RequestParam(value = "priority") Long priority,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) int size,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-
-        return ResponseEntity.ok(commentService.getComments(postId, userInfo.userId(), cursor, size));
+        return ResponseEntity.ok(commentService.getComments(postId, userInfo.userId(), new CommentCursor(cursor, priority.intValue()), size));
     }
     //댓글생성
     @PostMapping("")

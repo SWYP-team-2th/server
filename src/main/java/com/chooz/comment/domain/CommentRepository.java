@@ -12,18 +12,26 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
-        SELECT c 
+        SELECT c
         FROM Comment c
         WHERE c.postId = :postId
-          AND (:cursor IS NULL OR c.id < :cursor)
-        ORDER BY 
-             CASE WHEN c.userId = :userId THEN 0 ELSE 1 END,
-             c.id DESC
+        AND (
+           (:cursorId IS NULL AND :priority IS NULL) OR
+           (
+             CASE WHEN c.userId = :userId THEN 0 ELSE 1 END = :priority AND c.id < :cursorId
+           ) OR (
+             CASE WHEN c.userId = :userId THEN 0 ELSE 1 END > :priority
+           )
+         )
+        ORDER BY
+            CASE WHEN c.userId = :userId THEN 0 ELSE 1 END,
+            c.id DESC
     """)
-    List<Comment> findCommentsByPostId(
+    List<Comment> findCommentsByPostIdWithPriority(
         @Param("postId") Long postId,
         @Param("userId") Long userId,
-        @Param("cursor") Long cursor,
+        @Param("cursorId") Long cursorId,
+        @Param("priority") Integer priority,
         Pageable pageable
     );
 

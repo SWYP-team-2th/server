@@ -1,233 +1,181 @@
-//package com.chooz.comment.application;
-//
-//import com.chooz.auth.domain.UserInfo;
-//import com.chooz.comment.domain.Comment;
-//import com.chooz.comment.domain.CommentRepository;
-//import com.chooz.comment.presentation.dto.CommentResponse;
-//import com.chooz.comment.presentation.dto.CommentRequest;
-//import com.chooz.common.dto.CursorBasePaginatedResponse;
-//import com.chooz.common.exception.BadRequestException;
-//import com.chooz.common.exception.ErrorCode;
-//import com.chooz.common.exception.ForbiddenException;
-//import com.chooz.post.domain.Post;
-//import com.chooz.user.domain.Role;
-//import com.chooz.user.domain.User;
-//import com.chooz.user.domain.UserRepository;
-//import com.chooz.vote.domain.Vote;
-//import com.chooz.vote.domain.VoteRepository;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.SliceImpl;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//import static java.util.Optional.empty;
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.assertThatThrownBy;
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.BDDMockito.given;
-//import static org.mockito.Mockito.eq;
-//import static org.mockito.Mockito.when;
-//
-//@ExtendWith(MockitoExtension.class)
-//class CommentServiceTest {
-//
-//    @Mock
-//    private CommentRepository commentRepository;
-//
-//    @Mock
-//    private UserRepository userRepository;
-//
-//    @InjectMocks
-//    private CommentService commentService;
-//
-//    @Mock
-//    private VoteRepository voteRepository;
-//
-//    @Test
-//    @DisplayName("댓글 생성")
-//    void createComment() {
-//        // given
-//        Long postId = 1L;
-//        CommentRequest request = new CommentRequest("테스트 댓글");
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-////        Comment comment = Comment.of(Post, new User(userInfo.userId(), "", "www.example.com/profile.png", null), request.content());
-//
-//        // when
-//        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
-//
-//        // then
-//        assertDoesNotThrow(() -> commentService.createComment(postId, request, userInfo));
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 조회")
-//    void findComments() {
-//        // given
-//        Long postId = 1L;
-//        Long cursor = null;
-//        int size = 2;
-//
-//        Comment comment1 = new Comment(1L, postId, 100L, "첫 번째 댓글");
-//        Comment comment2 = new Comment(2L, postId, 100L, "두 번째 댓글");
-//        SliceImpl<Comment> commentSlice = new SliceImpl<>(List.of(comment1, comment2), PageRequest.of(0, size), false);
-//        User user = new User(100L, "닉네임","http://example.com/profile.png", Role.USER);
-//        List<Vote> votes = List.of(
-//                Vote.of(1L, 100L, 1L),
-//                Vote.of(1L, 101L, 1L)
-//        );
-//
-//        // Mock 설정
-//        given(commentRepository.findByPostId(eq(postId), eq(cursor), any(PageRequest.class))).willReturn(commentSlice);
-//        given(voteRepository.findByUserIdAndPostId(eq(user.getId()), eq(postId))).willReturn(votes);
-//        // 각 댓글마다 user_no=100L 이므로, findById(100L)만 호출됨
-//        given(userRepository.findById(100L)).willReturn(Optional.of(user));
-//
-//        // when
-//        CursorBasePaginatedResponse<CommentResponse> response = commentService.findComments(user.getId(), postId, cursor, size);
-//
-//        // then
-//        assertThat(response.data()).hasSize(2);
-//
-//        CommentResponse cr1 = response.data().get(0);
-//        assertThat(cr1.commentId()).isEqualTo(1L);
-//        assertThat(cr1.content()).isEqualTo("첫 번째 댓글");
-//        assertThat(cr1.author().nickname()).isEqualTo("닉네임");
-//
-//        CommentResponse cr2 = response.data().get(1);
-//        assertThat(cr2.commentId()).isEqualTo(2L);
-//        assertThat(cr2.content()).isEqualTo("두 번째 댓글");
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 조회 - 유저 정보 없는 경우")
-//    void findComments_userNotFound() {
-//        // given
-//        Long postId = 1L;
-//        Long cursor = null;
-//        int size = 2;
-//
-//        Comment comment1 = new Comment(1L, postId, 100L, "첫 번째 댓글");
-//        Comment comment2 = new Comment(2L, postId, 100L, "두 번째 댓글");
-//        SliceImpl<Comment> commentSlice = new SliceImpl<>(
-//                List.of(comment1, comment2),
-//                PageRequest.of(0, size),
-//                false
-//        );
-//
-//        given(commentRepository.findByPostId(eq(postId), eq(cursor), any(PageRequest.class))).willReturn(commentSlice);
-//        given(userRepository.findById(100L)).willReturn(empty());
-//
-//        // when & then
-//        assertThatThrownBy(() -> commentService.findComments(1L, postId, cursor, size))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage((ErrorCode.USER_NOT_FOUND.getMessage()));
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 수정")
-//    void updateComment() {
-//        // given
-//        Long postId = 1L;
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-//        Comment comment = new Comment(1L, postId, 100L, "첫 번째 댓글");
-//        CommentRequest request = new CommentRequest("수정 댓글");
-//        when(commentRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.of(comment));
-//
-//        // when
-//        commentService.updateComment(1L, request, userInfo);
-//
-//        // then
-//        assertAll(
-//                () -> assertThat(comment.getId()).isEqualTo(1L),
-//                () -> assertThat(comment.getContent()).isEqualTo("수정 댓글")
-//        );
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 수정 - 존재하지 않은 댓글")
-//    void updateComment_commentNotFound() {
-//        // given
-//        CommentRequest request = new CommentRequest("수정 댓글");
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-//        when(commentRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.empty());
-//
-//        // when then
-//        assertThatThrownBy(() -> commentService.updateComment(1L, request, userInfo))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage((ErrorCode.COMMENT_NOT_FOUND.getMessage()));
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 수정 - 권한 없는 사용자")
-//    void updateComment_forbiddenException() {
-//        // given
-//        Long postId = 1L;
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-//        Comment comment = new Comment(1L, postId, 110L, "첫 번째 댓글");
-//        CommentRequest request = new CommentRequest("수정 댓글");
-//        when(commentRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.of(comment));
-//
-//        // when then
-//        assertAll(
-//                () -> assertThatThrownBy(() -> commentService.updateComment(1L, request, userInfo))
-//                        .isInstanceOf(ForbiddenException.class),
-//                () -> assertThat(comment.getContent()).isEqualTo("첫 번째 댓글")
-//        );
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 삭제")
-//    void deleteComment() {
-//        // given
-//        Long postId = 1L;
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-//        Comment comment = new Comment(1L, postId, 100L, "첫 번째 댓글");
-//        when(commentRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.of(comment));
-//
-//        // when
-//        commentService.deleteComment(1L, userInfo);
-//
-//        // then
-//        assertAll(
-//                () -> assertTrue(comment.isDeleted()),
-//                () -> assertNotNull(comment.getDeletedAt())
-//        );
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 삭제 - 존재하지 않는 댓글")
-//    void deleteComment_commentNotFound() {
-//        // given
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-//        when(commentRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.empty());
-//
-//        // when then
-//        assertThatThrownBy(() -> commentService.deleteComment(1L, userInfo))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage((ErrorCode.COMMENT_NOT_FOUND.getMessage()));
-//    }
-//
-//    @Test
-//    @DisplayName("댓글 삭제 - 권한 없는 사용자")
-//    void deleteComment_forbiddenException() {
-//        // given
-//        Long postId = 1L;
-//        UserInfo userInfo = new UserInfo(100L, Role.USER);
-//        Comment comment = new Comment(1L, postId, 110L, "첫 번째 댓글");
-//        when(commentRepository.findByIdAndNotDeleted(1L)).thenReturn(Optional.of(comment));
-//
-//        // when then
-//        assertThatThrownBy(() -> commentService.deleteComment(1L, userInfo))
-//                .isInstanceOf(ForbiddenException.class);
-//        assertFalse(comment.isDeleted());
-//        assertNull(comment.getDeletedAt());
-//    }
-//}
+package com.chooz.comment.application;
+
+import com.chooz.comment.domain.Comment;
+import com.chooz.comment.domain.CommentLike;
+import com.chooz.comment.domain.CommentLikeRepository;
+import com.chooz.comment.domain.CommentRepository;
+import com.chooz.comment.presentation.dto.CommentAnchorResponse;
+import com.chooz.comment.presentation.dto.CommentRequest;
+import com.chooz.comment.support.CommentValidator;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.domain.Post;
+import com.chooz.post.domain.PostRepository;
+import com.chooz.user.domain.User;
+import com.chooz.user.domain.UserRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+
+@ExtendWith(MockitoExtension.class)
+class CommentServiceTest  {
+
+    @InjectMocks
+    private CommentService commentService;
+
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private CommentLikeRepository commentLikeRepository;
+
+    @Mock
+    private PostRepository postRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private CommentValidator commentValidator;
+
+    @Test
+    void createComment_성공() {
+
+        // given
+        Long postId = 1L;
+        Long userId = 2L;
+        String content = "테스트 댓글을 입니다.";
+
+        CommentRequest request = new CommentRequest(content);
+
+        Post mockPost = mock(Post.class);
+        User mockUser = mock(User.class);
+
+        Comment savedComment = Comment.builder()
+                .id(10L)
+                .postId(postId)
+                .userId(userId)
+                .content(content)
+                .build();
+
+        given(postRepository.findById(postId)).willReturn(Optional.of(mockPost));
+        given(userRepository.findById(userId)).willReturn(Optional.of(mockUser));
+        given(commentRepository.save(any(Comment.class))).willReturn(savedComment);
+
+        // when
+        CommentAnchorResponse response = commentService.createComment(postId, request, userId);
+
+        // then
+        assertThat(response.commentId()).isEqualTo(savedComment.getId());
+        assertThat(response.anchor()).isEqualTo("comment-" + savedComment.getId());
+    }
+
+    @Test
+    void createComment_존재하지_않는_포스트() {
+        // given
+        Long postId = 999L;
+        Long userId = 1L;
+        CommentRequest request = new CommentRequest("content");
+
+        given(postRepository.findById(postId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> commentService.createComment(postId, request, userId))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 댓글_수정_성공() {
+        // given
+        Long commentId = 1L;
+        Long postId = 10L;
+        Long userId = 100L;
+        String originalContent = "원래 댓글";
+        String updatedContent = "수정된 댓글";
+
+        Comment comment = Comment.create(postId, userId, originalContent);
+        ReflectionTestUtils.setField(comment, "id", commentId);
+
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+        willDoNothing().given(commentValidator).validateCommentAccess(comment, postId, userId);
+
+        // when
+        CommentAnchorResponse result = commentService.modifyComment(
+                postId,
+                commentId,
+                new CommentRequest(updatedContent),
+                userId
+        );
+        // then
+        assertThat(result.commentId()).isEqualTo(commentId);
+        assertThat(result.content()).isEqualTo(updatedContent);
+        assertThat(result.anchor()).isEqualTo("comment-" + commentId);
+    }
+
+    @Test
+    void 댓글_삭제_성공() {
+        // given
+        Long commentId = 1L;
+        Long postId = 10L;
+        Long userId = 100L;
+
+        Comment comment = Comment.create(postId, userId, "삭제할 댓글");
+        ReflectionTestUtils.setField(comment, "id", commentId);
+
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        willDoNothing().given(commentValidator).validateCommentAccess(comment, postId, userId);
+        willDoNothing().given(commentRepository).delete(comment);
+
+        // when
+        commentService.deleteComment(postId, commentId, userId);
+
+        // then
+        then(commentRepository).should().delete(comment);
+    }
+    @Test
+    void 댓글_좋아요_생성_성공() {
+        // given
+        Long commentId = 1L;
+        Long userId = 100L;
+
+        given(commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)).willReturn(false);
+
+        // when
+        commentService.createLikeComment(commentId, userId);
+
+        // then
+        then(commentLikeRepository).should().save(any(CommentLike.class));
+    }
+
+    @Test
+    void 댓글_좋아요_삭제_성공() {
+        // given
+        Long commentId = 1L;
+        Long userId = 100L;
+
+        CommentLike mockLike = new CommentLike(999L, commentId, userId);
+
+        given(commentLikeRepository.findByCommentIdAndUserId(commentId, userId))
+                .willReturn(Optional.of(mockLike));
+
+        // when
+        commentService.deleteLikeComment(commentId, userId);
+
+        // then
+        then(commentLikeRepository).should().delete(mockLike);
+    }
+
+}

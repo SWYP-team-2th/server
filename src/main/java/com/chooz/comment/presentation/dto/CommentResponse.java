@@ -10,11 +10,12 @@ public record CommentResponse(
         String content,
         int edited,
         int likeCount,
-        boolean liked
+        boolean liked,
+        CommentCursor commentCursor
 ) implements CursorDto  {
 
     @Override
     public long getId() {
-        return 0;
+        return this.id;
     }
 }

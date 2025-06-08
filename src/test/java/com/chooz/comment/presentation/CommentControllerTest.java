@@ -1,6 +1,7 @@
 package com.chooz.comment.presentation;
 
 import com.chooz.comment.presentation.dto.CommentAnchorResponse;
+import com.chooz.comment.presentation.dto.CommentCursor;
 import com.chooz.comment.presentation.dto.CommentRequest;
 import com.chooz.comment.presentation.dto.CommentResponse;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
@@ -36,6 +37,7 @@ class CommentControllerTest extends RestDocsTest {
         // given
         Long postId = 1L;
         Long cursor = null;
+        CommentCursor commentCursor = new CommentCursor(cursor, null);
         int size = 10;
 
         CommentResponse response = new CommentResponse(
@@ -46,7 +48,8 @@ class CommentControllerTest extends RestDocsTest {
                 "댓글내용",
                 0,
                 10,
-                false
+                false,
+                commentCursor
         );
 
         CursorBasePaginatedResponse<CommentResponse> commentListResponse = CursorBasePaginatedResponse.of( new SliceImpl<>(
@@ -55,13 +58,14 @@ class CommentControllerTest extends RestDocsTest {
                 false
         ));
 
-        when(commentService.getComments(eq(postId), any(), eq(cursor), eq(size)))
+        when(commentService.getComments(eq(postId), any(), any(), eq(size)))
                 .thenReturn(commentListResponse);
 
         // when then
         mockMvc.perform(get("/posts/{postId}/comments", postId)
                         .param("cursor", "")
                         .param("size", String.valueOf(size))
+                        .param("priority", "0")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(commentListResponse)))
@@ -78,12 +82,14 @@ class CommentControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].edited").description("수정 여부 (0이면 원본, 1이면 수정됨)"),
                                 fieldWithPath("data[].likeCount").description("댓글 좋아요 수"),
                                 fieldWithPath("data[].liked").description("내가 좋아요 눌렀는지 여부"),
+                                fieldWithPath("data[].commentCursor.id").optional().description("커서 기반 페이징을 위한 댓글 ID"),
+                                fieldWithPath("data[].commentCursor.priority").optional().description("커서 기반 페이징을 위한 우선순위 값"),
                                 fieldWithPath("nextCursor").optional().description("다음 커서 (없으면 null)"),
                                 fieldWithPath("hasNext").description("다음 페이지 존재 여부")
                         )
                 ));
 
-        verify(commentService, times(1)).getComments(eq(postId), any(), eq(cursor), eq(size));
+        verify(commentService, times(1)).getComments(eq(postId), any(), any(), eq(size));
     }
 
     @Test
@@ -108,6 +114,7 @@ class CommentControllerTest extends RestDocsTest {
                         requestFields(fieldWithPath("content").description("댓글 내용")),
                         responseFields(
                                 fieldWithPath("commentId").description("댓글 ID"),
+                                fieldWithPath("content").description("댓글 내용").optional(),
                                 fieldWithPath("anchor").description("프론트에서 사용하는 앵커 ex. comment-{id}")
                         )
                 ));
@@ -140,6 +147,7 @@ class CommentControllerTest extends RestDocsTest {
                         requestFields(fieldWithPath("content").description("수정할 댓글 내용")),
                         responseFields(
                                 fieldWithPath("commentId").description("댓글 ID"),
+                                fieldWithPath("content").description("댓글 내용").optional(),
                                 fieldWithPath("anchor").description("프론트에서 사용하는 앵커 ex. comment-{id}")
                         )
                 ));

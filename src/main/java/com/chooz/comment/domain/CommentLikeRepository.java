@@ -1,7 +1,6 @@
 package com.chooz.comment.domain;
 
 import com.chooz.comment.presentation.dto.CommentLikeCountProjection;
-import com.chooz.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,16 +16,14 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
 
     List<CommentLike> findByCommentIdInAndUserId(List<Long> commentIds, Long userId);
 
-    Optional<CommentLike> findByCommentIdInAndUserId(Long commentId, Long userId);
+    Optional<CommentLike> findByCommentIdAndUserId(Long commentId, Long userId);
 
     @Query("""
-            SELECT cl.comment.id AS commentId, COUNT(cl) AS likeCount
+            SELECT cl.commentId AS commentId, COUNT(cl) AS likeCount
             FROM CommentLike cl
-            WHERE cl.comment.id IN :commentIds 
-            GROUP BY cl.comment.id
+            WHERE cl.commentId IN :commentIds 
+            GROUP BY cl.commentId
     """)
     List<CommentLikeCountProjection> countByCommentIds(@Param("commentIds") List<Long> commentIds);
 
-
-    Long user(User user);
 }

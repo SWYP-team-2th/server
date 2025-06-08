@@ -4,10 +4,7 @@ import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentLike;
 import com.chooz.comment.domain.CommentLikeRepository;
 import com.chooz.comment.domain.CommentRepository;
-import com.chooz.comment.presentation.dto.CommentAnchorResponse;
-import com.chooz.comment.presentation.dto.CommentLikeCountProjection;
-import com.chooz.comment.presentation.dto.CommentRequest;
-import com.chooz.comment.presentation.dto.CommentResponse;
+import com.chooz.comment.presentation.dto.*;
 import com.chooz.comment.support.CommentValidator;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
@@ -42,11 +39,17 @@ public class CommentService {
     private final CommentValidator commentValidator;
 
 
-    public CursorBasePaginatedResponse<CommentResponse> getComments(Long postId, Long userId, Long cursor, int size) {
+    public CursorBasePaginatedResponse<CommentResponse> getComments(Long postId, Long userId, CommentCursor cursor, int size) {
         //페이징, size+1개 조회
         Pageable pageable = PageRequest.of(0, size + 1);
         //투표상세 페이지의 댓글들 조회
-        List<Comment> comments = commentRepository.findCommentsByPostId(postId, userId, cursor, pageable);
+        List<Comment> comments = commentRepository.findCommentsByPostIdWithPriority(
+                postId,
+                userId,
+                cursor.id() == null ? null : cursor.id(),
+                cursor.priority() == null ? null : cursor.priority(),
+                pageable
+        );
         //댓글 페이징할 거 더 있는지 확인
         boolean hasNext = comments.size() > size;
         if (hasNext) { //더 있으면 한개 제거 하고 리턴
@@ -66,7 +69,7 @@ public class CommentService {
         Map<Long, Boolean> likedMap = Optional.ofNullable(userId)
                 .map(id -> commentLikeRepository.findByCommentIdInAndUserId(commentIds, id).stream()
                         .collect(Collectors.toMap(
-                                cl -> cl.getComment().getId(),
+                                CommentLike::getCommentId,
                                 cl -> true
                         ))
                 ).orElse(Collections.emptyMap());
@@ -82,7 +85,8 @@ public class CommentService {
                             comment.getContent(),
                             comment.getEdited() ? 1 : 0,
                             likeCountMap.getOrDefault(comment.getId(), 0L).intValue(),
-                            likedMap.getOrDefault(comment.getId(), false)
+                            likedMap.getOrDefault(comment.getId(), false),
+                            new CommentCursor(comment.getId(), comment.getUserId().equals(userId) ? 0 : 1) //(내 댓글 = 0, 남 댓글 = 1)
                     );
                 }
                 )
@@ -126,15 +130,12 @@ public class CommentService {
         if (alreadyLiked) {
             return;
         }
-        Comment commentForLike = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
-        User userForLike = userRepository.getReferenceById(userId);
-        CommentLike like = new CommentLike(null, commentForLike, userForLike);
-        commentLikeRepository.save(like);
+        commentLikeRepository.save(new CommentLike(null, commentId, userId));
     }
 
     @Transactional
     public void deleteLikeComment(Long commentId, Long userId) {
-        commentLikeRepository.findByCommentIdInAndUserId(commentId, userId)
+        commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
                 .ifPresent(commentLikeRepository::delete);
     }
 }
