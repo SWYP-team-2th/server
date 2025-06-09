@@ -74,10 +74,6 @@ public class Post extends BaseEntity {
             PollOption pollOption,
             CloseOption closeOption
     ) {
-        validateNull(userId, title, description, status, pollChoices);
-        validateTitle(title);
-        validateDescription(description);
-        validatePollChoices(pollChoices);
         this.id = id;
         this.title = title;
         this.description = description;
@@ -90,38 +86,24 @@ public class Post extends BaseEntity {
         this.closeOption = closeOption;
     }
 
-    private void validatePollChoices(List<PollChoice> images) {
-        if (images.size() < 2 || images.size() > 9) {
-            throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
-        }
-    }
-
-    private void validateDescription(String description) {
-        if (description.length() > 100) {
-            throw new BadRequestException(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED);
-        }
-    }
-    
-    private void validateTitle(String title) {
-        if (StringUtils.hasText(title) && title.length() > 50) {
-            throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
-        }
-    }
-
     public static Post create(
-            Long userId, 
+            Long userId,
             String title,
-            String description, 
+            String description,
             List<PollChoice> pollChoices,
             String shareUrl,
             PollOption pollOption,
             CloseOption closeOption
     ) {
+        validateNull(userId, title, description, pollChoices);
+        validateTitle(title);
+        validateDescription(description);
+        validatePollChoices(pollChoices);
         return new Post(
-                null, 
-                userId, 
+                null,
+                userId,
                 title,
-                description, 
+                description,
                 Status.PROGRESS,
                 pollChoices,
                 shareUrl,
@@ -130,22 +112,22 @@ public class Post extends BaseEntity {
         );
     }
 
-//    public PollChoice getBestPickedImage() {
-//        return pollChoices.stream()
-//                .max(Comparator.comparing(PollChoice::getVoteCount))
-//                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
+    private static void validatePollChoices(List<PollChoice> images) {
+        if (images.size() < 2 || images.size() > 9) {
+            throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
+        }
 //    }
 
-    public void vote(Long imageId) {
-        PollChoice image = pollChoices.stream()
-                .filter(pollChoice -> pollChoice.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-//        image.increaseVoteCount();
+    private static void validateDescription(String description) {
+        if (description.length() > 100) {
+            throw new BadRequestException(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED);
+        }
     }
-
-    public void cancelVote(Long imageId) {
-        PollChoice image = pollChoices.stream()
+    
+    private static void validateTitle(String title) {
+        if (StringUtils.hasText(title) && title.length() > 50) {
+            throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
+        }
                 .filter(pollChoice -> pollChoice.getId().equals(imageId))
                 .findFirst()
                 .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
