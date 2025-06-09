@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -131,10 +130,14 @@ public class Post extends BaseEntity {
         }
     }
 
-    public void close(Long userId) {
+    public void closeByAuthor(Long userId) {
         if (!isAuthor(userId)) {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
+        close();
+    }
+
+    public void close() {
         if (status == Status.CLOSED) {
             throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
         }
@@ -179,5 +182,13 @@ public class Post extends BaseEntity {
 
     public boolean isSingleVote() {
         return PollType.SINGLE.equals(pollOption.getPollType());
+    }
+
+    public boolean isCloseTypeVoter() {
+        return CloseType.VOTER.equals(closeOption.getCloseType());
+    }
+
+    public boolean isClosedByVoter(long voterCount) {
+        return closeOption.getMaxVoterCount() == voterCount;
     }
 }

@@ -98,13 +98,13 @@ class PostTest {
 
     @Test
     @DisplayName("투표 마감")
-    void close() throws Exception {
+    void closeByAuthor() throws Exception {
         //given
         long userId = 1L;
         Post post = createDefaultPost(userId);
 
         //when
-        post.close(userId);
+        post.closeByAuthor(userId);
 
         //then
         assertThat(post.getStatus()).isEqualTo(Status.CLOSED);
@@ -112,7 +112,7 @@ class PostTest {
 
     @Test
     @DisplayName("투표 마감 - 이미 마감된 게시글인 경우")
-    void close_alreadyClosed() throws Exception {
+    void close_ByAuthor_alreadyClosed() throws Exception {
         //given
         long userId = 1L;
         Post post = createPostBuilder()
@@ -121,14 +121,14 @@ class PostTest {
                 .build();
 
         //when then
-        assertThatThrownBy(() -> post.close(userId))
+        assertThatThrownBy(() -> post.closeByAuthor(userId))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.POST_ALREADY_CLOSED.getMessage());
     }
 
     @Test
     @DisplayName("투표 마감 - 게시글 작성자가 아닌 경우")
-    void close_notPostAuthor() throws Exception {
+    void close_ByAuthor_notPostAuthor() throws Exception {
         //given
         long userId = 1L;
         Post post = createPostBuilder()
@@ -136,7 +136,7 @@ class PostTest {
                 .build();
 
         //when then
-        assertThatThrownBy(() -> post.close(2L))
+        assertThatThrownBy(() -> post.closeByAuthor(2L))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
     }

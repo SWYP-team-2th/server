@@ -374,7 +374,7 @@ class PostControllerTest extends RestDocsTest {
     @Test
     @WithMockUserInfo
     @DisplayName("게시글 마감")
-    void closePost() throws Exception {
+    void closeByAuthorPost() throws Exception {
         //given
 
         //when then
