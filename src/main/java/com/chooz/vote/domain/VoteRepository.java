@@ -18,4 +18,6 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     List<Vote> findAllByPostId(Long postId);
 
     List<Vote> findByPostIdAndDeletedFalse(Long id);
+
+    long countDistinctByPostIdAndUserId(Long postId, Long userId);
 }

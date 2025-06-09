@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.util.StringUtils;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -116,7 +117,7 @@ public class Post extends BaseEntity {
         if (images.size() < 2 || images.size() > 9) {
             throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
         }
-//    }
+    }
 
     private static void validateDescription(String description) {
         if (description.length() > 100) {
@@ -128,10 +129,6 @@ public class Post extends BaseEntity {
         if (StringUtils.hasText(title) && title.length() > 50) {
             throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
         }
-                .filter(pollChoice -> pollChoice.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-//        image.decreaseVoteCount();
     }
 
     public void close(Long userId) {
@@ -166,5 +163,21 @@ public class Post extends BaseEntity {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
         pollOption.toggleScope();
+    }
+
+    public void validateCloseDate(Clock clock) {
+        if (closeOption.getClosedAt().isBefore(LocalDateTime.now(clock))) {
+            throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
+        }
+    }
+
+    public void validateMaxVoterCount(long voterCount) {
+        if (closeOption.getMaxVoterCount() >= voterCount) {
+            throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
+        }
+    }
+
+    public boolean isSingleVote() {
+        return PollType.SINGLE.equals(pollOption.getPollType());
     }
 }
