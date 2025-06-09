@@ -1,5 +1,6 @@
 package com.chooz.vote.application;
 
+import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.Post;
@@ -9,7 +10,6 @@ import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,7 @@ public class VoteService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final RatioCalculator ratioCalculator;
-    private final ApplicationEventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
     private final VoteValidator voteValidator;
 
     @Transactional
@@ -40,7 +40,7 @@ public class VoteService {
 
     private Vote processVote(Long voterId, Long pollChoiceId, Post post) {
         Vote vote = createVote(voterId, pollChoiceId, post);
-        eventPublisher.publishEvent(new VotedEvent(post.getId(), pollChoiceId, voterId));
+        eventPublisher.publish(new VotedEvent(post.getId(), pollChoiceId, voterId));
         return vote;
     }
 

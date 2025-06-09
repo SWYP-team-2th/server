@@ -1,7 +1,5 @@
 package com.chooz.vote.application;
 
-import com.chooz.common.exception.BadRequestException;
-import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.CloseType;
 import com.chooz.post.domain.Post;
@@ -10,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +24,7 @@ public class VoteValidator {
         switch (closeType) {
             case DATE -> post.validateCloseDate(clock);
             case VOTER -> {
-                long voterCount = voteRepository.countDistinctByPostIdAndUserId(post.getId(), voterId);
+                long voterCount = voteRepository.countVoterByPostId(post.getId());
                 post.validateMaxVoterCount(voterCount);
             }
         }
