@@ -43,8 +43,8 @@ public class VoteStatusReader {
         String ratio = ratioCalculator.calculate(totalVoteCount, voteCount);
         return new VoteStatusResponse(
                 pollChoice.getId(),
-                pollChoice.getImageUrl(),
                 pollChoice.getTitle(),
+                pollChoice.getImageUrl(),
                 voteCount,
                 ratio
         );
