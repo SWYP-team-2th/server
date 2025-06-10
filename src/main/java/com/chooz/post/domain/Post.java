@@ -74,6 +74,10 @@ public class Post extends BaseEntity {
             PollOption pollOption,
             CloseOption closeOption
     ) {
+        validateNull(userId, title, description, pollChoices);
+        validateTitle(title);
+        validateDescription(description);
+        validatePollChoices(pollChoices);
         this.id = id;
         this.title = title;
         this.description = description;
@@ -95,10 +99,6 @@ public class Post extends BaseEntity {
             PollOption pollOption,
             CloseOption closeOption
     ) {
-        validateNull(userId, title, description, pollChoices);
-        validateTitle(title);
-        validateDescription(description);
-        validatePollChoices(pollChoices);
         return new Post(
                 null,
                 userId,
@@ -169,14 +169,14 @@ public class Post extends BaseEntity {
     }
 
     public void validateCloseDate(Clock clock) {
-        if (closeOption.getClosedAt().isBefore(LocalDateTime.now(clock))) {
-            throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
+        if (closeOption.getClosedAt().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException(ErrorCode.CLOSE_DATE_OVER);
         }
     }
 
     public void validateMaxVoterCount(long voterCount) {
         if (closeOption.getMaxVoterCount() >= voterCount) {
-            throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
+            throw new BadRequestException(ErrorCode.EXCEED_MAX_VOTER_COUNT);
         }
     }
 
@@ -188,7 +188,11 @@ public class Post extends BaseEntity {
         return CloseType.VOTER.equals(closeOption.getCloseType());
     }
 
-    public boolean isClosedByVoter(long voterCount) {
+    public boolean isClosableByVoterCount(long voterCount) {
         return closeOption.getMaxVoterCount() == voterCount;
+    }
+
+    public boolean isClosed() {
+        return this.status.equals(Status.CLOSED);
     }
 }

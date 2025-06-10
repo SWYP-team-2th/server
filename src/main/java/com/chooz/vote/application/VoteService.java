@@ -5,8 +5,7 @@ import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
-import com.chooz.vote.presentation.dto.PollChoiceStatusResponse;
-import com.chooz.user.domain.UserRepository;
+import com.chooz.vote.presentation.dto.VoteStatusResponse;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +20,16 @@ import java.util.List;
 public class VoteService {
 
     private final VoteRepository voteRepository;
-    private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final RatioCalculator ratioCalculator;
     private final EventPublisher eventPublisher;
     private final VoteValidator voteValidator;
+    private final VoteStatusReader voteStatusReader;
 
     @Transactional
     public Long vote(Long voterId, Long postId, Long pollChoiceId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        voteValidator.validateIsVotablePost(post, voterId);
+        voteValidator.validateIsVotablePost(post);
 
         return voteRepository.findByUserIdAndPollChoiceId(voterId, pollChoiceId)
                 .orElseGet(() -> processVote(voterId, pollChoiceId, post))
@@ -48,13 +46,16 @@ public class VoteService {
         if (post.isSingleVote()) {
             return voteRepository.findByUserIdAndPostId(voterId, post.getId()).stream()
                     .findFirst()
-                    .map(vote -> {
-                        vote.updatePollChoiceId(pollChoiceId);
-                        return vote;
-                    }).orElseGet(() -> voteRepository.save(Vote.create(post.getId(), pollChoiceId, voterId)));
+                    .map(vote -> updateExistVote(pollChoiceId, vote))
+                    .orElseGet(() -> voteRepository.save(Vote.create(post.getId(), pollChoiceId, voterId)));
         } else {
             return voteRepository.save(Vote.create(post.getId(), pollChoiceId, voterId));
         }
+    }
+
+    private Vote updateExistVote(Long pollChoiceId, Vote vote) {
+        vote.updatePollChoiceId(pollChoiceId);
+        return vote;
     }
 
     @Transactional
@@ -66,33 +67,12 @@ public class VoteService {
         voteRepository.delete(vote);
     }
 
-    public List<PollChoiceStatusResponse> findVoteStatus(Long userId, Long postId) {
-//        Post post = postRepository.findByIdFetchPollChoices(postId)
-//                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-//        validateVoteStatus(userId, post);
-//        int totalVoteCount = getTotalVoteCount(post.getPollChoices());
-//        return post.getPollChoices().stream()
-//                .map(image -> {
-//                    String ratio = ratioCalculator.calculate(totalVoteCount, image.getVoteCount());
-//                    return new PollChoiceStatusResponse(image.getId(), image.getTitle(), image.getVoteCount(), ratio);
-//                })
-//                .sorted(Comparator.comparingInt(PollChoiceStatusResponse::voteCount).reversed())
-//                .toList();
-        return null;
-    }
+    public List<VoteStatusResponse> findVoteStatus(Long userId, Long postId) {
+        Post post = postRepository.findByIdFetchPollChoices(postId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+        List<Vote> totalVoteList = voteRepository.findAllByPostId(postId);
+        voteValidator.validateVoteStatusAccess(userId, post, totalVoteList);
 
-    private void validateVoteStatus(Long userId, Post post) {
-        List<Vote> votes = voteRepository.findByUserIdAndPostId(userId, post.getId());
-        if (!(post.isAuthor(userId) || !votes.isEmpty())) {
-            throw new BadRequestException(ErrorCode.ACCESS_DENIED_VOTE_STATUS);
-        }
+        return voteStatusReader.getVoteStatus(totalVoteList, post);
     }
-
-//    private int getTotalVoteCount(List<PollChoice> pollChoices) {
-//        int totalVoteCount = 0;
-//        for (PollChoice image : pollChoices) {
-//            totalVoteCount += image.getVoteCount();
-//        }
-//        return totalVoteCount;
-//    }
 }

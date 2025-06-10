@@ -34,6 +34,8 @@ public enum ErrorCode {
     INVALID_SELF_CLOSE_OPTION("잘못된 자체 마감 옵션입니다."),
     INVALID_CLOSE_OPTION("잘못된 마감 옵션입니다."),
     THUMBNAIL_NOT_FOUND("썸네일을 찾을 수 없습니다."),
+    CLOSE_DATE_OVER("마감 시간이 지났습니다."),
+    EXCEED_MAX_VOTER_COUNT("투표 참여자 수가 초과했습니다."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

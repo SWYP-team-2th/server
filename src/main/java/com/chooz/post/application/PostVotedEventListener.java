@@ -25,7 +25,7 @@ public class PostVotedEventListener {
             return;
         }
         long voterCount = voteRepository.countVoterByPostId(event.postId());
-        if (post.isClosedByVoter(voterCount)) {
+        if (post.isClosableByVoterCount(voterCount)) {
             post.close();
         }
     }

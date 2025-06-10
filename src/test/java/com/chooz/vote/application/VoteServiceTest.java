@@ -168,7 +168,7 @@ class VoteServiceTest extends IntegrationTest {
         // when
         assertThatThrownBy(() -> voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.POST_ALREADY_CLOSED.getMessage());
+                .hasMessage(ErrorCode.EXCEED_MAX_VOTER_COUNT.getMessage());
     }
 
     @Test
@@ -189,7 +189,7 @@ class VoteServiceTest extends IntegrationTest {
         // when
         assertThatThrownBy(() -> voteService.vote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.POST_ALREADY_CLOSED.getMessage());
+                .hasMessage(ErrorCode.CLOSE_DATE_OVER.getMessage());
     }
 
     @Test
