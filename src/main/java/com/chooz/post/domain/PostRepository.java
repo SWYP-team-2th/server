@@ -75,4 +75,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """
     )
     Optional<Post> findByShareUrlFetchPollChoices(@Param("shareUrl") String shareUrl);
+
+    @Query("""
+            SELECT p
+            FROM Post p
+            WHERE p.closeOption.closeType = 'DATE'
+            AND p.status = 'PROGRESS'
+            AND p.closeOption.closedAt <= CURRENT_TIMESTAMP
+            """
+    )
+    List<Post> findPostsNeedToClose();
 }

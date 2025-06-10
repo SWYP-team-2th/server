@@ -2,8 +2,10 @@ package com.chooz.post.domain;
 
 import com.chooz.post.presentation.dto.FeedDto;
 import com.chooz.support.RepositoryTest;
+import com.chooz.support.fixture.PostFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,6 +113,33 @@ class PostRepositoryTest extends RepositoryTest {
                 () -> assertThat(res.getContent().size()).isEqualTo(size),
                 () -> assertThat(res.hasNext()).isFalse()
         );
+    }
+
+    @Test
+    @DisplayName("마감 시간 지난 진행 중인 게시글 조회")
+    void findPostNeedToClose() throws Exception {
+        //given
+        User user = userRepository.save(createDefaultUser());
+        createPosts(user.getId(), 5);
+        int expected = 10;
+        for (int i = 0; i < expected; i++) {
+            Post post = createPostBuilder()
+                    .userId(user.getId())
+                    .closeOption(
+                            PostFixture.createCloseOptionBuilder()
+                                    .closeType(CloseType.DATE)
+                                    .closedAt(LocalDateTime.now().minusMinutes(i))
+                                    .build()
+                    )
+                    .build();
+            postRepository.save(post);
+        }
+
+        //when
+        List<Post> postsNeedToClose = postRepository.findPostsNeedToClose();
+
+        //then
+        assertThat(postsNeedToClose).hasSize(expected);
     }
 
     private List<Post> createPosts(long userId, int size) {
