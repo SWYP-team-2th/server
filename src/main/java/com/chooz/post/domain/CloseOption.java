@@ -28,14 +28,14 @@ public class CloseOption {
     private Integer maxVoterCount;
 
     @Builder
-    private CloseOption(CloseType closeType, LocalDateTime closedAt, Integer maxVoterCount) {
+    public CloseOption(CloseType closeType, LocalDateTime closedAt, Integer maxVoterCount) {
+        validateNull(closeType);
         this.closeType = closeType;
         this.closedAt = closedAt;
         this.maxVoterCount = maxVoterCount;
     }
 
     public static CloseOption create(CloseType closeType, LocalDateTime closedAt, Integer maxVoterCount) {
-        validateNull(closeType);
         validateCloseOption(closeType, closedAt, maxVoterCount);
         return new CloseOption(closeType, closedAt, maxVoterCount);
     }

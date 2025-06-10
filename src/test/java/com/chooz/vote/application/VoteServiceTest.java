@@ -18,7 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -178,11 +180,7 @@ class VoteServiceTest extends IntegrationTest {
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
-                        .closeOption(
-                                PostFixture.createCloseOptionBuilder()
-                                        .closeType(CloseType.DATE)
-                                        .closedAt(LocalDateTime.now())
-                                        .build())
+                        .closeOption(PostFixture.createCloseOptionOverDate())
                         .build()
         );
 

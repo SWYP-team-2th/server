@@ -64,12 +64,7 @@ class VoteValidatorTest {
     void validateIsVotablePost_closeDateOver() throws Exception {
         //given
         Post post = PostFixture.createPostBuilder()
-                .closeOption(
-                        PostFixture.createCloseOptionBuilder()
-                                .closeType(CloseType.DATE)
-                                .closedAt(LocalDateTime.now())
-                                .build()
-                )
+                .closeOption(PostFixture.createCloseOptionOverDate())
                 .build();
 
         //when then

@@ -129,8 +129,7 @@ class PostRepositoryTest extends RepositoryTest {
                             PostFixture.createCloseOptionBuilder()
                                     .closeType(CloseType.DATE)
                                     .closedAt(LocalDateTime.now().minusMinutes(i))
-                                    .build()
-                    )
+                                    .build())
                     .build();
             postRepository.save(post);
         }

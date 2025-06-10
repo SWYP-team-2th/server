@@ -10,6 +10,7 @@ import com.chooz.post.domain.Post;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.domain.Status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PostFixture {
@@ -40,6 +41,10 @@ public class PostFixture {
                 .closeType(CloseType.SELF)
                 .closedAt(null)
                 .maxVoterCount(null);
+    }
+
+    public static CloseOption createCloseOptionOverDate() {
+        return new CloseOption(CloseType.DATE, LocalDateTime.now().minusMinutes(5), null);
     }
 
     public static PollOption.PollOptionBuilder createPollOptionBuilder() {
