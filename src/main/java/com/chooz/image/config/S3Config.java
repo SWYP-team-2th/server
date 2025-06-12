@@ -17,15 +17,6 @@ import java.net.URI;
 @Configuration
 public class S3Config {
 
-    @Value("${r2.access-key}")
-    private String r2AccessKey;
-
-    @Value("${r2.secret-key}")
-    private String r2SecretKey;
-
-    @Value("${r2.endpoint}")
-    private String endpoint;
-
     @Value("${aws.access-key}")
     private String awsAccessKey;
 
@@ -35,23 +26,15 @@ public class S3Config {
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()
-                .region(Region.of("auto"))
-                .endpointOverride(URI.create(endpoint))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(r2AccessKey, r2SecretKey)))
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .build())
-                .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
-                .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
-                .build();
-    }
-    @Bean
-    public LambdaClient lambdaClient() {
-        return LambdaClient.builder()
                 .region(Region.AP_NORTHEAST_2)
+//                .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(awsAccessKey, awsSecretKey)))
+//                .serviceConfiguration(S3Configuration.builder()
+//                        .pathStyleAccessEnabled(true)
+//                        .build())
+//                .requestChecksumCalculation(RequestChecksumCalculation.WHEN_REQUIRED)
+//                .responseChecksumValidation(ResponseChecksumValidation.WHEN_REQUIRED)
                 .build();
     }
 }
