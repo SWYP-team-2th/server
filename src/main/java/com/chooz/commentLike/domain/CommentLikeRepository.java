@@ -1,6 +1,5 @@
 package com.chooz.comment.domain;
 
-import com.chooz.comment.presentation.dto.CommentLikeCountProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

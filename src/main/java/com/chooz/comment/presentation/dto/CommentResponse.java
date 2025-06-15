@@ -1,21 +1,7 @@
 package com.chooz.comment.presentation.dto;
 
-import com.chooz.common.dto.CursorDto;
-
-public record CommentResponse(
-        Long id,
-        Long userId,
-        String nickname,
-        String profileUrl,
+public record CommentAnchorResponse(
+        Long commentId,
         String content,
-        int edited,
-        int likeCount,
-        boolean liked,
-        CommentCursor commentCursor
-) implements CursorDto  {
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-}
+        String anchor
+){}

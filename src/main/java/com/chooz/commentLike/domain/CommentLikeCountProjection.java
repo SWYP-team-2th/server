@@ -1,4 +1,4 @@
-package com.chooz.comment.presentation.dto;
+package com.chooz.comment.domain;
 
 public interface CommentLikeCountProjection {
     Long getCommentId();

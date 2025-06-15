@@ -24,4 +24,8 @@ public class CommentLike {
 
     @NotNull
     private Long userId;
+
+    public static CommentLike create(Long commentId, Long userId) {
+        return new CommentLike(null, commentId, userId);
+    }
 }
