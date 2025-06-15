@@ -1,9 +1,11 @@
 package com.chooz.common.dto;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
+@Slf4j
 public record CursorBasePaginatedResponse<T>(
         Long nextCursor,
         boolean hasNext,

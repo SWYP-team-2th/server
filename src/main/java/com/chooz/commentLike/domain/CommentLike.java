@@ -1,4 +1,4 @@
-package com.chooz.comment.domain;
+package com.chooz.commentLike.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

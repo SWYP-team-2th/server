@@ -1,4 +1,4 @@
-package com.chooz.comment.domain;
+package com.chooz.commentLike.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +20,7 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
     @Query("""
             SELECT cl.commentId AS commentId, COUNT(cl) AS likeCount
             FROM CommentLike cl
-            WHERE cl.commentId IN :commentIds 
+            WHERE cl.commentId IN :commentIds
             GROUP BY cl.commentId
     """)
     List<CommentLikeCountProjection> countByCommentIds(@Param("commentIds") List<Long> commentIds);

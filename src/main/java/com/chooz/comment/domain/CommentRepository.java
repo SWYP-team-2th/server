@@ -1,30 +1,34 @@
-package com.chooz.commentLike.domain;
+package com.chooz.comment.domain;
 
-import com.chooz.comment.domain.CommentLike;
-import com.chooz.comment.domain.CommentLikeCountProjection;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
-
-    boolean existsByCommentIdAndUserId(Long commentId, Long userId);
-
-    List<CommentLike> findByCommentIdInAndUserId(List<Long> commentIds, Long userId);
-
-    Optional<CommentLike> findByCommentIdAndUserId(Long commentId, Long userId);
+public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
-            SELECT cl.commentId AS commentId, COUNT(cl) AS likeCount
-            FROM CommentLike cl
-            WHERE cl.commentId IN :commentIds 
-            GROUP BY cl.commentId
+        SELECT c
+        FROM Comment c
+        WHERE c.postId = :postId
+        ORDER BY
+            c.id DESC
     """)
-    List<CommentLikeCountProjection> countByCommentIds(@Param("commentIds") List<Long> commentIds);
+    Slice<Comment> findByPostId(
+            @Param("postId") Long postId,
+            @Param("userId") Long userId,
+            @Param("cursorId") Long cursorId,
+            Pageable pageable
+    );
+    
+    long countByPostId(@NotNull Long postId);
+
+    List<Comment> findByPostIdAndDeletedFalse(@NotNull Long postId);
 
 }
