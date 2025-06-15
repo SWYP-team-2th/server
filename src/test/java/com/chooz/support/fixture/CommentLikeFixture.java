@@ -1,6 +1,6 @@
 package com.chooz.support.fixture;
 
-import com.chooz.comment.domain.CommentLike;
+import com.chooz.commentLike.domain.CommentLike;
 
 public class CommentLikeFixture {
 

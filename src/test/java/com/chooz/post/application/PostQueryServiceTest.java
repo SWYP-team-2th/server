@@ -3,12 +3,7 @@ package com.chooz.post.application;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.post.domain.CommentActive;
-import com.chooz.post.domain.PollOption;
-import com.chooz.post.domain.PollType;
-import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostRepository;
-import com.chooz.post.domain.Scope;
+import com.chooz.post.domain.*;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.PollChoiceResponse;
 import com.chooz.post.presentation.dto.PostResponse;
@@ -20,6 +15,8 @@ import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -37,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostQueryServiceTest extends IntegrationTest {
 
+    private static final Logger log = LoggerFactory.getLogger(PostQueryServiceTest.class);
     @Autowired
     PostService postService;
 

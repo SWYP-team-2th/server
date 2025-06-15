@@ -47,8 +47,7 @@ public abstract class RestDocsTest extends WebUnitTest {
     protected static ParameterDescriptor[] cursorQueryParams() {
         return new ParameterDescriptor[]{
                 parameterWithName("cursor").optional().description("페이지 조회 커서 값"),
-                parameterWithName("size").optional().attributes(defaultValue("10")).description("페이지 크기 (기본 값 10)"),
-                parameterWithName("priority").optional().description("정렬 기준 (0: 내가남긴댓글, 1: 다른사람댓글)")
+                parameterWithName("size").optional().attributes(defaultValue("10")).description("페이지 크기 (기본 값 10)")
         };
     }
 

@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/comments")
+@RequestMapping("/comment-likes")
 public class CommentLikeController {
 
     private final CommentLikeService commentLikeService;
 
-    @PostMapping("/{commentId}/like")
+    @PostMapping("/{commentId}")
     public ResponseEntity<Void> createLikeComment(
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal UserInfo userInfo
@@ -25,7 +25,7 @@ public class CommentLikeController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{commentId}/like")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteLikeComment(
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal UserInfo userInfo

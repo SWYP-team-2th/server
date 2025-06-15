@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CommentLikeServiceTest extends IntegrationTest {
+class CommentLikeCommandServiceTest extends IntegrationTest {
 
     @Autowired
     private CommentLikeRepository commentLikeRepository;
@@ -31,6 +31,7 @@ class CommentLikeServiceTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("댓글좋아요 삭제")
     void deleteCommentLike() {
         //given
         CommentLike commentLike = createAndGetSavedCommentLike();

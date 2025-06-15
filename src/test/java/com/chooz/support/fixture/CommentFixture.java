@@ -4,13 +4,12 @@ import com.chooz.comment.domain.Comment;
 
 public class CommentFixture {
 
+    public static Comment createDefaultComment() {
+        return createCommentBuilder().build();
+    }
     public static Comment createDefaultComment(Long userId, Long postId) {
-        return Comment.create(postId, userId, "content");
+        return Comment.create(postId, userId, "comment");
     }
-    public static Comment createWithContentComment(Long userId, Long postId, String content) {
-        return Comment.create(userId, postId, content);
-    }
-
     public static Comment.CommentBuilder createCommentBuilder() {
         return Comment.builder()
                 .postId(1L)
