@@ -20,13 +20,3 @@ operation::comment-controller-test/modify-comment[snippets='http-request,curl-re
 === `DELETE` 댓글 삭제
 
 operation::comment-controller-test/delete-comment[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
-
-[[댓글-좋아요]]
-=== `POST` 댓글 좋아요
-
-operation::comment-controller-test/create-like-comment[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
-
-[[댓글-좋아요-취소]]
-=== `DELETE` 댓글 좋아요 취소
-
-operation::comment-controller-test/delete-like-comment[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
