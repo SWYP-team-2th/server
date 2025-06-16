@@ -2,8 +2,6 @@ package com.chooz.vote.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.image.domain.ImageFile;
-import com.chooz.image.domain.ImageFileRepository;
 import com.chooz.post.domain.*;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.PostFixture;
@@ -35,9 +33,6 @@ class VoteServiceTest extends IntegrationTest {
 
     @Autowired
     PostRepository postRepository;
-
-    @Autowired
-    ImageFileRepository imageFileRepository;
 
     @Test
     @DisplayName("단일 투표하기")
