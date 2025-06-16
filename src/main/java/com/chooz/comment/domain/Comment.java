@@ -1,16 +1,9 @@
 package com.chooz.comment.domain;
 
 import com.chooz.common.domain.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import static com.chooz.common.util.Validator.validateEmptyString;
 import static com.chooz.common.util.Validator.validateNull;
@@ -19,6 +12,8 @@ import static com.chooz.common.util.Validator.validateNull;
 @Getter
 @Table(name = "comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Comment extends BaseEntity {
 
     @Id
@@ -34,15 +29,8 @@ public class Comment extends BaseEntity {
     @NotNull
     private String content;
 
-    @Builder
-    public Comment(Long id, Long postId, Long userId, String content) {
-        validateNull(postId, userId);
-        validateEmptyString(content);
-        this.id = id;
-        this.postId = postId;
-        this.userId = userId;
-        this.content = content;
-    }
+    @NotNull
+    private Boolean edited;
 
     public Comment(Long postId, Long userId, String content) {
         validateNull(postId, userId);
@@ -50,14 +38,16 @@ public class Comment extends BaseEntity {
         this.postId = postId;
         this.userId = userId;
         this.content = content;
+        this.edited = false;
     }
 
     public static Comment create(Long postId, Long userId, String content) {
-        return new Comment(null, postId, userId, content);
+        return new Comment(null, postId, userId, content, false);
     }
 
     public void updateComment(String content) {
         validateEmptyString(content);
         this.content = content;
+        this.edited = true;
     }
 }

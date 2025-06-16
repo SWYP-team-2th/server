@@ -111,3 +111,5 @@ include::posts.adoc[]
 include::votes.adoc[]
 
 include::comments.adoc[]
+
+include::comment-likes.adoc[]

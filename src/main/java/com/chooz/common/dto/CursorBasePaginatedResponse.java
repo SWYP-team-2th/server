@@ -1,7 +1,6 @@
 package com.chooz.common.dto;
 
 import org.springframework.data.domain.Slice;
-
 import java.util.List;
 
 public record CursorBasePaginatedResponse<T>(

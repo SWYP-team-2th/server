@@ -1,6 +1,5 @@
 package com.chooz.support;
 
-import com.chooz.common.presentation.CustomHeader;
 import com.chooz.support.config.RestDocsConfiguration;
 import com.chooz.support.config.TestSecurityConfig;
 import org.junit.jupiter.api.extension.ExtendWith;
