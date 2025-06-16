@@ -37,7 +37,7 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
         CommentLike commentLike = createAndGetSavedCommentLike();
 
         // when
-        commentLikeService.deleteLikeComment(commentLike.getCommentId(), commentLike.getUserId());
+        commentLikeService.deleteCommentLike(commentLike.getCommentId(), commentLike.getUserId());
 
         // then
         assertThat(commentLikeRepository.findById(commentLike.getId())).isEmpty();
@@ -46,7 +46,7 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
     private CommentLike createAndGetSavedCommentLike() {
         Comment comment = CommentFixture.createCommentBuilder().id(1L).build();
         User user = UserFixture.createUserBuilder().id(1L).build();
-        commentLikeService.createLikeComment(comment.getId(), user.getId());
+        commentLikeService.createCommentLike(comment.getId(), user.getId());
         return commentLikeRepository
                 .findByCommentIdAndUserId(comment.getId(), user.getId()).orElseThrow();
     }

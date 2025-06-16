@@ -85,7 +85,7 @@ class CommentControllerTest extends RestDocsTest {
                                         .description("댓글 내용"),
                                 fieldWithPath("data[].edited")
                                         .type(JsonFieldType.BOOLEAN)
-                                        .description("수정 여부 (0이면 원본, 1이면 수정됨)"),
+                                        .description("수정 여부"),
                                 fieldWithPath("data[].likeCount")
                                         .type(JsonFieldType.NUMBER)
                                         .description("댓글 좋아요 수"),

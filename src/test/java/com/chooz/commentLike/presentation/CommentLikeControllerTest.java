@@ -21,9 +21,9 @@ class CommentLikeControllerTest extends RestDocsTest {
     @Test
     @WithMockUserInfo
     @DisplayName("댓글 좋아요 생성")
-    void createLikeComment() throws Exception {
+    void createCommentLike() throws Exception {
         //when
-        doNothing().when(commentLikeService).createLikeComment(commentId, userId);
+        doNothing().when(commentLikeService).createCommentLike(commentId, userId);
 
         //then
         mockMvc.perform(post("/comment-likes/{commentId}", commentId)
@@ -40,9 +40,9 @@ class CommentLikeControllerTest extends RestDocsTest {
     @Test
     @WithMockUserInfo
     @DisplayName("댓글 좋아요 삭제")
-    void deleteLikeComment() throws Exception {
+    void deleteCommentLike() throws Exception {
         //when
-        doNothing().when(commentLikeService).deleteLikeComment(commentId, userId);
+        doNothing().when(commentLikeService).deleteCommentLike(commentId, userId);
         //given
         mockMvc.perform(delete("/comment-likes/{commentId}", commentId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))

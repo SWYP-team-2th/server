@@ -48,7 +48,7 @@ class CommentQueryServiceTest extends IntegrationTest {
                 .userId(user.getId())
                 .postId(post.getId())
                 .build());
-        createCommentLike10Times(user, comment);
+        createCommentLikesTimesOf(user, comment, 10);
         int size = 10;
 
         // when
@@ -68,10 +68,10 @@ class CommentQueryServiceTest extends IntegrationTest {
                 () -> assertThat(response.hasNext()).isFalse()
         );
     }
-    private void  createCommentLike10Times(User user, Comment comment) {
-        for(int i = 0 ; i < 10 ; i++){
+    private void  createCommentLikesTimesOf(User user, Comment comment, int times) {
+        for(int i = 0 ; i < times ; i++){
             commentLikeRepository.save(CommentLikeFixture.createCommentLikeBuilder()
-                    .userId(Long.valueOf(i))
+                    .userId((long) i)
                     .commentId(comment.getId())
                     .build());
         }
