@@ -49,6 +49,7 @@ public class DataInitializer {
 //        }
 //        List<NicknameAdjective> adjectives = nicknameAdjectiveRepository.findAll();
 //        User testUser = userRepository.save(User.create("nickname", "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
+        User user = userRepository.save(User.create("chooz", "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
 //        TokenResponse tokenResponse = jwtService.createToken(new JwtClaim(testUser.getId(), testUser.getRole()));
 //        TokenPair tokenPair = tokenResponse.tokenPair();
 //        System.out.println("accessToken = " + tokenPair.accessToken());
