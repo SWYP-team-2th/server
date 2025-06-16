@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
@@ -65,6 +66,21 @@ class PostTest {
         List<PollChoice> pollChoices = List.of(
                 PollChoice.create("title1", "http://example.com/image1")
         );
+
+        //when then
+        assertThatThrownBy(() -> createPostBuilder().pollChoices(pollChoices).build())
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.INVALID_POLL_CHOICE_COUNT.getMessage());
+    }
+
+    @Test
+    @DisplayName("게시글 생성 - 이미지가 10개 초과인 경우")
+    void create_invalidPollChoiceCount2() throws Exception {
+        //given
+        List<PollChoice> pollChoices = new ArrayList<>();
+        for (int i = 0; i <= 10; i++) {
+            pollChoices.add(PollChoice.create("title" + i, "http://example.com/image" + i));
+        }
 
         //when then
         assertThatThrownBy(() -> createPostBuilder().pollChoices(pollChoices).build())

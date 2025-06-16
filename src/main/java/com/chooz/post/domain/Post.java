@@ -113,7 +113,7 @@ public class Post extends BaseEntity {
     }
 
     private static void validatePollChoices(List<PollChoice> images) {
-        if (images.size() < 2 || images.size() > 9) {
+        if (images.size() < 2 || images.size() > 10) {
             throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
         }
     }
