@@ -14,12 +14,12 @@ public class CommentLikeService {
     private final CommentLikeCommandService commentLikeCommandService;
 
     @Transactional
-    public void createLikeComment(Long commentId, Long userId) {
-        commentLikeCommandService.createLikeComment(commentId, userId);
+    public void createCommentLike(Long commentId, Long userId) {
+        commentLikeCommandService.createCommentLike(commentId, userId);
     }
 
     @Transactional
-    public void deleteLikeComment(Long commentId, Long userId) {
-        commentLikeCommandService.deleteLikeComment(commentId, userId);
+    public void deleteCommentLike(Long commentId, Long userId) {
+        commentLikeCommandService.deleteCommentLike(commentId, userId);
     }
 }

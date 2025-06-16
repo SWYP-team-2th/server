@@ -17,12 +17,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         SELECT c
         FROM Comment c
         WHERE c.postId = :postId
+            AND (:cursorId is null OR c.id < :cursorId)
         ORDER BY
             c.id DESC
     """)
     Slice<Comment> findByPostId(
             @Param("postId") Long postId,
-            @Param("userId") Long userId,
             @Param("cursorId") Long cursorId,
             Pageable pageable
     );

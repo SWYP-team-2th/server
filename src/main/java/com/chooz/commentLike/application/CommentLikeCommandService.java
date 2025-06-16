@@ -15,7 +15,7 @@ public class CommentLikeCommandService {
 
     private final CommentLikeRepository commentLikeRepository;
 
-    public void createLikeComment(Long commentId, Long userId) {
+    public void createCommentLike(Long commentId, Long userId) {
         boolean alreadyLiked = commentLikeRepository.existsByCommentIdAndUserId(commentId, userId);
         if (alreadyLiked) {
             return;
@@ -23,7 +23,7 @@ public class CommentLikeCommandService {
         commentLikeRepository.save(CommentLike.create(commentId, userId));
     }
 
-    public void deleteLikeComment(Long commentId, Long userId) {
+    public void deleteCommentLike(Long commentId, Long userId) {
         commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
                 .ifPresent(commentLikeRepository::delete);
     }

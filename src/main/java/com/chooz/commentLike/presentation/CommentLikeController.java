@@ -17,20 +17,20 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     @PostMapping("/{commentId}")
-    public ResponseEntity<Void> createLikeComment(
+    public ResponseEntity<Void> createCommentLike(
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        commentLikeService.createLikeComment(commentId, userInfo.userId());
+        commentLikeService.createCommentLike(commentId, userInfo.userId());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteLikeComment(
+    public ResponseEntity<Void> deleteCommentLike(
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        commentLikeService.deleteLikeComment(commentId, userInfo.userId());
+        commentLikeService.deleteCommentLike(commentId, userInfo.userId());
         return ResponseEntity.noContent().build();
     }
 }

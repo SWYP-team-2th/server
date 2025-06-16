@@ -38,7 +38,7 @@ public class CommentQueryService {
 
 
     public CursorBasePaginatedResponse<CommentResponse> findComments(Long postId, Long userId, Long cursorId, int size) {
-        Slice<Comment> comments = commentRepository.findByPostId(postId, userId, cursorId, PageRequest.ofSize(size));
+        Slice<Comment> comments = commentRepository.findByPostId(postId, cursorId, PageRequest.ofSize(size));
 
         List<Long> commentIds = findCommentIds(comments);
         List<Long> userIds = findUserIds(comments);
@@ -57,30 +57,30 @@ public class CommentQueryService {
         ));
     }
 
-    public List<Long> findUserIds(Slice<Comment> comments) {
+    private List<Long> findUserIds(Slice<Comment> comments) {
         return comments.getContent().stream()
                 .map(Comment::getUserId)
                 .distinct()
                 .toList();
     }
 
-    public List<Long> findCommentIds(Slice<Comment> comments) {
+    private List<Long> findCommentIds(Slice<Comment> comments) {
          return comments.getContent().stream()
                 .map(Comment::getId)
                 .toList();
     }
 
-    public User findUserByUserMap(Map<Long, User> userCommentMap, Comment comment) {
+    private User findUserByUserMap(Map<Long, User> userCommentMap, Comment comment) {
         return Optional.ofNullable(userCommentMap.get(comment.getUserId()))
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public Map<Long, User> findUserCommentMap(List<Long> userIds) {
+    private Map<Long, User> findUserCommentMap(List<Long> userIds) {
         return userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(User::getId, Function.identity()));
     }
 
-    public Map<Long, Long> findLikeCountCommentMap(List<Long> commentIds) {
+    private Map<Long, Long> findLikeCountCommentMap(List<Long> commentIds) {
         return commentLikeRepository.countByCommentIds(commentIds).stream()
                 .collect(Collectors.toMap(
                         CommentLikeCountProjection::getCommentId,
@@ -88,7 +88,7 @@ public class CommentQueryService {
                 ));
     }
 
-    public Map<Long, Boolean> findLikedCommentMap(List<Long> commentIds, Long userId) {
+    private Map<Long, Boolean> findLikedCommentMap(List<Long> commentIds, Long userId) {
         return Optional.ofNullable(userId)
                 .map(id -> commentLikeRepository.findByCommentIdInAndUserId(commentIds, id).stream()
                         .collect(Collectors.toMap(
@@ -98,7 +98,7 @@ public class CommentQueryService {
                 ).orElse(Collections.emptyMap());
     }
 
-    public List<CommentResponse> findResponseContent(Slice<Comment> comments,
+    private List<CommentResponse> findResponseContent(Slice<Comment> comments,
                                                      Map<Long, User> userCommentMap,
                                                      Map<Long, Long>  likeCountCommentMap,
                                                      Map<Long, Boolean> likedCommentMap) {
