@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -45,9 +46,17 @@ class ImageControllerTest extends RestDocsTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
+                        requestFields(
+                                fieldWithPath("contentType")
+                                        .description("이미지의 Content-Type (예: image/jpg)")
+                                        .type(JsonFieldType.STRING),
+                                fieldWithPath("contentLength")
+                                        .description("이미지 파일 크기 (바이트 단위)")
+                                        .type(JsonFieldType.NUMBER)
+                        ),
                         responseFields(
                                 fieldWithPath("signedUploadPutUrl")
-                                        .description("이미지 업로드 presigned URL (해당 URL로 이미지와 PUT 요청을 보내야 함, 만료 시간 5분)")
+                                        .description("이미지 업로드 presigned URL (이미지를 해당 URL로 PUT 요청을 보내야 함, 만료 시간 5분)")
                                         .type(JsonFieldType.STRING),
                                 fieldWithPath("signedGetUrl")
                                         .description("이미지 조회 전체 주소")
