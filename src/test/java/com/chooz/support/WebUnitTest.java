@@ -1,11 +1,11 @@
 package com.chooz.support;
 
+import com.chooz.image.application.ImageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.chooz.auth.application.AuthService;
 import com.chooz.auth.presentation.RefreshTokenCookieGenerator;
 import com.chooz.comment.application.CommentService;
 import com.chooz.common.exception.DiscordMessageSender;
-import com.chooz.image.application.ImageService;
 import com.chooz.post.application.PostService;
 import com.chooz.user.application.UserService;
 import com.chooz.vote.application.VoteService;
@@ -29,10 +29,10 @@ public abstract class WebUnitTest {
     protected RefreshTokenCookieGenerator refreshTokenCookieGenerator;
 
     @MockitoBean
-    protected AuthService authService;
+    protected ImageService imageService;
 
     @MockitoBean
-    protected ImageService imageService;
+    protected AuthService authService;
 
     @MockitoBean
     protected PostService postService;
