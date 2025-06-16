@@ -1,4 +1,7 @@
 package com.chooz.image.application;
 
-public class S3Client {
+import com.chooz.image.presentation.dto.PresignedUrlRequest;
+
+public interface S3Client {
+    String getPresignedPutUrl(String fileName, PresignedUrlRequest request);
 }

@@ -18,7 +18,7 @@ public class FileValidator {
 
     private final Set<String> allowedExtensions;
 
-    public FileValidator(@Value("${file.allowed-extensions}") String allowedExtensionsConfig) {
+    public FileValidator(@Value("${image.allowed-extensions}") String allowedExtensionsConfig) {
         this.allowedExtensions = Arrays.stream(allowedExtensionsConfig.split(","))
                 .map(String::trim)
                 .map(String::toLowerCase)
