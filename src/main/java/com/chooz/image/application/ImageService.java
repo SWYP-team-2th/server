@@ -1,5 +1,6 @@
 package com.chooz.image.application;
 
+import com.chooz.image.application.dto.PresignedUrlRequestDto;
 import com.chooz.image.presentation.dto.PresignedUrlRequest;
 import com.chooz.image.presentation.dto.PresignedUrlResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,12 @@ public class ImageService {
 
     public PresignedUrlResponse getPresignedUrl(PresignedUrlRequest request) {
         imageValidator.validate(request.contentType());
-        String path = getAssetUrl();
-        String signedGetUrl = getSignedGetUrl(path);
-        String presignedUrl = s3Client.getPresignedPutUrl(path, request);
-        return new PresignedUrlResponse(presignedUrl, signedGetUrl, path);
+        String assetUrl = getAssetUrl();
+        String signedGetUrl = getSignedGetUrl(assetUrl);
+        String presignedUrl = s3Client.getPresignedPutUrl(
+                new PresignedUrlRequestDto(request.contentType(), request.contentLength(), assetUrl)
+        );
+        return new PresignedUrlResponse(presignedUrl, signedGetUrl, assetUrl);
     }
 
     private String getAssetUrl() {

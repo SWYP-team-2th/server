@@ -1,7 +1,7 @@
 package com.chooz.image.infrastructure;
 
 import com.chooz.image.application.S3Client;
-import com.chooz.image.presentation.dto.PresignedUrlRequest;
+import com.chooz.image.application.dto.PresignedUrlRequestDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -27,19 +27,19 @@ public class AwsS3Client implements S3Client {
     }
 
     @Override
-    public String getPresignedPutUrl(String assetUrl, PresignedUrlRequest request) {
-        PutObjectPresignRequest presignRequest = buildPresignedRequest(assetUrl, request);
+    public String getPresignedPutUrl(PresignedUrlRequestDto presignedUrlRequestDto) {
+        PutObjectPresignRequest presignRequest = buildPresignedRequest(presignedUrlRequestDto);
         return s3Presigner.presignPutObject(presignRequest)
                 .url()
                 .toString();
     }
 
-    private PutObjectPresignRequest buildPresignedRequest(String assetUrl, PresignedUrlRequest request) {
+    private PutObjectPresignRequest buildPresignedRequest(PresignedUrlRequestDto dto) {
         PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder()
                 .bucket(bucket)
-                .contentType(request.contentType())
-                .contentLength(request.contentLength())
-                .key(assetUrl);
+                .contentType(dto.contentType())
+                .contentLength(dto.contentLength())
+                .key(dto.assetUrl());
         return PutObjectPresignRequest.builder()
                 .signatureDuration(PRESIGNED_URL_EXPIRATION)
                 .putObjectRequest(requestBuilder.build())

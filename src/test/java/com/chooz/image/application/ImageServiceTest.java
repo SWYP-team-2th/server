@@ -2,6 +2,7 @@ package com.chooz.image.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.image.application.dto.PresignedUrlRequestDto;
 import com.chooz.image.presentation.dto.PresignedUrlRequest;
 import com.chooz.image.presentation.dto.PresignedUrlResponse;
 import com.chooz.support.IntegrationTest;
@@ -38,7 +39,7 @@ class ImageServiceTest extends IntegrationTest {
         PresignedUrlRequest request = new PresignedUrlRequest(12345L, "image/jpeg");
         String presignedUrl = "https://example.com/presigned-url";
         String imageName = "test-image";
-        given(s3Client.getPresignedPutUrl(anyString(), any(PresignedUrlRequest.class)))
+        given(s3Client.getPresignedPutUrl(any(PresignedUrlRequestDto.class)))
                 .willReturn(presignedUrl);
         given(imageNameGenerator.generate())
                 .willReturn(imageName);
