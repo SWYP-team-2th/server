@@ -13,7 +13,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND("리프레시 토큰을 찾을 수 없습니다."),
     INVALID_REFRESH_TOKEN_HEADER("잘못된 리프레시 토큰 헤더입니다."),
     MISSING_FILE_EXTENSION("확장자가 누락됐습니다."),
-    UNSUPPORTED_FILE_EXTENSION("지원하지 않는 확장자입니다."),
+    UNSUPPORTED_IMAGE_EXTENSION("지원하지 않는 확장자입니다."),
     EXCEED_MAX_FILE_SIZE("파일 크기가 초과했습니다."),
     POST_NOT_FOUND("존재하지 않는 게시글입니다."),
     DESCRIPTION_LENGTH_EXCEEDED("게시글 설명 길이가 초과했습니다."),

@@ -14,8 +14,10 @@ public class ImageService {
     private final S3Client s3Client;
     private final ImageNameGenerator imageNameGenerator;
     private final ImageProperties imageProperties;
+    private final ImageValidator imageValidator;
 
     public PresignedUrlResponse getPresignedUrl(PresignedUrlRequest request) {
+        imageValidator.validate(request.contentType());
         String path = getAssetUrl();
         String signedGetUrl = getSignedGetUrl(path);
         String presignedUrl = s3Client.getPresignedPutUrl(path, request);
