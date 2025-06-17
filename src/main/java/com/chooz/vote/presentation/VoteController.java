@@ -23,13 +23,12 @@ public class VoteController {
 
     private final VoteService voteService;
 
-    @PostMapping("/posts/{postId}/votes")
+    @PostMapping("/votes")
     public ResponseEntity<Void> vote(
-            @PathVariable("postId") Long postId,
             @Valid @RequestBody VoteRequest request,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        voteService.vote(userInfo.userId(), postId, request.imageId());
+        voteService.vote(userInfo.userId(), request.postId(), request.pollChoiceId());
         return ResponseEntity.ok().build();
     }
 
