@@ -29,11 +29,13 @@ public enum ErrorCode {
     NOT_VOTER("투표자가 아닙니다."),
     CLOSED_AT_REQUIRED("마감 시간 설정이 필요합니다."),
     MAX_VOTER_COUNT_REQUIRED("최대 투표자 수 설정이 필요합니다."),
-    INVALID_VOTER_CLOSE_OPTION("올바르지 않은 최대 투표자 수입니다."),
-    INVALID_DATE_CLOSE_OPTION("잘못된 마감 시간입니다"),
+    INVALID_VOTER_CLOSE_OPTION("잘못된 최대 투표자 마감 설정입니다."),
+    INVALID_DATE_CLOSE_OPTION("잘못된 마감 시간 설정입니다"),
     INVALID_SELF_CLOSE_OPTION("잘못된 자체 마감 옵션입니다."),
     INVALID_CLOSE_OPTION("잘못된 마감 옵션입니다."),
     THUMBNAIL_NOT_FOUND("썸네일을 찾을 수 없습니다."),
+    CLOSE_DATE_OVER("마감 시간이 지났습니다."),
+    EXCEED_MAX_VOTER_COUNT("투표 참여자 수가 초과했습니다."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

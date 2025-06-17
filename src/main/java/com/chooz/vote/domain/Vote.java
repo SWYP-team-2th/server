@@ -1,8 +1,8 @@
 package com.chooz.vote.domain;
 
 import com.chooz.common.domain.BaseEntity;
-import com.chooz.post.domain.PollChoice;
-import com.chooz.post.domain.Post;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -41,7 +41,13 @@ public class Vote extends BaseEntity {
         return new Vote(null, postId, pollChoiceId, userId);
     }
 
-    public boolean isVoter(Long userId) {
-        return this.userId.equals(userId);
+    public void validateVoter(Long userId) {
+        if (!this.userId.equals(userId)) {
+            throw new BadRequestException(ErrorCode.NOT_VOTER);
+        }
+    }
+
+    public void updatePollChoiceId(Long pollChoiceId) {
+        this.pollChoiceId = pollChoiceId;
     }
 }

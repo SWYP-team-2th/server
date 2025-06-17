@@ -1,6 +1,6 @@
 package com.chooz.vote.presentation;
 
-import com.chooz.vote.presentation.dto.PollChoiceStatusResponse;
+import com.chooz.vote.presentation.dto.VoteStatusResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
 import com.chooz.vote.presentation.dto.VoteRequest;
@@ -83,8 +83,8 @@ class VoteControllerTest extends RestDocsTest {
     void findVoteStatus() throws Exception {
         //given
         var response = List.of(
-                new PollChoiceStatusResponse(1L, "뽀또A", 2, "66.7"),
-                new PollChoiceStatusResponse(2L, "뽀또B", 1, "33.3")
+                new VoteStatusResponse(1L, "title1", "http://example.com/image/1", 2, "66.7"),
+                new VoteStatusResponse(2L, "title2", "http://example.com/image/2", 1, "33.3")
         );
         given(voteService.findVoteStatus(1L, 1L))
                 .willReturn(response);
@@ -103,6 +103,7 @@ class VoteControllerTest extends RestDocsTest {
                                 fieldWithPath("[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("이미지 Id"),
                                 fieldWithPath("[].title").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("[].imageUrl").type(JsonFieldType.STRING).description("사진 URL"),
                                 fieldWithPath("[].voteCount").type(JsonFieldType.NUMBER).description("투표 수"),
                                 fieldWithPath("[].voteRatio").type(JsonFieldType.STRING).description("투표 비율")
                         )

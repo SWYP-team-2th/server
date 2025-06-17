@@ -1,9 +1,10 @@
 package com.chooz.vote.presentation.dto;
 
-public record PollChoiceStatusResponse(
+public record VoteStatusResponse(
         Long id,
         String title,
-        int voteCount,
+        String imageUrl,
+        long voteCount,
         String voteRatio
 ) {
 }

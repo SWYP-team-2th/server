@@ -1,7 +1,7 @@
 package com.chooz.vote.presentation;
 
 import com.chooz.auth.domain.UserInfo;
-import com.chooz.vote.presentation.dto.PollChoiceStatusResponse;
+import com.chooz.vote.presentation.dto.VoteStatusResponse;
 import com.chooz.vote.application.VoteService;
 import com.chooz.vote.presentation.dto.VoteRequest;
 import jakarta.validation.Valid;
@@ -43,7 +43,7 @@ public class VoteController {
     }
 
     @GetMapping("/posts/{postId}/votes/status")
-    public ResponseEntity<List<PollChoiceStatusResponse>> findVoteStatus(
+    public ResponseEntity<List<VoteStatusResponse>> findVoteStatus(
             @PathVariable("postId") Long postId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
