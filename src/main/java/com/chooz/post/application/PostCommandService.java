@@ -88,11 +88,4 @@ public class PostCommandService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.closeByAuthor(userId);
     }
-
-    @Transactional
-    public void toggleScope(Long userId, Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        post.toggleScope(userId);
-    }
 }

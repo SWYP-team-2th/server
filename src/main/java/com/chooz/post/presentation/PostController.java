@@ -51,15 +51,6 @@ public class PostController {
         return ResponseEntity.ok(postService.findByShareUrl(userId, shareUrl));
     }
 
-    @PostMapping("/{postId}/scope")
-    public ResponseEntity<Void> toggleScopePost(
-            @PathVariable("postId") Long postId,
-            @AuthenticationPrincipal UserInfo userInfo
-    ) {
-        postService.toggleScope(userInfo.userId(), postId);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/{postId}/update")
     public ResponseEntity<Void> updatePost(
             @PathVariable("postId") Long postId,

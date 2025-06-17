@@ -324,28 +324,6 @@ class PostControllerTest extends RestDocsTest {
 
     @Test
     @WithMockUserInfo
-    @DisplayName("게시글 공개 범위 변경")
-    void toggleStatusPost() throws Exception {
-        //given
-        Long postId = 1L;
-        doNothing().when(postService).toggleScope(any(), eq(postId));
-
-        //when then
-        mockMvc.perform(post("/posts/{postId}/scope", 1)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
-                .andExpect(status().isOk())
-                .andDo(restDocs.document(
-                        requestHeaders(authorizationHeader()),
-                        pathParameters(
-                                parameterWithName("postId").description("게시글 Id")
-                        )
-                ));
-
-        verify(postService, times(1)).toggleScope(any(), eq(postId));
-    }
-
-    @Test
-    @WithMockUserInfo
     @DisplayName("게시글 수정")
     void updatePost() throws Exception {
         //given
