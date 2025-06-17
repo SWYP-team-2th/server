@@ -43,8 +43,8 @@ class CommentCommandServiceTest extends IntegrationTest {
 
         //then
         assertAll(
-                () -> assertThat(comment.getUserId()).isEqualTo(savedComment.getPostId()),
-                () -> assertThat(comment.getPostId()).isEqualTo(savedComment.getUserId()),
+                () -> assertThat(comment.getUserId()).isEqualTo(savedComment.getUserId()),
+                () -> assertThat(comment.getPostId()).isEqualTo(savedComment.getPostId()),
                 () -> assertThat(comment.getContent()).isEqualTo(savedComment.getContent()),
                 () -> assertThat(comment.getEdited()).isEqualTo(savedComment.getEdited())
         );
