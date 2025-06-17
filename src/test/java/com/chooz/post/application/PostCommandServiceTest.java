@@ -1,12 +1,17 @@
 package com.chooz.post.application;
 
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.*;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceRequestDto;
 import com.chooz.support.IntegrationTest;
+import com.chooz.support.fixture.PostFixture;
+import com.chooz.support.fixture.UserFixture;
 import com.chooz.thumbnail.domain.Thumbnail;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
+import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,126 +91,136 @@ public class PostCommandServiceTest extends IntegrationTest {
     @Test
     @DisplayName("게시글 작성 - 이미지가 2개 미만인 경우")
     void create_invalidPollChoiceCount() throws Exception {
-//        //given
-//        long userId = 1L;
-//        CreatePostRequest request = new CreatePostRequest(
-//                "description",
-//                List.of(
-//                        new PollChoiceRequestDto(1L)
-//                ),
-//                Scope.PRIVATE,
-//                VoteType.SINGLE
-//        );
-//        //when then
-//        assertThatThrownBy(() -> postService.create(userId, request))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage(ErrorCode.INVALID_POLL_CHOICE_COUNT.getMessage());
+        //given
+        long userId = 1L;
+        CreatePostRequest request = new CreatePostRequest(
+                "title",
+                "description",
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com")
+                ),
+                new CreatePostRequest.PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CreatePostRequest.CloseOptionDto(CloseType.SELF, null, null)
+        );
+        //when then
+        assertThatThrownBy(() -> postService.create(userId, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.INVALID_POLL_CHOICE_COUNT.getMessage());
     }
 
     @Test
     @DisplayName("게시글 작성 - 설명이 100자 넘어가는 경우")
     void create_descriptionCountExceeded() throws Exception {
-//        //given
-//        long userId = 1L;
-//        CreatePostRequest request = new CreatePostRequest(
-//                "a".repeat(101),
-//                List.of(
-//                        new PollChoiceRequestDto(1L),
-//                        new PollChoiceRequestDto(2L)
-//                ),
-//                Scope.PRIVATE,
-//                VoteType.SINGLE
-//        );
-//
-//        //when then
-//        assertThatThrownBy(() -> postService.create(userId, request))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED.getMessage());
+        //given
+        long userId = 1L;
+        CreatePostRequest request = new CreatePostRequest(
+                "title",
+                "a".repeat(101),
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new CreatePostRequest.PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CreatePostRequest.CloseOptionDto(CloseType.SELF, null, null)
+        );
+
+        //when then
+        assertThatThrownBy(() -> postService.create(userId, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED.getMessage());
     }
 
-//    @Test
-//    @DisplayName("투표 마감")
-//    void close() throws Exception {
-//        //given
-//        User user = userRepository.save(createUser(1));
-//        ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
-//        ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
-//        Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-//
-//        //when
-//        post.close(user.getId());
-//
-//        //then
-//        postRepository.findById(post.getId()).get();
-//        assertThat(post.getStatus()).isEqualTo(Status.CLOSED);
-//    }
-//
-//    @Test
-//    @DisplayName("투표 마감 - 게시글 작성자가 아닐 경우")
-//    void close_notPostAuthor() throws Exception {
-//        //given
-//        User user = userRepository.save(createUser(1));
-//        ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
-//        ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
-//        Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-//
-//        //when then
-//        assertThatThrownBy(() -> post.close(2L))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("투표 마감 - 이미 마감된 게시글인 경우")
-//    void close_alreadyClosed() throws Exception {
-//        //given
-//        User user = userRepository.save(createUser(1));
-//        ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
-//        ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
-//        Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-//        post.close(user.getId());
-//
-//        //when then
-//        assertThatThrownBy(() -> post.close(user.getId()))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage(ErrorCode.POST_ALREADY_CLOSED.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("투표 마감 - 존재하지 않는 게시글일 경우")
-//    void close_notFoundPost() throws Exception {
-//        //given
-//
-//        //when then
-//        assertThatThrownBy(() -> postService.close(1L, 1L))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("게시글 삭제")
-//    void delete() throws Exception {
-//        //given
-//        User user = userRepository.save(createUser(1));
-//        ImageFile imageFile1 = imageFileRepository.save(createImageFile(1));
-//        ImageFile imageFile2 = imageFileRepository.save(createImageFile(2));
-//        Post post = postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, 1));
-//
-//        //when
-//        postService.delete(user.getId(), post.getId());
-//
-//        //then
-//        assertThat(postRepository.findById(post.getId())).isEmpty();
-//    }
-//
-//    private List<Post> createPosts(User user) {
-//        List<Post> posts = new ArrayList<>();
-//        for (int i = 0; i < 30; i += 2) {
-//            ImageFile imageFile1 = imageFileRepository.save(createImageFile(i));
-//            ImageFile imageFile2 = imageFileRepository.save(createImageFile(i + 1));
-//            posts.add(postRepository.save(createPost(user.getId(), Scope.PRIVATE, imageFile1, imageFile2, i)));
-//        }
-//        return posts;
-//    }
+    @Test
+    @DisplayName("게시글 작성 - 제목이 50자 넘어가는 경우")
+    void create_titleCountExceeded() throws Exception {
+        //given
+        long userId = 1L;
+        CreatePostRequest request = new CreatePostRequest(
+                "a".repeat(51),
+                "description",
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new CreatePostRequest.PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CreatePostRequest.CloseOptionDto(CloseType.SELF, null, null)
+        );
 
+        //when then
+        assertThatThrownBy(() -> postService.create(userId, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.TITLE_LENGTH_EXCEEDED.getMessage());
+    }
+
+    @Test
+    @DisplayName("투표 마감")
+    void close() throws Exception {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
+
+        //when
+        postService.close(user.getId(), post.getId());
+
+        //then
+        postRepository.findById(post.getId()).get();
+        assertThat(post.getStatus()).isEqualTo(Status.CLOSED);
+    }
+
+    @Test
+    @DisplayName("투표 마감 - 게시글 작성자가 아닐 경우")
+    void close_notPostAuthor() throws Exception {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        User anotherUser = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
+
+        //when then
+        assertThatThrownBy(() -> postService.close(anotherUser.getId(), post.getId()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
+    }
+
+    @Test
+    @DisplayName("투표 마감 - 이미 마감된 게시글인 경우")
+    void close_alreadyClosed() throws Exception {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(
+                PostFixture.createPostBuilder()
+                        .userId(user.getId())
+                        .status(Status.CLOSED)
+                        .build()
+        );
+
+        //when then
+        assertThatThrownBy(() -> postService.close(user.getId(), post.getId()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_ALREADY_CLOSED.getMessage());
+    }
+
+    @Test
+    @DisplayName("투표 마감 - 존재하지 않는 게시글일 경우")
+    void close_notFoundPost() throws Exception {
+        //given
+
+        //when then
+        assertThatThrownBy(() -> postService.close(1L, 1L))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void delete() throws Exception {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
+
+        //when
+        postService.delete(user.getId(), post.getId());
+
+        //then
+        assertThat(postRepository.findById(post.getId())).isEmpty();
+    }
 }
