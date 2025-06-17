@@ -7,9 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Clock;
 
 @Configuration
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan(basePackages = "com.chooz")
 public class CommonConfig {
-
 
     @Bean
     public Clock clock() {

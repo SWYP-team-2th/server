@@ -6,8 +6,6 @@ import com.chooz.auth.application.jwt.TokenPair;
 import com.chooz.auth.presentation.dto.TokenResponse;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
-import com.chooz.image.domain.ImageFile;
-import com.chooz.image.domain.ImageFileRepository;
 import com.chooz.image.presentation.dto.ImageFileDto;
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.CloseType;
@@ -37,7 +35,6 @@ public class DataInitializer {
 
     private final NicknameAdjectiveRepository nicknameAdjectiveRepository;
     private final UserRepository userRepository;
-    private final ImageFileRepository imageFileRepository;
     private final PostRepository postRepository;
     private final JwtService jwtService;
     private final VoteService voteService;
@@ -46,7 +43,6 @@ public class DataInitializer {
     public DataInitializer(
             NicknameAdjectiveRepository nicknameAdjectiveRepository,
             UserRepository userRepository,
-            ImageFileRepository imageFileRepository,
             PostRepository postRepository,
             JwtService jwtService,
             VoteService voteService,
@@ -54,7 +50,6 @@ public class DataInitializer {
     ) {
         this.nicknameAdjectiveRepository = nicknameAdjectiveRepository;
         this.userRepository = userRepository;
-        this.imageFileRepository = imageFileRepository;
         this.postRepository = postRepository;
         this.jwtService = jwtService;
         this.voteService = voteService;

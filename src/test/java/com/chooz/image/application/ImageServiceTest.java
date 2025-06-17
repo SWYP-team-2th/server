@@ -2,168 +2,68 @@ package com.chooz.image.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.image.domain.ImageFile;
-import com.chooz.image.domain.ImageFileRepository;
-import com.chooz.image.presentation.dto.ImageFileDto;
-import com.chooz.image.presentation.dto.ImageFileResponse;
-import com.chooz.image.util.FileValidator;
+import com.chooz.image.application.dto.PresignedUrlRequestDto;
+import com.chooz.image.presentation.dto.PresignedUrlRequest;
+import com.chooz.image.presentation.dto.PresignedUrlResponse;
+import com.chooz.support.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-public class ImageServiceTest {
+class ImageServiceTest extends IntegrationTest {
 
-    @Mock
-    private R2Storage r2Storage;
+    @Autowired
+    ImageService imageService;
 
-    @Mock
-    private FileValidator fileValidator;
+    @MockitoBean
+    S3Client s3Client;
 
-    @Mock
-    private ImageFileRepository imageFileRepository;
+    @MockitoBean
+    ImageNameGenerator imageNameGenerator;
 
-    @InjectMocks
-    private ImageService imageService;
-
-    @Test
-    @DisplayName("ImageFile Entity 생성")
-    void createImageFile() {
-        // given
-        ImageFileDto dto = new ImageFileDto("test.jpg", "https://image.chooz.site/test.jpg", "https://image.chooz.site/thumb.jpg");
-        ImageFile imageFile = ImageFile.create(dto);
-
-        // when
-        ReflectionTestUtils.setField(imageFile, "id", 100L);
-        when(imageFileRepository.save(any(ImageFile.class))).thenReturn(imageFile);
-        Long id = imageService.createImageFile(dto);
-
-        // then
-        assertEquals(100L, id);
-    }
+    @Autowired
+    ImageProperties imageProperties;
 
     @Test
-    @DisplayName("ImageFile Entity 생성 - 파라미터가 null인 경우")
-    void createImageFile_null() {
-        // given
-        ImageFileDto dto = new ImageFileDto("test.jpg", null, null);
+    @DisplayName("presigned url 생성")
+    void getPresignedUrl() throws Exception {
+        //given
+        PresignedUrlRequest request = new PresignedUrlRequest(12345L, "image/jpeg");
+        String presignedUrl = "https://example.com/presigned-url";
+        String imageName = "test-image";
+        given(s3Client.getPresignedPutUrl(any(PresignedUrlRequestDto.class)))
+                .willReturn(presignedUrl);
+        given(imageNameGenerator.generate())
+                .willReturn(imageName);
 
-        // when
-        when(imageFileRepository.save(any(ImageFile.class)))
-                .thenThrow(new BadRequestException(ErrorCode.INVALID_ARGUMENT));
+        //when
+        PresignedUrlResponse response = imageService.getPresignedUrl(request);
 
-        // then
-        assertThatThrownBy(() -> imageService.createImageFile(dto))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_ARGUMENT.getMessage());
-
-    }
-
-    @Test
-    @DisplayName("ImageFile Entity 생성 - 파라미터가 빈 값인 경우")
-    void createImageFile_emptyString() {
-        // given
-        ImageFileDto dto = new ImageFileDto("test.jpg", "", "");
-
-        // when
-        when(imageFileRepository.save(any(ImageFile.class)))
-                .thenThrow(new BadRequestException(ErrorCode.INVALID_ARGUMENT));
-
-        // then
-        assertThatThrownBy(() -> imageService.createImageFile(dto))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_ARGUMENT.getMessage());
-
-    }
-
-    @Test
-    @DisplayName("파일 업로드")
-    void uploadImageFile() {
-        // given
-        MockMultipartFile file1 = new MockMultipartFile(
-                "files",
-                "test1.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "dummy content".getBytes(StandardCharsets.UTF_8)
-        );
-        MockMultipartFile file2 = new MockMultipartFile(
-                "files",
-                "test2.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "dummy content".getBytes(StandardCharsets.UTF_8)
-        );
-
-        List<ImageFileDto> imageFiles = List.of(
-                new ImageFileDto("test1.jpg", "https://image.chooz.site/test1.jpg", "https://image.chooz.site/thumb1.jpg"),
-                new ImageFileDto("test2.png", "https://image.chooz.site/test2.png", "https://image.chooz.site/thumb2.png")
-        );
-
-        doNothing().when(fileValidator).validate(file1, file2);
-        when(r2Storage.uploadImageFile(file1, file2)).thenReturn(imageFiles);
-
-        AtomicLong idGenerator = new AtomicLong(1L);
-        when(imageFileRepository.save(any(ImageFile.class))).thenAnswer(invocation -> new ImageFile() {
-            @Override
-            public Long getId() {
-                return idGenerator.getAndIncrement();
-            }
-        });
-
-        // when
-        ImageFileResponse response = imageService.uploadImageFile(file1, file2);
-
-        // then
+        //then
         assertAll(
-                () -> assertNotNull(response),
-                () -> assertEquals(2, response.imageFileId().size()),
-                () -> assertThat(response.imageFileId().get(0)).isEqualTo(1L),
-                () -> assertThat(response.imageFileId().get(1)).isEqualTo(2L)
+                () -> assertThat(response.signedUploadPutUrl()).isEqualTo(presignedUrl),
+                () -> assertThat(response.signedGetUrl()).isEqualTo(imageProperties.endpoint() + imageProperties.path() + imageName),
+                () -> assertThat(response.assetUrl()).isEqualTo(imageProperties.path() + imageName)
         );
     }
 
     @Test
-    @DisplayName("파일 업로드 - IOException 발생")
-    void uploadImageFile_IOException() {
-        // given
-        MockMultipartFile file1 = new MockMultipartFile(
-                "files",
-                "test1.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "dummy content".getBytes(StandardCharsets.UTF_8)
-        );
-        MockMultipartFile file2 = new MockMultipartFile(
-                "files",
-                "test2.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "dummy content".getBytes(StandardCharsets.UTF_8)
-        );
+    @DisplayName("presigned url 생성 - 지원하지 않는 컨텐츠 타입")
+    void getPresignedUrl_unsupportedContentType() throws Exception {
+        //given
+        PresignedUrlRequest request = new PresignedUrlRequest(12345L, "unsupported/type");
 
-        doNothing().when(fileValidator).validate(file1, file2);
-        when(r2Storage.uploadImageFile(file1, file2))
-                .thenThrow(new UncheckedIOException(new IOException(ErrorCode.SERVICE_UNAVAILABLE.getMessage())));
-
-        // when then
-        assertThatThrownBy(() -> imageService.uploadImageFile(file1, file2))
-                .isInstanceOf(UncheckedIOException.class)
-                .hasMessageContaining(ErrorCode.SERVICE_UNAVAILABLE.getMessage());
+        //when then
+        assertThatThrownBy(() -> imageService.getPresignedUrl(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.UNSUPPORTED_IMAGE_EXTENSION.getMessage());
     }
 }

@@ -4,8 +4,9 @@ import com.chooz.commentLike.domain.CommentLike;
 
 public class CommentLikeFixture {
 
-    public static CommentLike createDefaultCommentLike(Long commentId) {
+    public static CommentLike createDefaultCommentLike(Long userId, Long commentId) {
         return createCommentLikeBuilder()
+                .userId(userId)
                 .commentId(commentId)
                 .build();
     }

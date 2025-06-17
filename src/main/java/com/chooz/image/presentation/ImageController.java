@@ -1,27 +1,26 @@
 package com.chooz.image.presentation;
 
 import com.chooz.image.application.ImageService;
-import com.chooz.image.presentation.dto.ImageFileResponse;
+import com.chooz.image.presentation.dto.PresignedUrlRequest;
+import com.chooz.image.presentation.dto.PresignedUrlResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/image")
 public class ImageController {
 
-    private final ImageService r2Service;
+    private final ImageService imageService;
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageFileResponse> createImageFile(@RequestPart("files") MultipartFile... files) {
-        ImageFileResponse response = r2Service.uploadImageFile(files);
+    @PostMapping(value = "/upload")
+    public ResponseEntity<PresignedUrlResponse> createPresignedUrl(@Valid @RequestBody PresignedUrlRequest request) {
+        PresignedUrlResponse response = imageService.getPresignedUrl(request);
         return ResponseEntity.ok(response);
     }
-
 }
