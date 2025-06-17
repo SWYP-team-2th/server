@@ -195,7 +195,7 @@ class PostQueryServiceTest extends IntegrationTest {
         for (int i = 0; i < size; i ++) {
             Post post = createPostBuilder()
                     .userId(user.getId())
-                    .pollOption(new PollOption(PollType.SINGLE, scope, CommentActive.OPEN))
+                    .pollOption(PollOption.create(PollType.SINGLE, scope, CommentActive.OPEN))
                     .build();
             posts.add(postRepository.save(post));
         }

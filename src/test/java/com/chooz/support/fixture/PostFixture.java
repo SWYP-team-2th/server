@@ -10,6 +10,7 @@ import com.chooz.post.domain.Post;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.domain.Status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PostFixture {
@@ -27,11 +28,29 @@ public class PostFixture {
                 .description("Default post description")
                 .shareUrl("http://example.com/post/1")
                 .status(Status.PROGRESS)
-                .closeOption(new CloseOption(CloseType.SELF, null, null))
-                .pollOption(new PollOption(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN))
+                .closeOption(CloseOption.create(CloseType.SELF, null, null))
+                .pollOption(PollOption.create(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN))
                 .pollChoices(List.of(
                         PollChoice.create("Choice A", "http://example.com/image/1"),
                         PollChoice.create("Choice B", "http://example.com/image/1")
                 ));
+    }
+
+    public static CloseOption.CloseOptionBuilder createCloseOptionBuilder() {
+        return CloseOption.builder()
+                .closeType(CloseType.SELF)
+                .closedAt(null)
+                .maxVoterCount(null);
+    }
+
+    public static CloseOption createCloseOptionOverDate() {
+        return new CloseOption(CloseType.DATE, LocalDateTime.now().minusMinutes(5), null);
+    }
+
+    public static PollOption.PollOptionBuilder createPollOptionBuilder() {
+        return PollOption.builder()
+                .pollType(PollType.SINGLE)
+                .scope(Scope.PUBLIC)
+                .commentActive(CommentActive.OPEN);
     }
 }

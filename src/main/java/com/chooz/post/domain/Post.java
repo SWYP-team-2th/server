@@ -22,9 +22,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.util.StringUtils;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,7 +74,7 @@ public class Post extends BaseEntity {
             PollOption pollOption,
             CloseOption closeOption
     ) {
-        validateNull(userId, title, description, status, pollChoices);
+        validateNull(userId, title, description, pollChoices);
         validateTitle(title);
         validateDescription(description);
         validatePollChoices(pollChoices);
@@ -90,38 +90,20 @@ public class Post extends BaseEntity {
         this.closeOption = closeOption;
     }
 
-    private void validatePollChoices(List<PollChoice> images) {
-        if (images.size() < 2 || images.size() > 9) {
-            throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
-        }
-    }
-
-    private void validateDescription(String description) {
-        if (description.length() > 100) {
-            throw new BadRequestException(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED);
-        }
-    }
-    
-    private void validateTitle(String title) {
-        if (StringUtils.hasText(title) && title.length() > 50) {
-            throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
-        }
-    }
-
     public static Post create(
-            Long userId, 
+            Long userId,
             String title,
-            String description, 
+            String description,
             List<PollChoice> pollChoices,
             String shareUrl,
             PollOption pollOption,
             CloseOption closeOption
     ) {
         return new Post(
-                null, 
-                userId, 
+                null,
+                userId,
                 title,
-                description, 
+                description,
                 Status.PROGRESS,
                 pollChoices,
                 shareUrl,
@@ -130,32 +112,32 @@ public class Post extends BaseEntity {
         );
     }
 
-//    public PollChoice getBestPickedImage() {
-//        return pollChoices.stream()
-//                .max(Comparator.comparing(PollChoice::getVoteCount))
-//                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-//    }
-
-    public void vote(Long imageId) {
-        PollChoice image = pollChoices.stream()
-                .filter(pollChoice -> pollChoice.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-//        image.increaseVoteCount();
+    private static void validatePollChoices(List<PollChoice> images) {
+        if (images.size() < 2 || images.size() > 10) {
+            throw new BadRequestException(ErrorCode.INVALID_POLL_CHOICE_COUNT);
+        }
     }
 
-    public void cancelVote(Long imageId) {
-        PollChoice image = pollChoices.stream()
-                .filter(pollChoice -> pollChoice.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> new InternalServerException(ErrorCode.POLL_CHOICE_NOT_FOUND));
-//        image.decreaseVoteCount();
+    private static void validateDescription(String description) {
+        if (description.length() > 100) {
+            throw new BadRequestException(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED);
+        }
+    }
+    
+    private static void validateTitle(String title) {
+        if (StringUtils.hasText(title) && title.length() > 50) {
+            throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
+        }
     }
 
-    public void close(Long userId) {
+    public void closeByAuthor(Long userId) {
         if (!isAuthor(userId)) {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
+        close();
+    }
+
+    public void close() {
         if (status == Status.CLOSED) {
             throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
         }
@@ -184,5 +166,33 @@ public class Post extends BaseEntity {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
         pollOption.toggleScope();
+    }
+
+    public void validateCloseDate(Clock clock) {
+        if (closeOption.getClosedAt().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException(ErrorCode.CLOSE_DATE_OVER);
+        }
+    }
+
+    public void validateMaxVoterCount(long voterCount) {
+        if (closeOption.getMaxVoterCount() >= voterCount) {
+            throw new BadRequestException(ErrorCode.EXCEED_MAX_VOTER_COUNT);
+        }
+    }
+
+    public boolean isSingleVote() {
+        return PollType.SINGLE.equals(pollOption.getPollType());
+    }
+
+    public boolean isCloseTypeVoter() {
+        return CloseType.VOTER.equals(closeOption.getCloseType());
+    }
+
+    public boolean isClosableByVoterCount(long voterCount) {
+        return closeOption.getMaxVoterCount() == voterCount;
+    }
+
+    public boolean isClosed() {
+        return this.status.equals(Status.CLOSED);
     }
 }

@@ -9,14 +9,12 @@ import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
-import com.chooz.post.presentation.dto.PollChoiceRequestDto;
 import com.chooz.thumbnail.domain.Thumbnail;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,7 +86,7 @@ public class PostCommandService {
     public void close(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        post.close(userId);
+        post.closeByAuthor(userId);
     }
 
     @Transactional
