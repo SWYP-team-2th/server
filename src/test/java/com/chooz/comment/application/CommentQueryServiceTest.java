@@ -44,12 +44,10 @@ class CommentQueryServiceTest extends IntegrationTest {
         // given
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
-        Comment comment = commentRepository.save(CommentFixture.createCommentBuilder()
-                .userId(user.getId())
-                .postId(post.getId())
-                .build());
-        createCommentLikesTimesOf(user, comment, 10);
-        int size = 10;
+        Comment comment = commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
+
+        commentLikeRepository.save(CommentLikeFixture.createDefaultCommentLike(user.getId(), comment.getId()));
+        createUserAndCommentLikesTimesOf(comment, 9);
 
         // when
         CursorBasePaginatedResponse<CommentResponse> response =
@@ -58,22 +56,22 @@ class CommentQueryServiceTest extends IntegrationTest {
         //then
         assertAll(
                 () -> assertThat(response.data()).hasSize(1),
+                () -> assertThat(response.data().get(0).id()).isEqualTo(comment.getId()),
                 () -> assertThat(response.data().get(0).userId()).isEqualTo(user.getId()),
                 () -> assertThat(response.data().get(0).nickname()).isEqualTo(user.getNickname()),
                 () -> assertThat(response.data().get(0).profileUrl()).isEqualTo(user.getProfileUrl()),
                 () -> assertThat(response.data().get(0).edited()).isFalse(),
                 () -> assertThat(response.data().get(0).likeCount()).isEqualTo(10),
                 () -> assertThat(response.data().get(0).liked()).isTrue(),
-                () -> assertThat(response.data().get(0).content()).isEqualTo("This is a comment"),
+                () -> assertThat(response.data().get(0).content()).isEqualTo(comment.getContent()),
                 () -> assertThat(response.hasNext()).isFalse()
         );
     }
-    private void  createCommentLikesTimesOf(User user, Comment comment, int times) {
-        for(int i = 0 ; i < times ; i++){
-            commentLikeRepository.save(CommentLikeFixture.createCommentLikeBuilder()
-                    .userId((long) i)
-                    .commentId(comment.getId())
-                    .build());
+
+    private void createUserAndCommentLikesTimesOf(Comment comment, int times) {
+        for (int i = 0; i < times; i++) {
+            User user = userRepository.save(UserFixture.createDefaultUser());
+            commentLikeRepository.save(CommentLikeFixture.createDefaultCommentLike(user.getId(), comment.getId()));
         }
     }
 }
