@@ -6,12 +6,14 @@ import com.chooz.comment.presentation.dto.CommentAuthorDto;
 import com.chooz.comment.presentation.dto.CommentDto;
 import com.chooz.comment.presentation.dto.CommentLikeDto;
 import com.chooz.comment.presentation.dto.CommentResponse;
+import com.chooz.comment.support.CommentValidator;
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeCountProjection;
 import com.chooz.commentLike.domain.CommentLikeRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.domain.PostRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +40,14 @@ public class CommentQueryService {
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final CommentValidator commentValidator;
 
 
     public CommentResponse findComments(Long postId, Long userId, Long cursorId, int size) {
+        commentValidator.validateCommentActive(postRepository.findCommentActiveByPostId(postId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND)));
+
         Slice<Comment> comments = commentRepository.findByPostId(postId, cursorId, PageRequest.ofSize(size));
 
 

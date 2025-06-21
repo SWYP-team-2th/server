@@ -85,4 +85,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """
     )
     List<Post> findPostsNeedToClose();
+
+    @Query("""
+            SELECT p.pollOption.commentActive
+            FROM Post p
+            WHERE p.id = :postId
+            """
+    )
+    Optional<CommentActive> findCommentActiveByPostId(@Param("postId") Long postId);
 }

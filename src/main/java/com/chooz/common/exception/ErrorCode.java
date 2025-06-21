@@ -36,6 +36,9 @@ public enum ErrorCode {
     THUMBNAIL_NOT_FOUND("썸네일을 찾을 수 없습니다."),
     CLOSE_DATE_OVER("마감 시간이 지났습니다."),
     EXCEED_MAX_VOTER_COUNT("투표 참여자 수가 초과했습니다."),
+    CLOSE_COMMENT_ACTIVE("댓글 기능이 비활성화 되어 있습니다."),
+    COMMENT_NOT_BELONG_TO_POST("게시글에 속한 댓글이 아닙니다."),
+    NOT_COMMENT_OWNER("댓글의 작성자가 아닙니다."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),
