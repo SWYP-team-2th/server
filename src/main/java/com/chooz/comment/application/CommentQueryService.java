@@ -2,6 +2,9 @@ package com.chooz.comment.application;
 
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
+import com.chooz.comment.presentation.dto.CommentAuthorDto;
+import com.chooz.comment.presentation.dto.CommentDto;
+import com.chooz.comment.presentation.dto.CommentLikeDto;
 import com.chooz.comment.presentation.dto.CommentResponse;
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeCountProjection;
@@ -37,24 +40,38 @@ public class CommentQueryService {
     private final UserRepository userRepository;
 
 
-    public CursorBasePaginatedResponse<CommentResponse> findComments(Long postId, Long userId, Long cursorId, int size) {
+    public CommentResponse findComments(Long postId, Long userId, Long cursorId, int size) {
         Slice<Comment> comments = commentRepository.findByPostId(postId, cursorId, PageRequest.ofSize(size));
+
 
         List<Long> commentIds = findCommentIds(comments);
         List<Long> userIds = findUserIds(comments);
 
+        Long commentCount = commentRepository.countByPostId(postId);
         Map<Long, Long> likeCountCommentMap = findLikeCountCommentMap(commentIds);
-        Map<Long, Boolean> likedCommentMap = findLikedCommentMap(commentIds, userId);
+        List<CommentLike> commentLikes = findCommentLikes(commentIds, userId);
+        Map<Long, Boolean> likedCommentMap = findLikedCommentMap(commentLikes);
+        Map<Long, Long> likedCommentLikeIdMap = findLikedCommentLikeIdMap(commentLikes);
         Map<Long, User> userCommentMap = findUserCommentMap(userIds);
 
-        List<CommentResponse> responseContent =
-                findResponseContent(comments, userCommentMap, likeCountCommentMap, likedCommentMap);
-
-        return CursorBasePaginatedResponse.of(new SliceImpl<>(
-                responseContent,
-                comments.getPageable(),
-                comments.hasNext()
-        ));
+        List<CommentDto> responseContent =
+                findResponseContent(
+                        comments,
+                        userCommentMap,
+                        likedCommentLikeIdMap,
+                        likedCommentMap,
+                        likeCountCommentMap
+                );
+        return new CommentResponse(
+                commentCount,
+                CursorBasePaginatedResponse.of(
+                        new SliceImpl<>(
+                                responseContent,
+                                comments.getPageable(),
+                                comments.hasNext()
+                        )
+                )
+        );
     }
 
     private List<Long> findUserIds(Slice<Comment> comments) {
@@ -87,10 +104,23 @@ public class CommentQueryService {
                         CommentLikeCountProjection::getLikeCount
                 ));
     }
-
-    private Map<Long, Boolean> findLikedCommentMap(List<Long> commentIds, Long userId) {
-        return Optional.ofNullable(userId)
-                .map(id -> commentLikeRepository.findByCommentIdInAndUserId(commentIds, id).stream()
+    private List<CommentLike> findCommentLikes(List<Long> commentIds, Long userId){
+        return commentLikeRepository.findByCommentIdInAndUserId(commentIds, userId);
+    }
+    private Map<Long, Long> findLikedCommentLikeIdMap(List<CommentLike> commentLikes){
+        return Optional.ofNullable(commentLikes)
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.stream()
+                        .collect(Collectors.toMap(
+                                CommentLike::getCommentId,
+                                CommentLike::getId
+                        ))
+                ).orElse(Collections.emptyMap());
+    }
+    private Map<Long, Boolean> findLikedCommentMap(List<CommentLike> commentLikes) {
+        return Optional.ofNullable(commentLikes)
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.stream()
                         .collect(Collectors.toMap(
                                 CommentLike::getCommentId,
                                 cl -> true
@@ -98,22 +128,22 @@ public class CommentQueryService {
                 ).orElse(Collections.emptyMap());
     }
 
-    private List<CommentResponse> findResponseContent(Slice<Comment> comments,
-                                                     Map<Long, User> userCommentMap,
-                                                     Map<Long, Long>  likeCountCommentMap,
-                                                     Map<Long, Boolean> likedCommentMap) {
+    private List<CommentDto> findResponseContent(Slice<Comment> comments,
+                                                 Map<Long, User> userCommentMap,
+                                                 Map<Long, Long> likedCommentLikeIdMap,
+                                                 Map<Long, Boolean> likedCommentMap,
+                                                 Map<Long, Long>  likeCountCommentMap
+                                                 ) {
         return comments.getContent().stream()
                 .map(   comment -> {
-                            User user = findUserByUserMap(userCommentMap, comment);
-                            return new CommentResponse(
-                                    comment.getId(),
-                                    comment.getUserId(),
-                                    user.getNickname(),
-                                    user.getProfileUrl(),
-                                    comment.getContent(),
-                                    comment.getEdited(),
-                                    likeCountCommentMap.getOrDefault(comment.getId(), 0L).intValue(),
-                                    likedCommentMap.getOrDefault(comment.getId(), false)
+                            return CommentDto.of(
+                                    comment,
+                                    CommentAuthorDto.of(findUserByUserMap(userCommentMap, comment)),
+                                    CommentLikeDto.of(
+                                            likedCommentLikeIdMap.getOrDefault(comment.getId(), null),
+                                            likedCommentMap.getOrDefault(comment.getId(), false),
+                                            likeCountCommentMap.getOrDefault(comment.getId(), 0L).intValue()
+                                    )
                             );
                         }
                 ).toList();

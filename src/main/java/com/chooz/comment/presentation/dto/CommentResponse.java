@@ -1,20 +1,8 @@
 package com.chooz.comment.presentation.dto;
 
-import com.chooz.common.dto.CursorDto;
+import com.chooz.common.dto.CursorBasePaginatedResponse;
 
 public record CommentResponse(
-        Long id,
-        Long userId,
-        String nickname,
-        String profileUrl,
-        String content,
-        boolean edited,
-        int likeCount,
-        boolean liked
-) implements CursorDto {
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-}
+        Long commentCount,
+        CursorBasePaginatedResponse<CommentDto> commentDto
+){}

@@ -22,7 +22,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("")
-    public ResponseEntity<CursorBasePaginatedResponse<CommentResponse>> findComments(
+    public ResponseEntity<CommentResponse> findComments(
             @PathVariable("postId") Long postId,
             @RequestParam(value = "cursor", required = false) Long cursor,
             @RequestParam(value = "size", defaultValue = "10") int size,

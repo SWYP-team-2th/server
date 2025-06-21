@@ -18,7 +18,7 @@ public class CommentService {
     private final CommentQueryService commentQueryService;
     private final CommentCommandService commentCommandService;
 
-    public CursorBasePaginatedResponse<CommentResponse> findComments(Long postId, Long userId, Long cursorId, int size) {
+    public CommentResponse findComments(Long postId, Long userId, Long cursorId, int size) {
         return commentQueryService.findComments(postId, userId, cursorId, size);
     }
 
