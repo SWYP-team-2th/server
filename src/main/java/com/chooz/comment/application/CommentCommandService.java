@@ -28,6 +28,7 @@ public class CommentCommandService {
     private final CommentLikeCommandService commentLikeCommandService;
 
     public CommentIdResponse createComment(Long postId, CommentRequest commentRequest, Long userId) {
+        commentValidator.validateContentLength(commentRequest.content());
         Comment commentForSave = Comment.create(
                 postRepository.findById(postId)
                         .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND)).getId(),
@@ -40,6 +41,7 @@ public class CommentCommandService {
     }
 
     public CommentIdResponse updateComment(Long postId, Long commentId, CommentRequest commentRequest, Long userId) {
+        commentValidator.validateContentLength(commentRequest.content());
         Comment commentForUpdate = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
         commentValidator.validateCommentAccess(commentForUpdate, postId, userId);

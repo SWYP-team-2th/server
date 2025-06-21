@@ -29,6 +29,11 @@ public class CommentValidator {
             throw new BadRequestException(ErrorCode.CLOSE_COMMENT_ACTIVE);
         }
     }
+    public void validateContentLength(String content){
+        if(content.length() > 200) {
+            throw new BadRequestException(ErrorCode.COMMENT_LENGTH_OVER);
+        }
+    }
 
 
 }

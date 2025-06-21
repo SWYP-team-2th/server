@@ -39,7 +39,7 @@ public enum ErrorCode {
     CLOSE_COMMENT_ACTIVE("댓글 기능이 비활성화 되어 있습니다."),
     COMMENT_NOT_BELONG_TO_POST("게시글에 속한 댓글이 아닙니다."),
     NOT_COMMENT_OWNER("댓글의 작성자가 아닙니다."),
-
+    COMMENT_LENGTH_OVER("댓글 길이가 200글자를 초과하였습니다."),
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),
     INVALID_TOKEN("유효하지 않은 토큰입니다."),
