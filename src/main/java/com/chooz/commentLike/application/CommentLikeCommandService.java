@@ -27,4 +27,8 @@ public class CommentLikeCommandService {
         commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
                 .ifPresent(commentLikeRepository::delete);
     }
+
+    public void deleteCommentLikeByCommentId(Long commentId) {
+        commentLikeRepository.deleteByCommentId(commentId);
+    }
 }
