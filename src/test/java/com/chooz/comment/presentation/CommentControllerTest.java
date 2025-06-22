@@ -1,8 +1,6 @@
 package com.chooz.comment.presentation;
 
-import com.chooz.comment.presentation.dto.CommentIdResponse;
-import com.chooz.comment.presentation.dto.CommentRequest;
-import com.chooz.comment.presentation.dto.CommentResponse;
+import com.chooz.comment.presentation.dto.*;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
@@ -13,8 +11,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-
-import static java.util.Collections.singletonList;
+import java.time.LocalDateTime;
+import java.util.List;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -36,25 +34,35 @@ class CommentControllerTest extends RestDocsTest {
         // given
         int size = 10;
 
-        CommentResponse response = new CommentResponse(
-                1L,
-                userId,
-                "nickname",
-                "www.example.com/profile.png",
-                "댓글내용",
-                false,
-                10,
-                false
+        List<CommentDto> commentDtos = List.of(
+                new CommentDto(
+                        1L,
+                        "comment1",
+                        false,
+                        LocalDateTime.of(2025, 2, 13, 12, 0),
+                        new CommentAuthorDto(1L, "author", "https://image.chooz.site/profile-image"),
+                        new CommentLikeDto(null, false, 10)
+                ),
+                new CommentDto(
+                        2L,
+                        "comment2",
+                        true,
+                        LocalDateTime.of(2025, 2, 13, 12, 1),
+                        new CommentAuthorDto(2L, "author2", "https://image.chooz.site/profile-image2"),
+                        new CommentLikeDto(2L, true, 5)
+                )
         );
 
-        CursorBasePaginatedResponse<CommentResponse> commentListResponse =
+        CommentResponse commentResponse = new CommentResponse(
+                2,
                 CursorBasePaginatedResponse.of( new SliceImpl<>(
-                        singletonList(response),
+                        commentDtos,
                         PageRequest.of(0, size),
                 false
-        ));
+        )));
+
         given(commentService.findComments(postId, userId, null, size))
-                .willReturn(commentListResponse);
+                .willReturn(commentResponse);
 
         // when then
         mockMvc.perform(get("/posts/{postId}/comments", postId)
@@ -62,41 +70,51 @@ class CommentControllerTest extends RestDocsTest {
                         .param("size", String.valueOf(size))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(commentListResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(commentResponse)))
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
                         pathParameters(parameterWithName("postId").description("게시글 ID")),
                         queryParameters(cursorQueryParams()),
                         responseFields(
-                                fieldWithPath("data[].id")
+                                fieldWithPath("commentCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("게시글에 속한 댓글 수"),
+                                fieldWithPath("comments.data[].id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("댓글 ID"),
-                                fieldWithPath("data[].userId")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("작성자 ID"),
-                                fieldWithPath("data[].nickname")
-                                        .type(JsonFieldType.STRING)
-                                        .description("작성자 닉네임"),
-                                fieldWithPath("data[].profileUrl")
-                                        .type(JsonFieldType.STRING)
-                                        .description("작성자 프로필 이미지 URL"),
-                                fieldWithPath("data[].content")
+                                fieldWithPath("comments.data[].content")
                                         .type(JsonFieldType.STRING)
                                         .description("댓글 내용"),
-                                fieldWithPath("data[].edited")
+                                fieldWithPath("comments.data[].edited")
                                         .type(JsonFieldType.BOOLEAN)
                                         .description("수정 여부"),
-                                fieldWithPath("data[].likeCount")
+                                fieldWithPath("comments.data[].createdAt")
+                                        .type(JsonFieldType.STRING)
+                                        .description("댓글 생성시간"),
+                                fieldWithPath("comments.data[].author.userId")
                                         .type(JsonFieldType.NUMBER)
-                                        .description("댓글 좋아요 수"),
-                                fieldWithPath("data[].liked")
-                                        .type(JsonFieldType.BOOLEAN)
-                                        .description("내가 좋아요 눌렀는지 여부"),
-                                fieldWithPath("nextCursor")
+                                        .description("작성자 ID"),
+                                fieldWithPath("comments.data[].author.nickname")
+                                        .type(JsonFieldType.STRING)
+                                        .description("작성자 닉네임"),
+                                fieldWithPath("comments.data[].author.profileUrl")
+                                        .type(JsonFieldType.STRING)
+                                        .description("작성자 프로필 이미지 URL"),
+                                fieldWithPath("comments.data[].like.commentLikeId")
                                         .type(JsonFieldType.NUMBER)
                                         .optional()
-                                        .description("다음 커서 (없으면 null)"),
-                                fieldWithPath("hasNext")
+                                        .description("댓글 좋아요 ID(좋아요를 누르지 않은 경우, null)"),
+                                fieldWithPath("comments.data[].like.liked")
+                                        .type(JsonFieldType.BOOLEAN)
+                                        .description("내가 댓글 좋아요 눌렀는지 여부"),
+                                fieldWithPath("comments.data[].like.likeCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("댓글 좋아요 수"),
+                                fieldWithPath("comments.nextCursor")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("다음 커서"),
+                                fieldWithPath("comments.hasNext")
                                         .type(JsonFieldType.BOOLEAN)
                                         .description("다음 페이지 존재 여부")
                         )
@@ -132,7 +150,7 @@ class CommentControllerTest extends RestDocsTest {
     @Test
     @WithMockUserInfo
     @DisplayName("댓글 수정")
-    void modifyComment() throws Exception {
+    void updateComment() throws Exception {
         CommentRequest request = new CommentRequest("수정된 댓글 내용");
 
         CommentIdResponse response = new CommentIdResponse(commentId);
