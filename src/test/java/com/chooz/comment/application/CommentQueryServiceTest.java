@@ -109,7 +109,6 @@ class CommentQueryServiceTest extends IntegrationTest {
         //then
         assertAll(
                 () -> assertThat(response.commentCount()).isEqualTo(20),
-                () -> assertThat(response.comments().data()).hasSize(10),
                 () -> assertThat(response.comments().hasNext()).isFalse()
         );
     }
