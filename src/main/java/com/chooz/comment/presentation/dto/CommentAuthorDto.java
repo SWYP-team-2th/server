@@ -3,7 +3,7 @@ package com.chooz.comment.presentation.dto;
 import com.chooz.user.domain.User;
 
 public record CommentAuthorDto(
-        long id,
+        Long userId,
         String nickname,
         String profileUrl
 ) {

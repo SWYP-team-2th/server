@@ -6,26 +6,26 @@ import com.chooz.common.dto.CursorDto;
 import java.time.LocalDateTime;
 
 public record CommentDto(
-        long id,
+        Long id,
         String content,
         boolean edited,
         LocalDateTime createdAt,
-        CommentAuthorDto commentAuthorDto,
-        CommentLikeDto commentLikeDto
+        CommentAuthorDto author,
+        CommentLikeDto like
 ) implements CursorDto {
 
     public static CommentDto of (
             Comment comment,
-            CommentAuthorDto commentAuthorDto,
-            CommentLikeDto commentLikeDto
+            CommentAuthorDto author,
+            CommentLikeDto like
     ){
         return new CommentDto(
                 comment.getId(),
                 comment.getContent(),
                 comment.getEdited(),
                 comment.getCreatedAt(),
-                commentAuthorDto,
-                commentLikeDto
+                author,
+                like
         );
     }
 

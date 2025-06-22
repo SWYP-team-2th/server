@@ -54,7 +54,7 @@ public class CommentQueryService {
         List<Long> commentIds = findCommentIds(comments);
         List<Long> userIds = findUserIds(comments);
 
-        Long commentCount = commentRepository.countByPostId(postId);
+        int commentCount = commentRepository.countByPostId(postId);
         Map<Long, Long> likeCountCommentMap = findLikeCountCommentMap(commentIds);
         List<CommentLike> commentLikes = findCommentLikes(commentIds, userId);
         Map<Long, Boolean> likedCommentMap = findLikedCommentMap(commentLikes);
