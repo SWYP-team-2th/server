@@ -2,6 +2,9 @@ package com.chooz.commentLike.application;
 
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeRepository;
+import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,17 +18,20 @@ public class CommentLikeCommandService {
 
     private final CommentLikeRepository commentLikeRepository;
 
-    public void createCommentLike(Long commentId, Long userId) {
-        boolean alreadyLiked = commentLikeRepository.existsByCommentIdAndUserId(commentId, userId);
-        if (alreadyLiked) {
-            return;
+    public CommentLikeIdResponse createCommentLike(Long commentId, Long userId) {
+        if(commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)){
+            throw new BadRequestException(ErrorCode.COMMENT_LIKE_NOT_FOUND);
         }
-        commentLikeRepository.save(CommentLike.create(commentId, userId));
+        return new CommentLikeIdResponse(commentLikeRepository.save(CommentLike.create(commentId, userId)).getId());
     }
 
-    public void deleteCommentLike(Long commentId, Long userId) {
-        commentLikeRepository.findByCommentIdAndUserId(commentId, userId)
-                .ifPresent(commentLikeRepository::delete);
+    public void deleteCommentLike(Long commentLikeId, Long userId) {
+        CommentLike commentLike = commentLikeRepository.findById(commentLikeId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_LIKE_NOT_FOUND));
+        if(!commentLike.getUserId().equals(userId)){
+            throw new BadRequestException(ErrorCode.NOT_COMMENT_LIKE_AUTHOR);
+        }
+        commentLikeRepository.delete(commentLike);
     }
 
     public void deleteCommentLikeByCommentId(Long commentId) {

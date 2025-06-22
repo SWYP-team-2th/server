@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class CommentValidator {
     public void validateCommentOwnership(Comment comment, Long userId) {
         if (!comment.getUserId().equals(userId)) {
-            throw new BadRequestException(ErrorCode.NOT_COMMENT_OWNER);
+            throw new BadRequestException(ErrorCode.NOT_COMMENT_AUTHOR);
         }
     }
 
