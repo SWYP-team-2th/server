@@ -46,7 +46,7 @@ public class CommentQueryService {
 
     public CommentResponse findComments(Long postId, Long userId, Long cursorId, int size) {
         commentValidator.validateCommentActive(postRepository.findCommentActiveByPostId(postId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND)));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.CLOSE_COMMENT_ACTIVE)));
 
         Slice<Comment> comments = commentRepository.findByPostId(postId, cursorId, PageRequest.ofSize(size));
 

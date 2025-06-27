@@ -42,6 +42,7 @@ public enum ErrorCode {
     COMMENT_LENGTH_OVER("댓글 길이가 200글자를 초과하였습니다."),
     COMMENT_LIKE_NOT_FOUND("댓글좋아요를 찾을 수 없습니다."),
     NOT_COMMENT_LIKE_AUTHOR("댓글 좋아요를 누른 유저가 아닙니다."),
+
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),
     INVALID_TOKEN("유효하지 않은 토큰입니다."),

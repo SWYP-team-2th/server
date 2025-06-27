@@ -5,6 +5,9 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.comment.presentation.dto.CommentResponse;
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeRepository;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.support.IntegrationTest;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CommentQueryServiceTest extends IntegrationTest {
@@ -111,6 +115,26 @@ class CommentQueryServiceTest extends IntegrationTest {
                 () -> assertThat(response.commentCount()).isEqualTo(20),
                 () -> assertThat(response.comments().hasNext()).isFalse()
         );
+    }
+
+    @Test
+    @DisplayName("댓글 비활성화 게시물 조회 테스트")
+    void findCommentsCloseCommentActive() {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        PollOption pollOption = PostFixture.createPollOptionBuilder()
+                .commentActive(CommentActive.CLOSED).build();
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(pollOption).build());
+        Comment comment = commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
+        createUserAndCommentsTimesOf(post, 19);
+        createUserAndCommentLikesTimesOf(comment, 9);
+
+        // when & then
+        assertThatThrownBy(() -> commentQueryService.findComments(post.getId(), user.getId(), null, 10))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("댓글 기능이 비활성화 되어 있습니다.");
     }
 
 
