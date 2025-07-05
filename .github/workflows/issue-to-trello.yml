@@ -7,24 +7,31 @@ on:
 jobs:
   create-trello-card:
     runs-on: ubuntu-latest
+
     steps:
       - name: Create Trello Card in Trello
+        env:
+          TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
+          TRELLO_LABEL_ID: ${{ secrets.TRELLO_REVIEW_LABEL_ID }}
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
         run: |
-          ISSUE_NUMBER=${{ github.event.issue.number }}
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
           ISSUE_TITLE="${{ github.event.issue.title }}"
           ISSUE_BODY="${{ github.event.issue.body }}"
           ISSUE_URL="${{ github.event.issue.html_url }}"
 
-          DESCRIPTION="Issue Number: #$ISSUE_NUMBER\n$ISSUE_URL\n\n$ISSUE_BODY"
+          DESCRIPTION=$(echo -e "Issue Number: #$ISSUE_NUMBER\n$ISSUE_URL\n\n$ISSUE_BODY" | jq -Rs .)
+          TITLE=$(echo "$ISSUE_TITLE" | jq -Rs .)
 
           curl --request POST \
             --url "https://api.trello.com/1/cards" \
             --header "Content-Type: application/json" \
-            --data '{
-              "idList": "'"${{ secrets.TRELLO_LIST_ID }}"'",
-              "name": "'"${ISSUE_TITLE//\"/\\\"}"'",
-              "desc": "'"${DESCRIPTION//\"/\\\"}"'",
-              "idLabels": "'"${{ secrets.TRELLO_REVIEW_LABEL_ID }}"'",
-              "key": "'"${{ secrets.TRELLO_KEY }}"'",
-              "token": "'"${{ secrets.TRELLO_TOKEN }}"'"
-            }'
+            --data "{
+              \"idList\": \"$TRELLO_LIST_ID\",
+              \"name\": $TITLE,
+              \"desc\": $DESCRIPTION,
+              \"idLabels\": \"$TRELLO_LABEL_ID\",
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"
