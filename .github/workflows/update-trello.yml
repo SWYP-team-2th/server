@@ -7,13 +7,15 @@ on:
 jobs:
   update-trello-card:
     runs-on: ubuntu-latest
+
     steps:
       - name: Extract Issue Number from PR Body
         id: extract
         run: |
+          echo "Extracting issue number from PR body..."
           BODY="${{ github.event.pull_request.body }}"
           ISSUE_NUMBER=$(echo "$BODY" | grep -oE "#[0-9]+" | head -n1 | tr -d '#')
-          echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+          echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Skip if No Issue Number Found
         if: steps.extract.outputs.ISSUE_NUMBER == ''
@@ -34,7 +36,7 @@ jobs:
       - name: Update Card with Done Label & Complete
         if: github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract.outputs.ISSUE_NUMBER != ''
         run: |
-          # Add 'Done' label
+          # Add 'Done (PR Merged)' label
           curl --request POST \
             --url "https://api.trello.com/1/cards/${{ steps.extract.outputs.ISSUE_NUMBER }}/idLabels" \
             --header "Content-Type: application/json" \
