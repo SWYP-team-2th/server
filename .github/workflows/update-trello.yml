@@ -12,46 +12,56 @@ jobs:
       - name: Extract Issue Number from PR Body
         id: extract
         run: |
-          echo "Extracting issue number from PR body..."
           BODY="${{ github.event.pull_request.body }}"
           ISSUE_NUMBER=$(echo "$BODY" | grep -oE "#[0-9]+" | head -n1 | tr -d '#')
           echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Skip if No Issue Number Found
         if: steps.extract.outputs.ISSUE_NUMBER == ''
-        run: echo "No issue number found in PR body. Skipping workflow..."
+        run: echo "No issue number found. Skipping workflow..."
 
       - name: Add PR Link as Comment to Trello Card
         if: github.event.action == 'opened' && steps.extract.outputs.ISSUE_NUMBER != ''
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
         run: |
-          curl --request POST \
-            --url "https://api.trello.com/1/cards/${{ steps.extract.outputs.ISSUE_NUMBER }}/actions/comments" \
-            --header "Content-Type: application/json" \
-            --data '{
-              "text": "PR opened: '${{ github.event.pull_request.html_url }}'",
-              "key": "'"${{ secrets.TRELLO_KEY }}"'",
-              "token": "'"${{ secrets.TRELLO_TOKEN }}"'"
-            }'
+          CARD_ID="${{ steps.extract.outputs.ISSUE_NUMBER }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_COMMENT=$(echo "PR opened: $PR_URL" | jq -Rs .)
 
-      - name: Update Card with Done Label & Complete
+          curl --request POST \
+            --url "https://api.trello.com/1/cards/$CARD_ID/actions/comments" \
+            --header "Content-Type: application/json" \
+            --data "{
+              \"text\": $PR_COMMENT,
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"
+
+      - name: Mark Card as Done when PR is Merged
         if: github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract.outputs.ISSUE_NUMBER != ''
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          TRELLO_DONE_LABEL_ID: ${{ secrets.TRELLO_DONE_LABEL_ID }}
         run: |
-          # Add 'Done (PR Merged)' label
-          curl --request POST \
-            --url "https://api.trello.com/1/cards/${{ steps.extract.outputs.ISSUE_NUMBER }}/idLabels" \
-            --header "Content-Type: application/json" \
-            --data '{
-              "value": "'"${{ secrets.TRELLO_DONE_LABEL_ID }}"'",
-              "key": "'"${{ secrets.TRELLO_KEY }}"'",
-              "token": "'"${{ secrets.TRELLO_TOKEN }}"'"
-            }'
+          CARD_ID="${{ steps.extract.outputs.ISSUE_NUMBER }}"
 
-          # Set dueComplete to true
-          curl --request PUT \
-            --url "https://api.trello.com/1/cards/${{ steps.extract.outputs.ISSUE_NUMBER }}" \
+          curl --request POST \
+            --url "https://api.trello.com/1/cards/$CARD_ID/idLabels" \
             --header "Content-Type: application/json" \
-            --data '{
-              "dueComplete": true,
-              "key": "'"${{ secrets.TRELLO_KEY }}"'",
-              "token": "'"${{ secrets.TRELLO_TOKEN }}"'"
-            }'
+            --data "{
+              \"value\": \"$TRELLO_DONE_LABEL_ID\",
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"
+
+          curl --request PUT \
+            --url "https://api.trello.com/1/cards/$CARD_ID" \
+            --header "Content-Type: application/json" \
+            --data "{
+              \"dueComplete\": true,
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"
