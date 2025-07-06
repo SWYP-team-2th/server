@@ -7,6 +7,7 @@ import com.chooz.user.presentation.dto.UserMyInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +30,11 @@ public class UserController {
             @AuthenticationPrincipal UserInfo userInfo
     ) {
         return ResponseEntity.ok(userService.findByMe(userInfo.userId()));
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<Void> withdraw(@AuthenticationPrincipal UserInfo userInfo) {
+        userService.withdraw(userInfo.userId());
+        return ResponseEntity.ok().build();
     }
 }

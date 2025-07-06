@@ -1,10 +1,12 @@
 package com.chooz.user.application;
 
 import com.chooz.support.IntegrationTest;
+import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.NicknameAdjective;
 import com.chooz.user.domain.NicknameAdjectiveRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,5 +46,19 @@ class UserServiceTest extends IntegrationTest {
                 () -> assertThat(returnUser.get().getNickname()).contains("뽀또")
         );
 
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 테스트")
+    void withdraw() {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+
+        // when
+        userService.withdraw(user.getId());
+
+        // then
+        Optional<User> deletedUser = userRepository.findById(user.getId());
+        assertThat(deletedUser).isEmpty();
     }
 }
