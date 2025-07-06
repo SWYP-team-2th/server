@@ -2,11 +2,11 @@
 == 댓글좋아요 API
 
 [[댓글좋아요-생성]]
-=== `POST` 댓글 좋아요 생성
+=== `POST` 댓글 좋아요 생성 (미구현)
 
 operation::comment-like-controller-test/create-comment-like[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
 
 [[댓글좋아요-삭제]]
-=== `DELETE` 댓글 좋아요 삭제
+=== `DELETE` 댓글 좋아요 삭제 (미구현)
 
 operation::comment-like-controller-test/delete-comment-like[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
