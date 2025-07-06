@@ -34,7 +34,7 @@ class NicknameGeneratorTest {
                 .willReturn(Optional.of(new NicknameAdjective("호기심 많은")));
 
         //when
-        String nickname = nicknameGenerator.generate(role);
+        String nickname = nicknameGenerator.generate();
 
         //then
         Assertions.assertThat(nickname).isEqualTo("호기심 많은 뽀또");

@@ -2,7 +2,6 @@ package com.chooz.user.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.user.domain.Role;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.user.presentation.dto.UserInfoResponse;
@@ -29,7 +28,7 @@ public class UserService {
 
     private String getNickname(String nickname) {
         return Optional.ofNullable(nickname)
-                .orElseGet(() -> nicknameGenerator.generate(Role.USER));
+                .orElseGet(() -> nicknameGenerator.generate());
     }
 
     private String getProfileImage(String profileImageUrl) {
