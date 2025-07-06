@@ -37,11 +37,6 @@ public class UserService {
                 .orElse(User.DEFAULT_PROFILE_URL);
     }
 
-    @Transactional
-    public User createGuest() {
-        return userRepository.save(User.createGuest(nicknameGenerator.generate(Role.GUEST)));
-    }
-
     public UserInfoResponse findById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));

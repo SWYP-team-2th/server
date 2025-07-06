@@ -4,9 +4,9 @@ package com.chooz.auth.presentation;
 import com.chooz.auth.application.AuthService;
 import com.chooz.auth.application.jwt.TokenPair;
 import com.chooz.auth.domain.UserInfo;
+import com.chooz.auth.presentation.dto.AuthResponse;
 import com.chooz.auth.presentation.dto.OAuthSignInRequest;
 import com.chooz.auth.presentation.dto.TokenResponse;
-import com.chooz.auth.presentation.dto.AuthResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.common.presentation.CustomHeader;
@@ -38,18 +38,6 @@ public class AuthController {
             HttpServletResponse response
     ) {
         TokenResponse tokenResponse = authService.oauthSignIn(request.code(), request.redirectUri());
-        TokenPair tokenPair = tokenResponse.tokenPair();
-        Cookie cookie = refreshTokenCookieGenerator.createCookie(tokenPair.refreshToken());
-        response.addCookie(cookie);
-        return ResponseEntity.ok(new AuthResponse(tokenPair.accessToken(), tokenResponse.userId(), tokenResponse.role()));
-    }
-
-    @PostMapping("/guest/sign-in")
-    public ResponseEntity<AuthResponse> guestSignIn(
-            @CookieValue(name = CustomHeader.CustomCookie.REFRESH_TOKEN, required = false) String refreshToken,
-            HttpServletResponse response
-    ) {
-        TokenResponse tokenResponse = authService.guestSignIn(refreshToken);
         TokenPair tokenPair = tokenResponse.tokenPair();
         Cookie cookie = refreshTokenCookieGenerator.createCookie(tokenPair.refreshToken());
         response.addCookie(cookie);

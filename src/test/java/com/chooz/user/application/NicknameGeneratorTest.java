@@ -40,18 +40,4 @@ class NicknameGeneratorTest {
         Assertions.assertThat(nickname).isEqualTo("호기심 많은 뽀또");
     }
 
-    @Test
-    @DisplayName("닉네임 생성 테스트 - 게스트")
-    void generate_guest() throws Exception {
-        //given
-        Role role = Role.GUEST;
-        given(nicknameAdjectiveRepository.findRandomNicknameAdjective())
-                .willReturn(Optional.of(new NicknameAdjective("호기심 많은")));
-
-        //when
-        String nickname = nicknameGenerator.generate(role);
-
-        //then
-        Assertions.assertThat(nickname).isEqualTo("호기심 많은 낫또");
-    }
 }
