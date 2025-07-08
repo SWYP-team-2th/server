@@ -1,5 +1,6 @@
 package com.chooz.commentLike.application;
 
+import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,12 @@ public class CommentLikeService {
     private final CommentLikeCommandService commentLikeCommandService;
 
     @Transactional
-    public void createCommentLike(Long commentId, Long userId) {
-        commentLikeCommandService.createCommentLike(commentId, userId);
+    public CommentLikeIdResponse createCommentLike(Long commentId, Long userId) {
+        return commentLikeCommandService.createCommentLike(commentId, userId);
     }
 
     @Transactional
-    public void deleteCommentLike(Long commentId, Long userId) {
-        commentLikeCommandService.deleteCommentLike(commentId, userId);
+    public void deleteCommentLike(Long commentLikeId, Long userId) {
+        commentLikeCommandService.deleteCommentLike(commentLikeId, userId);
     }
 }

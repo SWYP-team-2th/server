@@ -1,12 +1,15 @@
 package com.chooz.commentLike.application;
 
 import com.chooz.comment.domain.Comment;
+import com.chooz.comment.domain.CommentRepository;
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeRepository;
+import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.CommentFixture;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.User;
+import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,11 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
 
     @Autowired
     private CommentLikeRepository commentLikeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private CommentLikeService commentLikeService;
@@ -37,17 +45,20 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
         CommentLike commentLike = createAndGetSavedCommentLike();
 
         // when
-        commentLikeService.deleteCommentLike(commentLike.getCommentId(), commentLike.getUserId());
+        commentLikeService.deleteCommentLike(commentLike.getId(), commentLike.getUserId());
 
         // then
-        assertThat(commentLikeRepository.findById(commentLike.getId())).isEmpty();
+        assertThat(commentLikeRepository.existsById(commentLike.getId())).isFalse();
     }
 
     private CommentLike createAndGetSavedCommentLike() {
-        Comment comment = CommentFixture.createCommentBuilder().id(1L).build();
-        User user = UserFixture.createUserBuilder().id(1L).build();
-        commentLikeService.createCommentLike(comment.getId(), user.getId());
+        Comment comment = commentRepository.save(CommentFixture.createCommentBuilder().build());
+        User user = userRepository.save(UserFixture.createUserBuilder().build());
+
+        CommentLikeIdResponse commentLikeIdResponse =
+                commentLikeService.createCommentLike(comment.getId(), user.getId());
+
         return commentLikeRepository
-                .findByCommentIdAndUserId(comment.getId(), user.getId()).orElseThrow();
+                .findById(commentLikeIdResponse.commentLikeId()).orElseThrow();
     }
 }

@@ -2,6 +2,7 @@ package com.chooz.commentLike.presentation;
 
 import com.chooz.auth.domain.UserInfo;
 import com.chooz.commentLike.application.CommentLikeService;
+import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +18,19 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     @PostMapping("/{commentId}")
-    public ResponseEntity<Void> createCommentLike(
+    public ResponseEntity<CommentLikeIdResponse> createCommentLike(
             @PathVariable("commentId") Long commentId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        commentLikeService.createCommentLike(commentId, userInfo.userId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(commentLikeService.createCommentLike(commentId, userInfo.userId()));
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/{commentLikeId}")
     public ResponseEntity<Void> deleteCommentLike(
-            @PathVariable("commentId") Long commentId,
+            @PathVariable("commentLikeId") Long commentLikeId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        commentLikeService.deleteCommentLike(commentId, userInfo.userId());
+        commentLikeService.deleteCommentLike(commentLikeId, userInfo.userId());
         return ResponseEntity.noContent().build();
     }
 }

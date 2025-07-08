@@ -3,8 +3,11 @@ package com.chooz.comment.application;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.comment.presentation.dto.CommentResponse;
+import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeRepository;
-import com.chooz.common.dto.CursorBasePaginatedResponse;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.support.IntegrationTest;
@@ -17,8 +20,10 @@ import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CommentQueryServiceTest extends IntegrationTest {
@@ -45,33 +50,104 @@ class CommentQueryServiceTest extends IntegrationTest {
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
         Comment comment = commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
-
-        commentLikeRepository.save(CommentLikeFixture.createDefaultCommentLike(user.getId(), comment.getId()));
+        CommentLike cl = commentLikeRepository.save(CommentLikeFixture.createDefaultCommentLike(user.getId(), comment.getId()));
         createUserAndCommentLikesTimesOf(comment, 9);
 
         // when
-        CursorBasePaginatedResponse<CommentResponse> response =
+        CommentResponse response =
                 commentQueryService.findComments(post.getId(), user.getId(), null, 10);
 
         //then
         assertAll(
-                () -> assertThat(response.data()).hasSize(1),
-                () -> assertThat(response.data().get(0).id()).isEqualTo(comment.getId()),
-                () -> assertThat(response.data().get(0).userId()).isEqualTo(user.getId()),
-                () -> assertThat(response.data().get(0).nickname()).isEqualTo(user.getNickname()),
-                () -> assertThat(response.data().get(0).profileUrl()).isEqualTo(user.getProfileUrl()),
-                () -> assertThat(response.data().get(0).edited()).isFalse(),
-                () -> assertThat(response.data().get(0).likeCount()).isEqualTo(10),
-                () -> assertThat(response.data().get(0).liked()).isTrue(),
-                () -> assertThat(response.data().get(0).content()).isEqualTo(comment.getContent()),
-                () -> assertThat(response.hasNext()).isFalse()
+                () -> assertThat(response.commentCount()).isEqualTo(1),
+                () -> assertThat(response.comments().data()).hasSize(1),
+                () -> assertThat(response.comments().data().get(0).id()).isEqualTo(comment.getId()),
+                () -> assertThat(response.comments().data().get(0).content()).isEqualTo(comment.getContent()),
+                () -> assertThat(response.comments().data().get(0).edited()).isFalse(),
+                () -> assertThat(response.comments().data().get(0).author().userId()).isEqualTo(user.getId()),
+                () -> assertThat(response.comments().data().get(0).author().nickname()).isEqualTo(user.getNickname()),
+                () -> assertThat(response.comments().data().get(0).author().profileUrl()).isEqualTo(user.getProfileUrl()),
+                () -> assertThat(response.comments().data().get(0).like().commentLikeId()).isEqualTo(cl.getId()),
+                () -> assertThat(response.comments().data().get(0).like().likeCount()).isEqualTo(10),
+                () -> assertThat(response.comments().data().get(0).like().liked()).isTrue(),
+                () -> assertThat(response.comments().hasNext()).isFalse()
         );
     }
 
-    private void createUserAndCommentLikesTimesOf(Comment comment, int times) {
+    @Test
+    @DisplayName("댓글 20개 목록 조회 테스트")
+    void findComments20() {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
+        Comment comment = commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
+        createUserAndCommentsTimesOf(post, 19);
+        createUserAndCommentLikesTimesOf(comment, 9);
+
+        // when
+        CommentResponse response =
+                commentQueryService.findComments(post.getId(), user.getId(), null, 10);
+
+        //then
+        assertAll(
+                () -> assertThat(response.commentCount()).isEqualTo(20),
+                () -> assertThat(response.comments().data()).hasSize(10),
+                () -> assertThat(response.comments().hasNext()).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("댓글 20개 커서 11 목록 조회 테스트")
+    void findComments20Cursor11() {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
+        Comment comment = commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
+        createUserAndCommentsTimesOf(post, 19);
+        createUserAndCommentLikesTimesOf(comment, 9);
+
+        // when
+        CommentResponse response =
+                commentQueryService.findComments(post.getId(), user.getId(), 11L, 10);
+
+        //then
+        assertAll(
+                () -> assertThat(response.commentCount()).isEqualTo(20),
+                () -> assertThat(response.comments().hasNext()).isFalse()
+        );
+    }
+
+    @Test
+    @DisplayName("댓글 비활성화 게시물 조회 테스트")
+    void findCommentsCloseCommentActive() {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        PollOption pollOption = PostFixture.createPollOptionBuilder()
+                .commentActive(CommentActive.CLOSED).build();
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(pollOption).build());
+        Comment comment = commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
+        createUserAndCommentsTimesOf(post, 19);
+        createUserAndCommentLikesTimesOf(comment, 9);
+
+        // when & then
+        assertThatThrownBy(() -> commentQueryService.findComments(post.getId(), user.getId(), null, 10))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("댓글 기능이 비활성화 되어 있습니다.");
+    }
+
+
+    void createUserAndCommentLikesTimesOf(Comment comment, int times) {
         for (int i = 0; i < times; i++) {
             User user = userRepository.save(UserFixture.createDefaultUser());
             commentLikeRepository.save(CommentLikeFixture.createDefaultCommentLike(user.getId(), comment.getId()));
+        }
+    }
+    private void createUserAndCommentsTimesOf(Post post, int times) {
+        for (int i = 0; i < times; i++) {
+            User user = userRepository.save(UserFixture.createDefaultUser());
+            commentRepository.save(CommentFixture.createDefaultComment(user.getId(), post.getId()));
         }
     }
 }
