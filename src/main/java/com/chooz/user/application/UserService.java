@@ -47,11 +47,4 @@ public class UserService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
         return UserMyInfoResponse.of(user);
     }
-
-    @Transactional
-    public void withdraw(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        userRepository.delete(user);
-    }
 }

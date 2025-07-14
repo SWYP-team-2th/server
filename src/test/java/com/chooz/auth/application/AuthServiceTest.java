@@ -9,12 +9,15 @@ import com.chooz.auth.domain.SocialAccount;
 import com.chooz.auth.domain.SocialAccountRepository;
 import com.chooz.auth.presentation.dto.TokenResponse;
 import com.chooz.support.IntegrationTest;
+import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -56,7 +59,7 @@ class AuthServiceTest extends IntegrationTest {
         //then
         TokenPair tokenPair = tokenResponse.tokenPair();
         SocialAccount socialAccount = socialAccountRepository.findBySocialIdAndProvider(oAuthUserInfo.socialId(), Provider.KAKAO).get();
-        User user = userRepository.findById(socialAccount.getId()).get();
+        User user = userRepository.findById(socialAccount.getUserId()).get();
         assertAll(
                 () -> assertThat(tokenPair).isEqualTo(expectedTokenPair),
                 () -> assertThat(socialAccount.getUserId()).isNotNull(),
@@ -65,5 +68,19 @@ class AuthServiceTest extends IntegrationTest {
                 () -> assertThat(user.getNickname()).isEqualTo(oAuthUserInfo.nickname()),
                 () -> assertThat(user.getProfileUrl()).isEqualTo(oAuthUserInfo.profileImageUrl())
         );
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 테스트")
+    void withdraw() {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+
+        // when
+        authService.withdraw(user.getId());
+
+        // then
+        Optional<User> deletedUser = userRepository.findById(user.getId());
+        assertThat(deletedUser).isEmpty();
     }
 }

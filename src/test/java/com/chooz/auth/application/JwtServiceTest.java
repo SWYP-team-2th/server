@@ -108,30 +108,15 @@ class JwtServiceTest extends IntegrationTest {
 
     @Test
     @DisplayName("로그아웃하면 refresh token을 db에서 삭제해야 함")
-    void signOut() throws Exception {
+    void removeToken() throws Exception {
         //given
         long givenUserId = 1L;
-        String givenRefreshToken = "refreshToken";
-        refreshTokenRepository.save(new RefreshToken(givenUserId, givenRefreshToken));
+        refreshTokenRepository.save(new RefreshToken(givenUserId, "refreshToken"));
 
         //when
-        jwtService.signOut(givenUserId, givenRefreshToken);
+        jwtService.removeToken(givenUserId);
 
         //then
         assertThat(refreshTokenRepository.findByUserId(givenUserId)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("로그아웃 - 유저의 refresh token이 아닌 경우")
-    void signOut_invalidRefreshToken() throws Exception {
-        //given
-        long givenUserId = 1L;
-        String givenRefreshToken = "refreshToken";
-        refreshTokenRepository.save(new RefreshToken(givenUserId, givenRefreshToken));
-
-        //when then
-        assertThatThrownBy(() -> jwtService.signOut(givenUserId, "differentToken"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.REFRESH_TOKEN_MISMATCHED.getMessage());
     }
 }

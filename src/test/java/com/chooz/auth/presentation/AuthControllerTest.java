@@ -26,6 +26,7 @@ import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWit
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -174,9 +175,6 @@ class AuthControllerTest extends RestDocsTest {
                 .andExpect(cookie().maxAge(CustomHeader.CustomCookie.REFRESH_TOKEN, 0))
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
-                        requestCookies(
-                                cookieWithName(CustomHeader.CustomCookie.REFRESH_TOKEN).description("리프레시 토큰")
-                        ),
                         responseCookies(
                                 cookieWithName(CustomHeader.CustomCookie.REFRESH_TOKEN).description("리프레시 토큰")
                         )
@@ -190,7 +188,7 @@ class AuthControllerTest extends RestDocsTest {
         //given
 
         //when then
-        mockMvc.perform(post("/auth/withdraw")
+        mockMvc.perform(delete("/auth/withdraw")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(

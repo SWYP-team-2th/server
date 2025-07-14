@@ -47,18 +47,4 @@ class UserServiceTest extends IntegrationTest {
         );
 
     }
-
-    @Test
-    @DisplayName("회원 탈퇴 테스트")
-    void withdraw() {
-        // given
-        User user = userRepository.save(UserFixture.createDefaultUser());
-
-        // when
-        userService.withdraw(user.getId());
-
-        // then
-        Optional<User> deletedUser = userRepository.findById(user.getId());
-        assertThat(deletedUser).isEmpty();
-    }
 }

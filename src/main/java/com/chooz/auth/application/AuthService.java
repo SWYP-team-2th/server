@@ -8,8 +8,12 @@ import com.chooz.auth.domain.Provider;
 import com.chooz.auth.domain.SocialAccount;
 import com.chooz.auth.domain.SocialAccountRepository;
 import com.chooz.auth.presentation.dto.TokenResponse;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import com.chooz.user.application.UserService;
 import com.chooz.user.domain.Role;
+import com.chooz.user.domain.User;
+import com.chooz.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ public class AuthService {
     private final OAuthService oAuthService;
     private final SocialAccountRepository socialAccountRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     public TokenResponse oauthSignIn(String code, String redirectUri) {
         OAuthUserInfo oAuthUserInfo = oAuthService.getUserInfo(code, redirectUri);
@@ -53,8 +58,15 @@ public class AuthService {
         return response;
     }
 
-    public void signOut(Long userId, String refreshToken) {
-        jwtService.signOut(userId, refreshToken);
+    public void signOut(Long userId) {
+        jwtService.removeToken(userId);
     }
 
+    @Transactional
+    public void withdraw(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+        jwtService.removeToken(userId);
+        userRepository.delete(user);
+    }
 }

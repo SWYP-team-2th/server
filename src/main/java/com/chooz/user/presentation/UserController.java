@@ -32,9 +32,4 @@ public class UserController {
         return ResponseEntity.ok(userService.findByMe(userInfo.userId()));
     }
 
-    @DeleteMapping("")
-    public ResponseEntity<Void> withdraw(@AuthenticationPrincipal UserInfo userInfo) {
-        userService.withdraw(userInfo.userId());
-        return ResponseEntity.ok().build();
-    }
 }

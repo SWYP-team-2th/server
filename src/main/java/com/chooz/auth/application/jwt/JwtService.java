@@ -42,13 +42,8 @@ public class JwtService {
     }
 
     @Transactional
-    public void signOut(Long userId, String refreshToken) {
-        RefreshToken token = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
-
-        if (!token.getToken().equals(refreshToken)) {
-            throw new BadRequestException(ErrorCode.REFRESH_TOKEN_MISMATCHED);
-        }
-        refreshTokenRepository.delete(token);
+    public void removeToken(Long userId) {
+        refreshTokenRepository.findByUserId(userId)
+                .ifPresent(refreshTokenRepository::delete);
     }
 }
