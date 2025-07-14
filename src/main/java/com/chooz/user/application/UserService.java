@@ -52,7 +52,6 @@ public class UserService {
     public void withdraw(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        user.delete();
         userRepository.delete(user);
     }
 }
