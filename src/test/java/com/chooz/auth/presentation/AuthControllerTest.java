@@ -2,8 +2,8 @@ package com.chooz.auth.presentation;
 
 import com.chooz.auth.application.AuthService;
 import com.chooz.auth.application.jwt.TokenPair;
-import com.chooz.auth.presentation.dto.OAuthSignInRequest;
 import com.chooz.auth.presentation.dto.AuthResponse;
+import com.chooz.auth.presentation.dto.OAuthSignInRequest;
 import com.chooz.auth.presentation.dto.TokenResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
@@ -20,15 +20,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
 import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.cookies.CookieDocumentation.responseCookies;
-
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -68,44 +66,6 @@ class AuthControllerTest extends RestDocsTest {
                         requestFields(
                                 fieldWithPath("code").description("카카오 인증 코드"),
                                 fieldWithPath("redirectUri").description("카카오 인증 redirect uri")
-                        ),
-                        responseFields(
-                                fieldWithPath("accessToken").description("액세스 토큰"),
-                                fieldWithPath("userId").description("유저 Id"),
-                                fieldWithPath("role").description("유저 권한")
-                        ),
-                        responseCookies(
-                                cookieWithName(CustomHeader.CustomCookie.REFRESH_TOKEN).description("리프레시 토큰")
-                        )
-                ));
-    }
-
-    @Test
-    @DisplayName("게스트 로그인")
-    void guestSignIn() throws Exception {
-        //given
-        TokenPair expectedTokenPair = new TokenPair("accessToken", "refreshToken");
-        AuthResponse response = new AuthResponse(expectedTokenPair.accessToken(), 1L, Role.USER);
-        given(authService.guestSignIn(any()))
-                .willReturn(new TokenResponse(expectedTokenPair, 1L, Role.USER));
-
-        //when then
-        mockMvc.perform(post("/auth/guest/sign-in")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(new Cookie(CustomHeader.CustomCookie.REFRESH_TOKEN, "refreshToken")))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(response)))
-                .andExpect(cookie().value(CustomHeader.CustomCookie.REFRESH_TOKEN, expectedTokenPair.refreshToken()))
-                .andExpect(cookie().httpOnly(CustomHeader.CustomCookie.REFRESH_TOKEN, true))
-                .andExpect(cookie().path(CustomHeader.CustomCookie.REFRESH_TOKEN, "/"))
-                .andExpect(cookie().secure(CustomHeader.CustomCookie.REFRESH_TOKEN, true))
-                .andExpect(cookie().attribute(CustomHeader.CustomCookie.REFRESH_TOKEN, "SameSite", "None"))
-                .andExpect(cookie().maxAge(CustomHeader.CustomCookie.REFRESH_TOKEN, 60 * 60 * 24 * 14))
-                .andDo(restDocs.document(
-                        requestCookies(
-                                cookieWithName(CustomHeader.CustomCookie.REFRESH_TOKEN)
-                                        .optional()
-                                        .description("리프레시 토큰")
                         ),
                         responseFields(
                                 fieldWithPath("accessToken").description("액세스 토큰"),
@@ -215,9 +175,6 @@ class AuthControllerTest extends RestDocsTest {
                 .andExpect(cookie().maxAge(CustomHeader.CustomCookie.REFRESH_TOKEN, 0))
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
-                        requestCookies(
-                                cookieWithName(CustomHeader.CustomCookie.REFRESH_TOKEN).description("리프레시 토큰")
-                        ),
                         responseCookies(
                                 cookieWithName(CustomHeader.CustomCookie.REFRESH_TOKEN).description("리프레시 토큰")
                         )
@@ -231,7 +188,7 @@ class AuthControllerTest extends RestDocsTest {
         //given
 
         //when then
-        mockMvc.perform(post("/auth/withdraw")
+        mockMvc.perform(delete("/auth/withdraw")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer accessToken"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(

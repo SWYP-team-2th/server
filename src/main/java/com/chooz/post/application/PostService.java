@@ -33,11 +33,6 @@ public class PostService {
         postCommandService.close(userId, postId);
     }
 
-    @Transactional
-    public void toggleScope(Long userId, Long postId) {
-        postCommandService.toggleScope(userId, postId);
-    }
-
     public PostResponse findById(Long userId, Long postId) {
         return postQueryService.findById(userId, postId);
     }

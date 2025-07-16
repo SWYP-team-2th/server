@@ -14,7 +14,7 @@ class JwtClaimTest {
     void idAsLong() {
         // given
         long givenId = 1;
-        Role givenRole = Role.GUEST;
+        Role givenRole = Role.USER;
 
         // when
         JwtClaim jwtClaim = JwtClaim.from(givenId, givenRole);

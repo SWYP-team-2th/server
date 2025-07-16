@@ -36,23 +36,23 @@ class VoteControllerTest extends RestDocsTest {
     @DisplayName("투표")
     void vote() throws Exception {
         //given
-        VoteRequest request = new VoteRequest(1L);
+        VoteRequest request = new VoteRequest(1L, 1L);
 
         //when test
-        mockMvc.perform(post("/posts/{postId}/votes", "1")
+        mockMvc.perform(post("/votes", "1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
-                        pathParameters(
-                                parameterWithName("postId").description("게시글 Id")
-                        ),
                         requestFields(
-                                fieldWithPath("imageId")
+                                fieldWithPath("postId")
                                         .type(JsonFieldType.NUMBER)
-                                        .description("투표 후보 Id")
+                                        .description("게시글 Id"),
+                                fieldWithPath("pollChoiceId")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("투표 선택지 Id")
                         )
                 ));
         verify(voteService, times(1)).vote(any(), any(), any());

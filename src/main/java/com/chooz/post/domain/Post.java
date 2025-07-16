@@ -167,13 +167,6 @@ public class Post extends BaseEntity {
         this.shareUrl = shareUrl;
     }
 
-    public void toggleScope(Long userId) {
-        if (!isAuthor(userId)) {
-            throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
-        }
-        pollOption.toggleScope();
-    }
-
     public void validateCloseDate(Clock clock) {
         if (closeOption.getClosedAt().isBefore(LocalDateTime.now())) {
             throw new BadRequestException(ErrorCode.CLOSE_DATE_OVER);

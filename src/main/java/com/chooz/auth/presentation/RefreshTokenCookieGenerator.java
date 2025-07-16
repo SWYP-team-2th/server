@@ -14,13 +14,7 @@ public class RefreshTokenCookieGenerator {
 
     public Cookie createCookie(String refreshToken) {
         Cookie cookie = new Cookie(CustomHeader.CustomCookie.REFRESH_TOKEN, refreshToken);
-        cookie.setHttpOnly(true);
-        if ("local".equals(activeProfile)) {
-            cookie.setSecure(false);
-        } else {
-            cookie.setSecure(true);
-            cookie.setAttribute("SameSite", "None");
-        }
+        setCookieSecure(cookie);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60 * 24 * 14);
         return cookie;
@@ -28,16 +22,19 @@ public class RefreshTokenCookieGenerator {
 
     public void removeCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(CustomHeader.CustomCookie.REFRESH_TOKEN, null);
+        setCookieSecure(cookie);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+    private void setCookieSecure(Cookie cookie) {
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
         if ("local".equals(activeProfile)) {
             cookie.setSecure(false);
         } else {
             cookie.setSecure(true);
             cookie.setAttribute("SameSite", "None");
         }
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
     }
 }

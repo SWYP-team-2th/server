@@ -159,39 +159,4 @@ class PostTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
     }
-
-    @Test
-    @DisplayName("게시글 공개 범위 수정")
-    void toggleScope() throws Exception {
-        //given
-        long userId = 1L;
-        Post post = createPostBuilder()
-                .userId(userId)
-                .pollOption(PollOption.create(PollType.SINGLE, Scope.PRIVATE, CommentActive.OPEN))
-                .build();
-
-        //when then
-        post.toggleScope(userId);
-        assertThat(post.getPollOption().getScope()).isEqualTo(Scope.PUBLIC);
-
-        //when then
-        post.toggleScope(userId);
-        assertThat(post.getPollOption().getScope()).isEqualTo(Scope.PRIVATE);
-    }
-
-    @Test
-    @DisplayName("게시글 공개 범위 수정 - 게시글 작성자가 아닌 경우")
-    void toggleScope_notPostAuthor() throws Exception {
-        //given
-        long userId = 1L;
-        Post post = createPostBuilder()
-                .userId(userId)
-                .pollOption(PollOption.create(PollType.SINGLE, Scope.PRIVATE, CommentActive.OPEN))
-                .build();
-
-        //when then
-        assertThatThrownBy(() -> post.toggleScope(2L))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
-    }
 }

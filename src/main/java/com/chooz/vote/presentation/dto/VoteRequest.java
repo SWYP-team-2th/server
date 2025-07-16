@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotNull;
 
 public record VoteRequest(
         @NotNull
-        Long imageId
+        Long postId,
+
+        @NotNull
+        Long pollChoiceId
 ) {
 }
