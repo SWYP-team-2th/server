@@ -8,7 +8,7 @@ import java.math.RoundingMode;
 @Component
 public class RatioCalculator {
 
-    public String calculate(int totalVoteCount, long voteCount) {
+    public String calculate(long totalVoteCount, long voteCount) {
         if (totalVoteCount == 0) {
             return "0.0";
         }
@@ -17,5 +17,9 @@ public class RatioCalculator {
         BigDecimal bigDecimal = count.divide(totalCount, 3, RoundingMode.HALF_UP)
                 .multiply(new BigDecimal(100));
         return String.format("%.1f", bigDecimal);
+    }
+
+    public String calculate(int totalVoteCount, long voteCount) {
+        return calculate((long) totalVoteCount, voteCount);
     }
 }

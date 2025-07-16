@@ -143,7 +143,7 @@ class PostControllerTest extends RestDocsTest {
                 true,
                 Status.PROGRESS,
                 new PostResponse.PollOptionDto(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
-                new PostResponse.CloseOptionDto(CloseType.SELF, null, null),
+                new CloseOptionDto(CloseType.SELF, null, null),
                 0L,
                 1L,
                 LocalDateTime.of(2025, 2, 13, 12, 0)
@@ -219,10 +219,13 @@ class PostControllerTest extends RestDocsTest {
                 1L,
                 false,
                 List.of(
-                        new SimplePostResponse(
+                        new MyPagePostResponse(
                                 1L,
+                                "title",
                                 "https://image.chooz.site/1",
-                                "https://chooz.site/shareurl",
+                                Status.PROGRESS,
+                                new CloseOptionDto(CloseType.SELF, null, null),
+                                new MyPagePostResponse.PostVoteInfo(5L, new MostVotedPollChoiceDto(1L, "title", 5, "50%")),
                                 LocalDateTime.of(2025, 2, 13, 12, 0)
                         )
                 )
@@ -253,12 +256,55 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("게시글 Id"),
+                                fieldWithPath("data[].title")
+                                        .type(JsonFieldType.STRING)
+                                        .description("게시글 제목"),
                                 fieldWithPath("data[].thumbnailImageUrl")
                                         .type(JsonFieldType.STRING)
-                                        .description("가장 많은 득표를 받은 이미지 URL"),
-                                fieldWithPath("data[].shareUrl")
+                                        .description("썸네일 이미지 URL"),
+                                fieldWithPath("data[].status")
                                         .type(JsonFieldType.STRING)
-                                        .description("게시글 공유 URL"),
+                                        .description(enumDescription("게시글 상태", Status.class)),
+                                fieldWithPath("data[].closeOptionDto")
+                                        .type(JsonFieldType.OBJECT)
+                                        .description("게시글 마감 옵션"),
+                                fieldWithPath("data[].closeOptionDto.closeType")
+                                        .type(JsonFieldType.STRING)
+                                        .description(enumDescription("마감 방식", CloseType.class)),
+                                fieldWithPath("data[].closeOptionDto.closedAt")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("마감 시간 (closeType이 DATE일 경우)"),
+                                fieldWithPath("data[].closeOptionDto.maxVoterCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("최대 투표자 수 (closeType이 VOTER일 경우)"),
+                                fieldWithPath("data[].postVoteInfo")
+                                        .type(JsonFieldType.OBJECT)
+                                        .description("게시글 투표 정보"),
+                                fieldWithPath("data[].postVoteInfo.totalVoterCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("총 투표자 수"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice")
+                                        .type(JsonFieldType.OBJECT)
+                                        .optional()
+                                        .description("가장 많은 투표를 받은 선택지 정보"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.id")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("선택지 ID"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.title")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("선택지 제목"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.voteCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("선택지 투표 수"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.voteRatio")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("선택지 투표 비율"),
                                 fieldWithPath("data[].createdAt")
                                         .type(JsonFieldType.STRING)
                                         .description("게시글 생성 시간")
@@ -275,10 +321,13 @@ class PostControllerTest extends RestDocsTest {
                 1L,
                 false,
                 List.of(
-                        new SimplePostResponse(
+                        new MyPagePostResponse(
                                 1L,
+                                "title",
                                 "https://image.chooz.site/1",
-                                "https://chooz.site/shareurl",
+                                Status.PROGRESS,
+                                new CloseOptionDto(CloseType.SELF, null, null),
+                                new MyPagePostResponse.PostVoteInfo(5L, new MostVotedPollChoiceDto(1L, "title", 5, "50%")),
                                 LocalDateTime.of(2025, 2, 13, 12, 0)
                         )
                 )
@@ -309,12 +358,55 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("게시글 Id"),
+                                fieldWithPath("data[].title")
+                                        .type(JsonFieldType.STRING)
+                                        .description("게시글 제목"),
                                 fieldWithPath("data[].thumbnailImageUrl")
                                         .type(JsonFieldType.STRING)
-                                        .description("가장 많은 득표를 받은 이미지 URL"),
-                                fieldWithPath("data[].shareUrl")
+                                        .description("썸네일 이미지 URL"),
+                                fieldWithPath("data[].status")
                                         .type(JsonFieldType.STRING)
-                                        .description("게시글 공유 URL"),
+                                        .description(enumDescription("게시글 상태", Status.class)),
+                                fieldWithPath("data[].closeOptionDto")
+                                        .type(JsonFieldType.OBJECT)
+                                        .description("게시글 마감 옵션"),
+                                fieldWithPath("data[].closeOptionDto.closeType")
+                                        .type(JsonFieldType.STRING)
+                                        .description(enumDescription("마감 방식", CloseType.class)),
+                                fieldWithPath("data[].closeOptionDto.closedAt")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("마감 시간 (closeType이 DATE일 경우)"),
+                                fieldWithPath("data[].closeOptionDto.maxVoterCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("최대 투표자 수 (closeType이 VOTER일 경우)"),
+                                fieldWithPath("data[].postVoteInfo")
+                                        .type(JsonFieldType.OBJECT)
+                                        .description("게시글 투표 정보"),
+                                fieldWithPath("data[].postVoteInfo.totalVoterCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("총 투표자 수"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice")
+                                        .type(JsonFieldType.OBJECT)
+                                        .optional()
+                                        .description("가장 많은 투표를 받은 선택지 정보"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.id")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("선택지 ID"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.title")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("선택지 제목"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.voteCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .optional()
+                                        .description("선택지 투표 수"),
+                                fieldWithPath("data[].postVoteInfo.mostVotedPollChoice.voteRatio")
+                                        .type(JsonFieldType.STRING)
+                                        .optional()
+                                        .description("선택지 투표 비율"),
                                 fieldWithPath("data[].createdAt")
                                         .type(JsonFieldType.STRING)
                                         .description("게시글 생성 시간")

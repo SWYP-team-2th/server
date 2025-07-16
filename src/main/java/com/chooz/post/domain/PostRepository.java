@@ -1,5 +1,6 @@
 package com.chooz.post.domain;
 
+import com.chooz.post.application.dto.PostWithVoteCount;
 import com.chooz.post.presentation.dto.FeedDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -93,4 +94,42 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """
     )
     Optional<CommentActive> findCommentActiveByPostId(@Param("postId") Long postId);
+
+    @Query("""
+        select new com.chooz.post.application.dto.PostWithVoteCount(
+                p,
+                count(distinct v.userId)
+            )
+        from Post p
+        left join Vote v on v.postId = p.id
+        where p.userId = :userId
+        and (:postId is null or p.id < :postId)
+        group by p
+        order by p.id desc
+        """
+    )
+    Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(
+            @Param("userId") Long userId,
+            @Param("postId") Long postId,
+            Pageable pageable
+    );
+
+    @Query("""
+        select new com.chooz.post.application.dto.PostWithVoteCount(
+                p,
+                count(distinct v2.userId)
+            )
+        from Post p
+        inner join Vote v on v.postId = p.id and v.userId = :userId
+        left join Vote v2 on v2.postId = p.id
+        where (:postId is null or p.id < :postId)
+        group by p
+        order by p.id desc
+        """
+    )
+    Slice<PostWithVoteCount> findVotedPostsWithVoteCount(
+            @Param("userId") Long userId,
+            @Param("postId") Long postId,
+            Pageable pageable
+    );
 }

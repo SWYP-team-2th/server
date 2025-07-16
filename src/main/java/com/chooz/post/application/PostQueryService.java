@@ -4,26 +4,31 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.common.exception.InternalServerException;
+import com.chooz.post.application.dto.PollChoiceVoteInfo;
+import com.chooz.post.application.dto.PostWithVoteCount;
 import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.*;
-import com.chooz.thumbnail.domain.Thumbnail;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
+import com.chooz.vote.application.RatioCalculator;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,6 +41,7 @@ public class PostQueryService {
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final ThumbnailRepository thumbnailRepository;
+    private final RatioCalculator ratioCalculator;
 
     public PostResponse findByShareUrl(Long userId, String shareUrl) {
         Post post = postRepository.findByShareUrlFetchPollChoices(shareUrl)
@@ -88,47 +94,73 @@ public class PostQueryService {
                 .orElse(null);
     }
 
-    public CursorBasePaginatedResponse<SimplePostResponse> findUserPosts(Long userId, Long cursor, int size) {
-        Slice<Post> postSlice = postRepository.findByUserId(userId, cursor, PageRequest.ofSize(size));
+    public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(Long userId, Long cursor, int size) {
+        Slice<PostWithVoteCount> postSlice = postRepository.findPostsWithVoteCountByUserId(userId, cursor, Pageable.ofSize(size));
+
         return getCursorPaginatedResponse(postSlice);
     }
 
-    public CursorBasePaginatedResponse<SimplePostResponse> findVotedPosts(Long userId, Long cursor, int size) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        List<Long> votedPostIds = voteRepository.findByUserId(user.getId())
-                .map(Vote::getPostId)
-                .toList();
-        Slice<Post> votedPostSlice = postRepository.findByIdIn(votedPostIds, cursor, PageRequest.ofSize(size));
+    public CursorBasePaginatedResponse<MyPagePostResponse> findVotedPosts(Long userId, Long cursor, int size) {
+        Slice<PostWithVoteCount> postSlice = postRepository.findVotedPostsWithVoteCount(userId, cursor, Pageable.ofSize(size));
 
-        return getCursorPaginatedResponse(votedPostSlice);
+        return getCursorPaginatedResponse(postSlice);
     }
 
-    private CursorBasePaginatedResponse<SimplePostResponse> getCursorPaginatedResponse(Slice<Post> postSlice) {
-        List<Long> postIds = postSlice.getContent()
-                .stream()
-                .map(Post::getId)
-                .toList();
+    private CursorBasePaginatedResponse<MyPagePostResponse> getCursorPaginatedResponse(Slice<PostWithVoteCount> postSlice) {
+        if (postSlice.isEmpty()) {
+            return CursorBasePaginatedResponse.of(new SliceImpl<>(
+                    List.of(),
+                    postSlice.getPageable(),
+                    false
+            ));
+        }
 
-        List<Thumbnail> thumbnails = thumbnailRepository.findByPostIdIn(postIds);
+        Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId = getMostVotedPollChoiceByPostId(getPostIds(postSlice));
 
-        List<SimplePostResponse> responseContent = postSlice.getContent().stream()
-                .map(post -> getSimplePostResponse(post, thumbnails))
-                .toList();
+        List<MyPagePostResponse> response = getMyPagePostResponses(postSlice, mostVotedPollChoiceByPostId);
 
         return CursorBasePaginatedResponse.of(new SliceImpl<>(
-                responseContent,
+                response,
                 postSlice.getPageable(),
                 postSlice.hasNext()
         ));
     }
 
-    private SimplePostResponse getSimplePostResponse(Post post, List<Thumbnail> imageIds) {
-        Thumbnail postThumbnail = imageIds.stream()
-                .filter(thumbnail -> thumbnail.isThumbnailOf(post.getId()))
-                .findFirst()
-                .orElseThrow(() -> new InternalServerException(ErrorCode.THUMBNAIL_NOT_FOUND));
-        return SimplePostResponse.of(post, postThumbnail.getThumbnailUrl());
+    private List<MyPagePostResponse> getMyPagePostResponses(
+            Slice<PostWithVoteCount> postSlice,
+            Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId
+    ) {
+        return postSlice.getContent().stream()
+                .map(postWithVoteCount -> {
+                    var pollChoiceVoteInfo = mostVotedPollChoiceByPostId.get(postWithVoteCount.post().getId());
+                    var mostVotedPollChoiceInfo = MostVotedPollChoiceDto.of(
+                            pollChoiceVoteInfo,
+                            ratioCalculator.calculate(postWithVoteCount.voteCount(), pollChoiceVoteInfo.voteCounts())
+                    );
+                    return MyPagePostResponse.of(postWithVoteCount, mostVotedPollChoiceInfo);
+                })
+                .toList();
+    }
+
+    private Map<Long, PollChoiceVoteInfo> getMostVotedPollChoiceByPostId(List<Long> postIds) {
+        List<PollChoiceVoteInfo> pollChoiceWithVoteInfo = pollChoiceRepository.findPollChoiceWithVoteInfo(postIds);
+        return pollChoiceWithVoteInfo.stream()
+                .collect(Collectors.groupingBy(
+                        PollChoiceVoteInfo::postId,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                choices -> choices.stream()
+                                        .max(Comparator.comparing(PollChoiceVoteInfo::voteCounts))
+                                        .orElse(null)
+                        )
+                ));
+    }
+
+    private List<Long> getPostIds(Slice<PostWithVoteCount> postSlice) {
+        return postSlice.getContent()
+                .stream()
+                .map(postWithVoteCount -> postWithVoteCount.post().getId())
+                .toList();
     }
 
     public CursorBasePaginatedResponse<FeedResponse> findFeed(Long userId, Long cursor, int size) {

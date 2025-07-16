@@ -7,7 +7,7 @@ import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
-import com.chooz.post.presentation.dto.SimplePostResponse;
+import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -88,7 +88,7 @@ public class PostController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<CursorBasePaginatedResponse<SimplePostResponse>> findMyPosts(
+    public ResponseEntity<CursorBasePaginatedResponse<MyPagePostResponse>> findMyPosts(
             @PathVariable("userId") Long userId,
             @RequestParam(name = "cursor", required = false) @Min(0) Long cursor,
             @RequestParam(name = "size", required = false, defaultValue = "10") @Min(1) int size
@@ -97,7 +97,7 @@ public class PostController {
     }
 
     @GetMapping("/users/{userId}/voted")
-    public ResponseEntity<CursorBasePaginatedResponse<SimplePostResponse>> findVotedPosts(
+    public ResponseEntity<CursorBasePaginatedResponse<MyPagePostResponse>> findVotedPosts(
             @PathVariable("userId") Long userId,
             @RequestParam(name = "cursor", required = false) @Min(0) Long cursor,
             @RequestParam(name = "size", required = false, defaultValue = "10") @Min(1) int size

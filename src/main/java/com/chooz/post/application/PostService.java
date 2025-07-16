@@ -4,8 +4,8 @@ import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
+import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PostResponse;
-import com.chooz.post.presentation.dto.SimplePostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,11 +42,11 @@ public class PostService {
         return postQueryService.findById(userId, postId);
     }
 
-    public CursorBasePaginatedResponse<SimplePostResponse> findUserPosts(Long userId, Long cursor, int size) {
+    public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(Long userId, Long cursor, int size) {
         return postQueryService.findUserPosts(userId, cursor, size);
     }
 
-    public CursorBasePaginatedResponse<SimplePostResponse> findVotedPosts(Long userId, Long cursor, int size) {
+    public CursorBasePaginatedResponse<MyPagePostResponse> findVotedPosts(Long userId, Long cursor, int size) {
         return postQueryService.findVotedPosts(userId, cursor, size);
     }
 
