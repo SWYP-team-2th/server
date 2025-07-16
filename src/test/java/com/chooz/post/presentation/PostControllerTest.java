@@ -84,29 +84,29 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("pollChoices[].imageUrl")
                                         .type(JsonFieldType.STRING)
                                         .description("투표 선택지 이미지 url"),
-                                fieldWithPath("pollOptions")
+                                fieldWithPath("pollOption")
                                         .type(JsonFieldType.OBJECT)
                                         .description("투표 옵션"),
-                                fieldWithPath("pollOptions.scope")
+                                fieldWithPath("pollOption.scope")
                                         .type(JsonFieldType.STRING)
                                         .description(enumDescription("투표 공개 범위", Scope.class)),
-                                fieldWithPath("pollOptions.pollType")
+                                fieldWithPath("pollOption.pollType")
                                         .type(JsonFieldType.STRING)
                                         .description(enumDescription("투표 방식", PollType.class)),
-                                fieldWithPath("pollOptions.commentActive")
+                                fieldWithPath("pollOption.commentActive")
                                         .type(JsonFieldType.STRING)
                                         .description(enumDescription("게시글 댓글 활성화 여부", CommentActive.class)),
-                                fieldWithPath("closeOptions")
+                                fieldWithPath("closeOption")
                                         .type(JsonFieldType.OBJECT)
                                         .description("투표 마감 옵션"),
-                                fieldWithPath("closeOptions.closeType")
+                                fieldWithPath("closeOption.closeType")
                                         .type(JsonFieldType.STRING)
                                         .description(enumDescription("투표 마감 방식", CloseType.class)),
-                                fieldWithPath("closeOptions.closedAt")
+                                fieldWithPath("closeOption.closedAt")
                                         .type(JsonFieldType.STRING)
                                         .optional()
                                         .description("투표 마감 시간"),
-                                fieldWithPath("closeOptions.maxVoterCount")
+                                fieldWithPath("closeOption.maxVoterCount")
                                         .type(JsonFieldType.NUMBER)
                                         .optional()
                                         .description("투표 최대 참여자 수")
@@ -174,14 +174,14 @@ class PostControllerTest extends RestDocsTest {
                                 fieldWithPath("pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
                                 fieldWithPath("pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
                                 fieldWithPath("shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
-                                fieldWithPath("pollOptions").type(JsonFieldType.OBJECT).description("투표 설정"),
-                                fieldWithPath("pollOptions.pollType").type(JsonFieldType.STRING).description(enumDescription("단일/복수 투표", PollType.class)),
-                                fieldWithPath("pollOptions.scope").type(JsonFieldType.STRING).description(enumDescription("공개 여부", Scope.class)),
-                                fieldWithPath("pollOptions.commentActive").type(JsonFieldType.STRING).description(enumDescription("댓글 활성화 여부", CommentActive.class)),
-                                fieldWithPath("closeOptions").type(JsonFieldType.OBJECT).description("마감 설정"),
-                                fieldWithPath("closeOptions.closeType").type(JsonFieldType.STRING).description(enumDescription("마감 방식", CloseType.class)),
-                                fieldWithPath("closeOptions.closedAt").type(JsonFieldType.STRING).optional().description("마감 시간, (closeType이 DATE일 경우 NN)"),
-                                fieldWithPath("closeOptions.maxVoterCount").type(JsonFieldType.NUMBER).optional().description("남은 투표 참여자 수 (closeType이 VOTER_COUNT일 경우 NN)"),
+                                fieldWithPath("pollOption").type(JsonFieldType.OBJECT).description("투표 설정"),
+                                fieldWithPath("pollOption.pollType").type(JsonFieldType.STRING).description(enumDescription("단일/복수 투표", PollType.class)),
+                                fieldWithPath("pollOption.scope").type(JsonFieldType.STRING).description(enumDescription("공개 여부", Scope.class)),
+                                fieldWithPath("pollOption.commentActive").type(JsonFieldType.STRING).description(enumDescription("댓글 활성화 여부", CommentActive.class)),
+                                fieldWithPath("closeOption").type(JsonFieldType.OBJECT).description("마감 설정"),
+                                fieldWithPath("closeOption.closeType").type(JsonFieldType.STRING).description(enumDescription("마감 방식", CloseType.class)),
+                                fieldWithPath("closeOption.closedAt").type(JsonFieldType.STRING).optional().description("마감 시간, (closeType이 DATE일 경우 NN)"),
+                                fieldWithPath("closeOption.maxVoterCount").type(JsonFieldType.NUMBER).optional().description("남은 투표 참여자 수 (closeType이 VOTER_COUNT일 경우 NN)"),
                                 fieldWithPath("commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                                 fieldWithPath("voterCount").type(JsonFieldType.NUMBER).description("투표 참여자 수"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
