@@ -4,9 +4,9 @@ package com.chooz.auth.presentation;
 import com.chooz.auth.application.AuthService;
 import com.chooz.auth.application.jwt.TokenPair;
 import com.chooz.auth.domain.UserInfo;
+import com.chooz.auth.presentation.dto.AuthResponse;
 import com.chooz.auth.presentation.dto.OAuthSignInRequest;
 import com.chooz.auth.presentation.dto.TokenResponse;
-import com.chooz.auth.presentation.dto.AuthResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.common.presentation.CustomHeader;
@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,18 +39,6 @@ public class AuthController {
             HttpServletResponse response
     ) {
         TokenResponse tokenResponse = authService.oauthSignIn(request.code(), request.redirectUri());
-        TokenPair tokenPair = tokenResponse.tokenPair();
-        Cookie cookie = refreshTokenCookieGenerator.createCookie(tokenPair.refreshToken());
-        response.addCookie(cookie);
-        return ResponseEntity.ok(new AuthResponse(tokenPair.accessToken(), tokenResponse.userId(), tokenResponse.role()));
-    }
-
-    @PostMapping("/guest/sign-in")
-    public ResponseEntity<AuthResponse> guestSignIn(
-            @CookieValue(name = CustomHeader.CustomCookie.REFRESH_TOKEN, required = false) String refreshToken,
-            HttpServletResponse response
-    ) {
-        TokenResponse tokenResponse = authService.guestSignIn(refreshToken);
         TokenPair tokenPair = tokenResponse.tokenPair();
         Cookie cookie = refreshTokenCookieGenerator.createCookie(tokenPair.refreshToken());
         response.addCookie(cookie);
@@ -79,22 +68,21 @@ public class AuthController {
 
     @PostMapping("/sign-out")
     public ResponseEntity<Void> signOut(
-            @CookieValue(name = CustomHeader.CustomCookie.REFRESH_TOKEN, required = false) String refreshToken,
             HttpServletResponse response,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        if (Objects.isNull(refreshToken)) {
-            throw new BadRequestException(ErrorCode.INVALID_REFRESH_TOKEN_HEADER);
-        }
         refreshTokenCookieGenerator.removeCookie(response);
-        authService.signOut(userInfo.userId(), refreshToken);
+        authService.signOut(userInfo.userId());
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/withdraw")
+    @DeleteMapping("/withdraw")
     public ResponseEntity<Void> withdraw(
-            @AuthenticationPrincipal UserInfo userInfo
+            @AuthenticationPrincipal UserInfo userInfo,
+            HttpServletResponse response
     ) {
+        refreshTokenCookieGenerator.removeCookie(response);
+        authService.withdraw(userInfo.userId());
         return ResponseEntity.ok().build();
     }
 }

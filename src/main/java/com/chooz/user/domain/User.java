@@ -42,12 +42,4 @@ public class User extends BaseEntity {
         return new User(null, nickname, profileUrl, Role.USER);
     }
 
-    public static User createGuest(String nickname) {
-        return new User(
-                null,
-                nickname,
-                DEFAULT_PROFILE_URL,
-                Role.GUEST
-        );
-    }
 }

@@ -1,10 +1,12 @@
 package com.chooz.user.application;
 
 import com.chooz.support.IntegrationTest;
+import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.NicknameAdjective;
 import com.chooz.user.domain.NicknameAdjectiveRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,8 +32,8 @@ class UserServiceTest extends IntegrationTest {
         User user = User.create(null, "https://image.com/1");
 
         for (int i = 0; i < 250; i++) {
-            nicknameAdjectiveRepository.save(new NicknameAdjective("호기심 많은 뽀또"));
-            nicknameAdjectiveRepository.save(new NicknameAdjective("배려 깊은 뽀또"));
+            nicknameAdjectiveRepository.save(new NicknameAdjective("호기심 많은 츄"));
+            nicknameAdjectiveRepository.save(new NicknameAdjective("배려 깊은 츄"));
         }
 
         // when
@@ -41,7 +43,7 @@ class UserServiceTest extends IntegrationTest {
         // when then
         assertAll(
                 () -> assertThat(returnUser.get().getNickname()).isNotNull(),
-                () -> assertThat(returnUser.get().getNickname()).contains("뽀또")
+                () -> assertThat(returnUser.get().getNickname()).contains("츄")
         );
 
     }

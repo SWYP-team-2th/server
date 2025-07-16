@@ -84,7 +84,7 @@ public class SecurityConfig {
                         authorize
                                 .requestMatchers(getWhiteList(introspect)).permitAll()
                                 .requestMatchers(getGuestAllowedList(introspect))
-                                .hasAnyRole(Role.USER.name(), Role.GUEST.name())
+                                .hasAnyRole(Role.USER.name())
                                 .anyRequest().hasRole(Role.USER.name()))
 
                 .addFilterBefore(
