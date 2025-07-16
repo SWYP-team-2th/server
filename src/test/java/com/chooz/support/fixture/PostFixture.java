@@ -26,6 +26,7 @@ public class PostFixture {
                 .userId(1L)
                 .title("Default title")
                 .description("Default post description")
+                .imageUrl("https://example.com/image.png")
                 .shareUrl("http://example.com/post/1")
                 .status(Status.PROGRESS)
                 .closeOption(CloseOption.create(CloseType.SELF, null, null))

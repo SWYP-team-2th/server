@@ -40,6 +40,7 @@ public class PostCommandService {
                 userId,
                 request.title(),
                 request.description(),
+                pollChoices.getFirst().getImageUrl(),
                 pollChoices,
                 shareUrl,
                 PollOption.create(

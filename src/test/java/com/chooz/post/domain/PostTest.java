@@ -24,6 +24,7 @@ class PostTest {
         long userId = 1L;
         String title = "title";
         String description = "description";
+        String imageUrl = "http://example.com/image1";
         List<PollChoice> pollChoices = List.of(
                 PollChoice.create("title1", "http://example.com/image1"),
                 PollChoice.create("title2", "http://example.com/image2")
@@ -34,6 +35,7 @@ class PostTest {
                 userId,
                 title,
                 description,
+                imageUrl,
                 pollChoices,
                 "http://example.com/shareurl",
                 PollOption.create(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
@@ -47,6 +49,7 @@ class PostTest {
                 () -> assertThat(post.getStatus()).isEqualTo(Status.PROGRESS),
                 () -> assertThat(post.getPollChoices()).hasSize(2),
                 () -> assertThat(post.getShareUrl()).isEqualTo("http://example.com/shareurl"),
+                () -> assertThat(post.getImageUrl()).isEqualTo(imageUrl),
                 () -> assertThat(post.getPollOption().getPollType()).isEqualTo(PollType.SINGLE),
                 () -> assertThat(post.getPollOption().getScope()).isEqualTo(Scope.PUBLIC),
                 () -> assertThat(post.getCloseOption().getCloseType()).isEqualTo(CloseType.SELF),
@@ -190,48 +193,5 @@ class PostTest {
         assertThatThrownBy(() -> post.toggleScope(2L))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
-    }
-
-    @Test
-    @DisplayName("게시글 베스트 픽 조회")
-    @Disabled
-    void getBestPickedImage() throws Exception {
-//        //given
-//        long userId = 1L;
-//        List<PollChoice> pollChoices = List.of(
-//                PollChoice.create("뽀또A", 1L),
-//                PollChoice.create("뽀또B", 2L)
-//        );
-//        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
-//        post.getPollChoices().get(0).increaseVoteCount();
-//        post.getPollChoices().get(0).increaseVoteCount();
-//        post.getPollChoices().get(1).increaseVoteCount();
-//
-//        //when
-//        PollChoice bestPickedImage = post.getBestPickedImage();
-//
-//        //then
-//        assertThat(bestPickedImage.getName()).isEqualTo("뽀또A");
-    }
-
-    @Test
-    @DisplayName("게시글 베스트 픽 조회 - 동일 투표수인 경우 첫 번째 이미지가 선택됨")
-    @Disabled
-    void getBestPickedImage_saveVoteCount() throws Exception {
-//        //given
-//        long userId = 1L;
-//        List<PollChoice> pollChoices = List.of(
-//                PollChoice.create("뽀또A", 1L),
-//                PollChoice.create("뽀또B", 2L)
-//        );
-//        Post post = new Post(null, userId, "description", Status.PROGRESS, Scope.PRIVATE, pollChoices, "shareUrl", VoteType.SINGLE);
-//        post.getPollChoices().get(0).increaseVoteCount();
-//        post.getPollChoices().get(1).increaseVoteCount();
-//
-//        //when
-//        PollChoice bestPickedImage = post.getBestPickedImage();
-//
-//        //then
-//        assertThat(bestPickedImage.getName()).isEqualTo("뽀또A");
     }
 }

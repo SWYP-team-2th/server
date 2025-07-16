@@ -46,6 +46,8 @@ public class Post extends BaseEntity {
 
     private String description;
 
+    private String imageUrl;
+
     private Long userId;
 
     @Enumerated(EnumType.STRING)
@@ -68,19 +70,21 @@ public class Post extends BaseEntity {
             Long userId,
             String title,
             String description,
+            String imageUrl,
             Status status,
             List<PollChoice> pollChoices,
             String shareUrl,
             PollOption pollOption,
             CloseOption closeOption
     ) {
-        validateNull(userId, title, description, pollChoices);
+        validateNull(userId, title, description, pollChoices, imageUrl);
         validateTitle(title);
         validateDescription(description);
         validatePollChoices(pollChoices);
         this.id = id;
         this.title = title;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.userId = userId;
         this.status = status;
         this.pollChoices = pollChoices;
@@ -94,6 +98,7 @@ public class Post extends BaseEntity {
             Long userId,
             String title,
             String description,
+            String imageUrl,
             List<PollChoice> pollChoices,
             String shareUrl,
             PollOption pollOption,
@@ -104,6 +109,7 @@ public class Post extends BaseEntity {
                 userId,
                 title,
                 description,
+                imageUrl,
                 Status.PROGRESS,
                 pollChoices,
                 shareUrl,
