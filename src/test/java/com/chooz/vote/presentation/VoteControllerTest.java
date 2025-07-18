@@ -60,25 +60,6 @@ class VoteControllerTest extends RestDocsTest {
 
     @Test
     @WithMockUserInfo
-    @DisplayName("투표 취소")
-    void cancelVote() throws Exception {
-        //given
-
-        //when test
-        mockMvc.perform(delete("/votes/{voteId}", "1")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
-                .andExpect(status().isOk())
-                .andDo(restDocs.document(
-                        requestHeaders(authorizationHeader()),
-                        pathParameters(
-                                parameterWithName("voteId").description("투표 Id")
-                        )
-                ));
-        verify(voteService, times(1)).cancelVote(any(), any());
-    }
-
-    @Test
-    @WithMockUserInfo
     @DisplayName("게시글 투표 상태 조회")
     void findVoteStatus() throws Exception {
         //given

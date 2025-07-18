@@ -292,40 +292,6 @@ class VoteServiceTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("투표 취소")
-    void cancelVote() {
-        // given
-        User user = userRepository.save(UserFixture.createDefaultUser());
-        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
-        Long pollChoiceId = post.getPollChoices().getFirst().getId();
-        List<Long> voteIds = voteService.vote(user.getId(), post.getId(), List.of(pollChoiceId));
-        Long voteId = voteIds.getFirst();
-
-        // when
-        voteService.cancelVote(user.getId(), voteId);
-
-        // then
-        boolean res = voteRepository.findById(voteId).isEmpty();
-        assertThat(res).isTrue();
-    }
-
-    @Test
-    @DisplayName("투표 취소 - 투표자가 아닌 경우")
-    void cancelVote_notVoter() {
-        // given
-        User user = userRepository.save(UserFixture.createDefaultUser());
-        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
-        Long pollChoiceId = post.getPollChoices().getFirst().getId();
-        List<Long> voteIds = voteService.vote(user.getId(), post.getId(), List.of(pollChoiceId));
-        Long voteId = voteIds.getFirst();
-
-        // when then
-        assertThatThrownBy(() -> voteService.cancelVote(2L, voteId))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.NOT_VOTER.getMessage());
-    }
-
-    @Test
     @DisplayName("투표 현황 조회")
     void findVoteStatus() {
         //given

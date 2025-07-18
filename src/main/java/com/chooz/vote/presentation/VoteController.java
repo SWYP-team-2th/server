@@ -32,15 +32,6 @@ public class VoteController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/votes/{voteId}")
-    public ResponseEntity<Void> cancelVote(
-            @PathVariable("voteId") Long voteId,
-            @AuthenticationPrincipal UserInfo userInfo
-    ) {
-        voteService.cancelVote(userInfo.userId(), voteId);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/posts/{postId}/votes/status")
     public ResponseEntity<List<VoteStatusResponse>> findVoteStatus(
             @PathVariable("postId") Long postId,

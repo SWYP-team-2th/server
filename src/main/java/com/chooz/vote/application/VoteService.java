@@ -40,15 +40,6 @@ public class VoteService {
         return voteIds;
     }
 
-    @Transactional
-    public void cancelVote(Long userId, Long voteId) {
-        Vote vote = voteRepository.findById(voteId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.VOTE_NOT_FOUND));
-        vote.validateVoter(userId);
-
-        voteRepository.delete(vote);
-    }
-
     public List<VoteStatusResponse> findVoteStatus(Long userId, Long postId) {
         Post post = postRepository.findByIdFetchPollChoices(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
