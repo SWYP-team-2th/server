@@ -42,6 +42,9 @@ public enum ErrorCode {
     COMMENT_LENGTH_OVER("댓글 길이가 200글자를 초과하였습니다."),
     COMMENT_LIKE_NOT_FOUND("댓글좋아요를 찾을 수 없습니다."),
     NOT_COMMENT_LIKE_AUTHOR("댓글 좋아요를 누른 유저가 아닙니다."),
+    SINGLE_POLL_ALLOWS_MAXIMUM_ONE_CHOICE("단일 투표인 경우 최대 하나의 선택지만 투표 가능"),
+    DUPLICATE_POLL_CHOICE("복수 투표의 경우 중복된 선탟지가 있으면 안 됨"),
+    NOT_POST_POLL_CHOICE_ID("게시글의 투표 선택지가 아님"),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

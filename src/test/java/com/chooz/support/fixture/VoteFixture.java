@@ -5,7 +5,7 @@ import com.chooz.vote.domain.Vote;
 public class VoteFixture {
 
     public static Vote createDefaultVote(Long userId, Long postId, Long pollChoiceId) {
-        return Vote.create(postId, pollChoiceId, userId);
+        return Vote.create(userId, postId, pollChoiceId);
     }
 
     public static Vote.VoteBuilder createVoteBuilder() {

@@ -1,4 +1,6 @@
 package com.chooz.vote.application;
 
-public record VotedEvent(Long postId, Long pollChoiceId, Long voterId) {
+import java.util.List;
+
+public record VotedEvent(Long postId, List<Long> pollChoiceIds, Long voterId) {
 }

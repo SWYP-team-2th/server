@@ -174,7 +174,7 @@ public class Post extends BaseEntity {
     }
 
     public void validateMaxVoterCount(long voterCount) {
-        if (closeOption.getMaxVoterCount() >= voterCount) {
+        if (closeOption.getMaxVoterCount() <= voterCount) {
             throw new BadRequestException(ErrorCode.EXCEED_MAX_VOTER_COUNT);
         }
     }

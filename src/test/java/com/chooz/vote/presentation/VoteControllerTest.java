@@ -36,7 +36,7 @@ class VoteControllerTest extends RestDocsTest {
     @DisplayName("투표")
     void vote() throws Exception {
         //given
-        VoteRequest request = new VoteRequest(1L, 1L);
+        VoteRequest request = new VoteRequest(1L, List.of(1L));
 
         //when test
         mockMvc.perform(post("/votes", "1")
@@ -50,8 +50,8 @@ class VoteControllerTest extends RestDocsTest {
                                 fieldWithPath("postId")
                                         .type(JsonFieldType.NUMBER)
                                         .description("게시글 Id"),
-                                fieldWithPath("pollChoiceId")
-                                        .type(JsonFieldType.NUMBER)
+                                fieldWithPath("pollChoiceIds")
+                                        .type(JsonFieldType.ARRAY)
                                         .description("투표 선택지 Id")
                         )
                 ));

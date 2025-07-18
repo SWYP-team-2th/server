@@ -9,6 +9,7 @@ import com.chooz.post.domain.PollType;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.Scope;
 import com.chooz.post.domain.Status;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +36,18 @@ public class PostFixture {
                         PollChoice.create("Choice A", "http://example.com/image/1"),
                         PollChoice.create("Choice B", "http://example.com/image/1")
                 ));
+    }
+
+    public static Post createWithId(Long userId) {
+        Post post = createDefaultPost(userId);
+        ReflectionTestUtils.setField(post, "id", 1L);
+        ReflectionTestUtils.setField(post.getPollChoices().get(0), "id", 1L);
+        ReflectionTestUtils.setField(post.getPollChoices().get(1), "id", 2L);
+        return post;
+    }
+
+    public static PollChoice createPollChoice() {
+        return PollChoice.create("Choice", "http://example.com/image/1");
     }
 
     public static CloseOption.CloseOptionBuilder createCloseOptionBuilder() {

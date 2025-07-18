@@ -37,7 +37,7 @@ public class Vote extends BaseEntity {
         this.userId = userId;
     }
 
-    public static Vote create(Long postId, Long pollChoiceId, Long userId) {
+    public static Vote create(Long userId, Long postId, Long pollChoiceId) {
         return new Vote(null, postId, pollChoiceId, userId);
     }
 

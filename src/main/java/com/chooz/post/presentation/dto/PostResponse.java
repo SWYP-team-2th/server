@@ -21,8 +21,8 @@ public record PostResponse(
         String shareUrl,
         boolean isAuthor,
         Status status,
-        PollOptionDto pollOptions,
-        CloseOptionDto closeOptions,
+        PollOptionDto pollOption,
+        CloseOptionDto closeOption,
         long commentCount,
         long voterCount,
         LocalDateTime createdAt

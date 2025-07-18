@@ -28,7 +28,7 @@ public class VoteController {
             @Valid @RequestBody VoteRequest request,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        voteService.vote(userInfo.userId(), request.postId(), request.pollChoiceId());
+        voteService.vote(userInfo.userId(), request.postId(), request.pollChoiceIds());
         return ResponseEntity.ok().build();
     }
 

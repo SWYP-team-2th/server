@@ -8,6 +8,9 @@ import com.chooz.vote.application.VotedEvent;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
@@ -17,7 +20,7 @@ public class PostVotedEventListener {
     private final PostRepository postRepository;
     private final VoteRepository voteRepository;
 
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handle(VotedEvent event) {
         Post post = postRepository.findById(event.postId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));

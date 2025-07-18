@@ -5,9 +5,9 @@ import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
-import com.chooz.vote.presentation.dto.VoteStatusResponse;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
+import com.chooz.vote.presentation.dto.VoteStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,38 +24,20 @@ public class VoteService {
     private final EventPublisher eventPublisher;
     private final VoteValidator voteValidator;
     private final VoteStatusReader voteStatusReader;
+    private final VoteWriter voteWriter;
 
     @Transactional
-    public Long vote(Long voterId, Long postId, Long pollChoiceId) {
-        Post post = postRepository.findById(postId)
+    public List<Long> vote(Long voterId, Long postId, List<Long> pollChoiceIds) {
+        Post post = postRepository.findByIdFetchPollChoices(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        voteValidator.validateIsVotablePost(post);
 
-        return voteRepository.findByUserIdAndPollChoiceId(voterId, pollChoiceId)
-                .orElseGet(() -> processVote(voterId, pollChoiceId, post))
-                .getId();
-    }
+        voteValidator.validateIsVotable(post, pollChoiceIds);
 
-    private Vote processVote(Long voterId, Long pollChoiceId, Post post) {
-        Vote vote = createVote(voterId, pollChoiceId, post);
-        eventPublisher.publish(new VotedEvent(post.getId(), pollChoiceId, voterId));
-        return vote;
-    }
+        List<Long> voteIds = voteWriter.vote(voterId, postId, pollChoiceIds);
 
-    private Vote createVote(Long voterId, Long pollChoiceId, Post post) {
-        if (post.isSingleVote()) {
-            return voteRepository.findByUserIdAndPostId(voterId, post.getId()).stream()
-                    .findFirst()
-                    .map(vote -> updateExistVote(pollChoiceId, vote))
-                    .orElseGet(() -> voteRepository.save(Vote.create(post.getId(), pollChoiceId, voterId)));
-        } else {
-            return voteRepository.save(Vote.create(post.getId(), pollChoiceId, voterId));
-        }
-    }
+        eventPublisher.publish(new VotedEvent(post.getId(), pollChoiceIds, voterId));
 
-    private Vote updateExistVote(Long pollChoiceId, Vote vote) {
-        vote.updatePollChoiceId(pollChoiceId);
-        return vote;
+        return voteIds;
     }
 
     @Transactional
