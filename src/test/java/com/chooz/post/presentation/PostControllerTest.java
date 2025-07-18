@@ -192,6 +192,75 @@ class PostControllerTest extends RestDocsTest {
     }
 
     @Test
+    @WithAnonymousUser
+    @DisplayName("게시글 상세 조회")
+    void findPost() throws Exception {
+        PostResponse response = new PostResponse(
+                1L,
+                "title",
+                "description",
+                new AuthorDto(
+                        1L,
+                        "author",
+                        "https://image.chooz.site/profile-image"
+                ),
+                List.of(
+                        new PollChoiceResponse(1L, "title1", "https://image.chooz.site/image/1", 1L),
+                        new PollChoiceResponse(2L, "title2", "https://image.chooz.site/image/2", null)
+                ),
+                "https://chooz.site/shareurl",
+                true,
+                Status.PROGRESS,
+                new PostResponse.PollOptionDto(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.SELF, null, null),
+                0L,
+                1L,
+                LocalDateTime.of(2025, 2, 13, 12, 0)
+        );
+        //given
+        given(postService.findById(any(), any()))
+                .willReturn(response);
+
+        //when then
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("postId").description("게시글 Id")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 Id"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("게시글 설명"),
+                                fieldWithPath("author").type(JsonFieldType.OBJECT).description("게시글 작성자 정보"),
+                                fieldWithPath("author.id").type(JsonFieldType.NUMBER).description("게시글 작성자 유저 Id"),
+                                fieldWithPath("author.nickname").type(JsonFieldType.STRING).description("게시글 작성자 닉네임"),
+                                fieldWithPath("author.profileUrl").type(JsonFieldType.STRING).description("게시글 작성자 프로필 이미지"),
+                                fieldWithPath("pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
+                                fieldWithPath("pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
+                                fieldWithPath("pollChoices[].title").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
+                                fieldWithPath("pollChoices[].voteId").type(JsonFieldType.NUMBER).optional().description("투표 Id (투표 안 한 경우 null)"),
+                                fieldWithPath("shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
+                                fieldWithPath("pollOption").type(JsonFieldType.OBJECT).description("투표 설정"),
+                                fieldWithPath("pollOption.pollType").type(JsonFieldType.STRING).description(enumDescription("단일/복수 투표", PollType.class)),
+                                fieldWithPath("pollOption.scope").type(JsonFieldType.STRING).description(enumDescription("공개 여부", Scope.class)),
+                                fieldWithPath("pollOption.commentActive").type(JsonFieldType.STRING).description(enumDescription("댓글 활성화 여부", CommentActive.class)),
+                                fieldWithPath("closeOption").type(JsonFieldType.OBJECT).description("마감 설정"),
+                                fieldWithPath("closeOption.closeType").type(JsonFieldType.STRING).description(enumDescription("마감 방식", CloseType.class)),
+                                fieldWithPath("closeOption.closedAt").type(JsonFieldType.STRING).optional().description("마감 시간, (closeType이 DATE일 경우 NN)"),
+                                fieldWithPath("closeOption.maxVoterCount").type(JsonFieldType.NUMBER).optional().description("남은 투표 참여자 수 (closeType이 VOTER_COUNT일 경우 NN)"),
+                                fieldWithPath("commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                                fieldWithPath("voterCount").type(JsonFieldType.NUMBER).description("투표 참여자 수"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
+                                fieldWithPath("isAuthor").type(JsonFieldType.BOOLEAN).description("게시글 작성자 여부"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("게시글 작성 시간")
+                        )
+                ));
+    }
+
+    @Test
     @WithMockUserInfo
     @DisplayName("게시글 삭제")
     void deletePost() throws Exception {
