@@ -10,8 +10,13 @@ import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
-import com.chooz.post.presentation.dto.*;
-import com.chooz.thumbnail.domain.ThumbnailRepository;
+import com.chooz.post.presentation.dto.AuthorDto;
+import com.chooz.post.presentation.dto.FeedDto;
+import com.chooz.post.presentation.dto.FeedResponse;
+import com.chooz.post.presentation.dto.MostVotedPollChoiceDto;
+import com.chooz.post.presentation.dto.MyPagePostResponse;
+import com.chooz.post.presentation.dto.PollChoiceResponse;
+import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.application.RatioCalculator;
@@ -40,7 +45,6 @@ public class PostQueryService {
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
-    private final ThumbnailRepository thumbnailRepository;
     private final RatioCalculator ratioCalculator;
 
     public PostResponse findByShareUrl(Long userId, String shareUrl) {
