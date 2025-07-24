@@ -24,6 +24,7 @@ class PostTest {
         long userId = 1L;
         String title = "title";
         String description = "description";
+        String imageUrl = "http://example.com/image1";
         List<PollChoice> pollChoices = List.of(
                 PollChoice.create("title1", "http://example.com/image1"),
                 PollChoice.create("title2", "http://example.com/image2")
@@ -34,6 +35,7 @@ class PostTest {
                 userId,
                 title,
                 description,
+                imageUrl,
                 pollChoices,
                 "http://example.com/shareurl",
                 PollOption.create(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
@@ -47,6 +49,7 @@ class PostTest {
                 () -> assertThat(post.getStatus()).isEqualTo(Status.PROGRESS),
                 () -> assertThat(post.getPollChoices()).hasSize(2),
                 () -> assertThat(post.getShareUrl()).isEqualTo("http://example.com/shareurl"),
+                () -> assertThat(post.getImageUrl()).isEqualTo(imageUrl),
                 () -> assertThat(post.getPollOption().getPollType()).isEqualTo(PollType.SINGLE),
                 () -> assertThat(post.getPollOption().getScope()).isEqualTo(Scope.PUBLIC),
                 () -> assertThat(post.getCloseOption().getCloseType()).isEqualTo(CloseType.SELF),

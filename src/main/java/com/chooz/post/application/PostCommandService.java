@@ -40,17 +40,18 @@ public class PostCommandService {
                 userId,
                 request.title(),
                 request.description(),
+                pollChoices.getFirst().getImageUrl(),
                 pollChoices,
                 shareUrl,
                 PollOption.create(
-                        request.pollOptions().pollType(),
-                        request.pollOptions().scope(),
-                        request.pollOptions().commentActive()
+                        request.pollOption().pollType(),
+                        request.pollOption().scope(),
+                        request.pollOption().commentActive()
                 ),
                 CloseOption.create(
-                        request.closeOptions().closeType(),
-                        request.closeOptions().closedAt(),
-                        request.closeOptions().maxVoterCount()
+                        request.closeOption().closeType(),
+                        request.closeOption().closedAt(),
+                        request.closeOption().maxVoterCount()
                 )
         );
         return postRepository.save(post);

@@ -1,5 +1,6 @@
 package com.chooz.vote.domain;
 
+import com.chooz.post.application.dto.MostVotedPollChoice;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,10 +22,13 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     List<Vote> findByPostIdAndDeletedFalse(Long id);
 
+    List<Vote> findAllByPostIdIn(List<Long> postIds);
+
     @Query("""
             SELECT COUNT(DISTINCT v.userId)
             FROM Vote v
             WHERE v.postId = :postId
             """)
     long countVoterByPostId(@Param("postId") Long postId);
+
 }

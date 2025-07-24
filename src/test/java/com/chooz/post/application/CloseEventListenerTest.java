@@ -16,6 +16,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,7 +55,7 @@ class CloseEventListenerTest extends IntegrationTest {
         }
 
         //when
-        postVotedEventListener.handle(new VotedEvent(post.getId(), post.getPollChoices().get(0).getId(), user1.getId()));
+        postVotedEventListener.handle(new VotedEvent(post.getId(), List.of(post.getPollChoices().get(0).getId()), user1.getId()));
 
         //then
         Post findPost = postRepository.findById(post.getId()).get();

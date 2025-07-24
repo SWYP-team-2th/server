@@ -8,6 +8,7 @@ import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.PollChoiceResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.support.IntegrationTest;
+import com.chooz.support.fixture.VoteFixture;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
@@ -15,8 +16,6 @@ import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostQueryServiceTest extends IntegrationTest {
 
-    private static final Logger log = LoggerFactory.getLogger(PostQueryServiceTest.class);
     @Autowired
     PostService postService;
 
@@ -60,7 +58,7 @@ class PostQueryServiceTest extends IntegrationTest {
         User user1 = userRepository.save(createDefaultUser());
         User user2 = userRepository.save(createDefaultUser());
         Post post = postRepository.save(createDefaultPost(user1.getId()));
-        Vote vote = voteRepository.save(Vote.create(post.getId(), post.getPollChoices().get(0).getId(), user1.getId()));
+        Vote vote = voteRepository.save(VoteFixture.createDefaultVote(user1.getId(), post.getId(), post.getPollChoices().get(0).getId()));
 
         //when
         PostResponse response = postService.findById(user1.getId(), post.getId());
@@ -77,8 +75,8 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(response.isAuthor()).isTrue(),
                 () -> assertThat(response.commentCount()).isEqualTo(0L),
                 () -> assertThat(response.voterCount()).isEqualTo(1L),
-                () -> assertThat(response.pollOptions()).isNotNull(),
-                () -> assertThat(response.closeOptions()).isNotNull(),
+                () -> assertThat(response.pollOption()).isNotNull(),
+                () -> assertThat(response.closeOption()).isNotNull(),
                 () -> assertThat(pollChoices).hasSize(2),
                 () -> assertThat(pollChoices.get(0).imageUrl()).isEqualTo(post.getPollChoices().get(0).getImageUrl()),
                 () -> assertThat(pollChoices.get(0).voteId()).isEqualTo(vote.getId()),
@@ -133,7 +131,7 @@ class PostQueryServiceTest extends IntegrationTest {
         List<Post> posts = createPosts(user, 15);
         for (int i = 0; i < 15; i++) {
             Post post = posts.get(i);
-            voteRepository.save(Vote.create(post.getId(), post.getPollChoices().get(0).getId(), user.getId()));
+            voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
         }
         int size = 10;
 

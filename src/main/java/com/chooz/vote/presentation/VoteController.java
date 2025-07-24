@@ -28,16 +28,7 @@ public class VoteController {
             @Valid @RequestBody VoteRequest request,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        voteService.vote(userInfo.userId(), request.postId(), request.pollChoiceId());
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/votes/{voteId}")
-    public ResponseEntity<Void> cancelVote(
-            @PathVariable("voteId") Long voteId,
-            @AuthenticationPrincipal UserInfo userInfo
-    ) {
-        voteService.cancelVote(userInfo.userId(), voteId);
+        voteService.vote(userInfo.userId(), request.postId(), request.pollChoiceIds());
         return ResponseEntity.ok().build();
     }
 

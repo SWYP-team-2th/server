@@ -25,11 +25,11 @@ public record CreatePostRequest(
 
         @Valid
         @NotNull
-        PollOptionDto pollOptions,
+        PollOptionDto pollOption,
 
         @Valid
         @NotNull
-        CloseOptionDto closeOptions
+        CloseOptionDto closeOption
 ) {
 
         public record PollOptionDto(

@@ -36,7 +36,7 @@ class VoteControllerTest extends RestDocsTest {
     @DisplayName("투표")
     void vote() throws Exception {
         //given
-        VoteRequest request = new VoteRequest(1L, 1L);
+        VoteRequest request = new VoteRequest(1L, List.of(1L));
 
         //when test
         mockMvc.perform(post("/votes", "1")
@@ -50,31 +50,12 @@ class VoteControllerTest extends RestDocsTest {
                                 fieldWithPath("postId")
                                         .type(JsonFieldType.NUMBER)
                                         .description("게시글 Id"),
-                                fieldWithPath("pollChoiceId")
-                                        .type(JsonFieldType.NUMBER)
+                                fieldWithPath("pollChoiceIds")
+                                        .type(JsonFieldType.ARRAY)
                                         .description("투표 선택지 Id")
                         )
                 ));
         verify(voteService, times(1)).vote(any(), any(), any());
-    }
-
-    @Test
-    @WithMockUserInfo
-    @DisplayName("투표 취소")
-    void cancelVote() throws Exception {
-        //given
-
-        //when test
-        mockMvc.perform(delete("/votes/{voteId}", "1")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
-                .andExpect(status().isOk())
-                .andDo(restDocs.document(
-                        requestHeaders(authorizationHeader()),
-                        pathParameters(
-                                parameterWithName("voteId").description("투표 Id")
-                        )
-                ));
-        verify(voteService, times(1)).cancelVote(any(), any());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.chooz.post.presentation.dto;
 
 import com.chooz.post.domain.CloseOption;
-import com.chooz.post.domain.CloseType;
 import com.chooz.post.domain.CommentActive;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.PollType;
@@ -22,8 +21,8 @@ public record PostResponse(
         String shareUrl,
         boolean isAuthor,
         Status status,
-        PollOptionDto pollOptions,
-        CloseOptionDto closeOptions,
+        PollOptionDto pollOption,
+        CloseOptionDto closeOption,
         long commentCount,
         long voterCount,
         LocalDateTime createdAt
@@ -35,14 +34,6 @@ public record PostResponse(
             Scope scope,
 
             CommentActive commentActive
-    ) { }
-
-    public record CloseOptionDto(
-            CloseType closeType,
-
-            LocalDateTime closedAt,
-
-            Integer maxVoterCount
     ) { }
 
     public static PostResponse of(
