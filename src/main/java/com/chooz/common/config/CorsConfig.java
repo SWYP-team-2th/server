@@ -19,8 +19,7 @@ public class CorsConfig {
                 List.of(
                         "https://chooz.site",
                         "https://www.chooz.site",
-                        "https://www.photopic.site",
-                        "https://dev.photopic.site"
+                        "https://www.photopic.site"
                 )
         );
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -32,7 +31,13 @@ public class CorsConfig {
     @Profile({"local", "dev", "default", "test"})
     public UrlBasedCorsConfigurationSource corsConfigurationSourceLocal() {
         CorsConfiguration configuration = getCorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://dev.chooz.site", "https://www.dev.photopic.site"));
+        configuration.setAllowedOrigins(
+                List.of(
+                        "http://localhost:5173",
+                        "https://dev.chooz.site",
+                        "https://dev.photopic.site"
+                )
+        );
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
