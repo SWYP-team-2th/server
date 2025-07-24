@@ -15,7 +15,14 @@ public class CorsConfig {
     @Profile("prod")
     public UrlBasedCorsConfigurationSource corsConfigurationSourceProd() {
         CorsConfiguration configuration = getCorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://chooz.site", "https://www.chooz.site", "https://www.photopic.site"));
+        configuration.setAllowedOrigins(
+                List.of(
+                        "https://chooz.site",
+                        "https://www.chooz.site",
+                        "https://www.photopic.site",
+                        "https://dev.photopic.site"
+                )
+        );
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
