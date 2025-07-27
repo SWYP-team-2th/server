@@ -11,8 +11,9 @@ public class UserFixture {
 
     public static User.UserBuilder createUserBuilder() {
         return User.builder()
-                .role(Role.USER)
                 .nickname("nickname")
-                .profileUrl("http://example.com/profile.png");
+                .profileUrl("http://example.com/profile.png")
+                .is_onboard(true)
+                .notification(false);
     }
 }

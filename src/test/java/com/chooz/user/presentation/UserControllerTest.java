@@ -12,8 +12,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -28,7 +27,7 @@ class UserControllerTest extends RestDocsTest {
     @DisplayName("유저 정보 조회")
     void findUserInfo() throws Exception {
         //given
-        UserInfoResponse response = new UserInfoResponse(1L, "nickname", "https://image.com/profile-image");
+        UserInfoResponse response = new UserInfoResponse(1L, "nickname", "https://image.com/profile-image", true, false);
         given(userService.findById(1L))
                 .willReturn(response);
 
@@ -43,7 +42,9 @@ class UserControllerTest extends RestDocsTest {
                         responseFields(
                                 fieldWithPath("id").description("유저 아이디").type(NUMBER),
                                 fieldWithPath("nickname").description("닉네임").type(STRING),
-                                fieldWithPath("profileUrl").description("프로필 이미지 URL").type(STRING)
+                                fieldWithPath("profileUrl").description("프로필 이미지 URL").type(STRING),
+                                fieldWithPath("is_onboard").description("온보딩 유저 여부").type(BOOLEAN),
+                                fieldWithPath("notification").description("알림 설정 여부").type(BOOLEAN)
                         )
                 ));
     }
@@ -53,7 +54,7 @@ class UserControllerTest extends RestDocsTest {
     @DisplayName("본인 정보 조회")
     void findMe() throws Exception {
         //given
-        UserMyInfoResponse response = new UserMyInfoResponse(1L, "nickname", "https://image.com/profile-image", Role.USER);
+        UserMyInfoResponse response = new UserMyInfoResponse(1L, "nickname", "https://image.com/profile-image", true, false);
         given(userService.findByMe(1L))
                 .willReturn(response);
 
@@ -68,7 +69,8 @@ class UserControllerTest extends RestDocsTest {
                                 fieldWithPath("id").description("유저 아이디").type(NUMBER),
                                 fieldWithPath("nickname").description("닉네임").type(STRING),
                                 fieldWithPath("profileImageUrl").description("프로필 이미지 URL").type(STRING),
-                                fieldWithPath("role").description("유저 권한").type(STRING)
+                                fieldWithPath("is_onboard").description("온보딩 유저 여부").type(BOOLEAN),
+                                fieldWithPath("notification").description("알림 설정 여부").type(BOOLEAN)
                         )
                 ));
     }

@@ -9,7 +9,7 @@ class UserTest {
 
     @Test
     @DisplayName("user Entity 생성")
-    void create() throws Exception {
+    void create() {
         //given
         String nickname = "nickname";
 

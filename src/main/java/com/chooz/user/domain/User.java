@@ -27,19 +27,21 @@ public class User extends BaseEntity {
 
     private String profileUrl;
 
-    @Enumerated(jakarta.persistence.EnumType.STRING)
-    public Role role;
+    private boolean is_onboard;
+
+    private boolean notification;
 
     @Builder
-    private User(Long id, String nickname, String profileUrl, Role role) {
+    private User(Long id, String nickname, String profileUrl, boolean is_onboard, boolean notification) {
         this.id = id;
         this.nickname = nickname;
         this.profileUrl = profileUrl;
-        this.role = role;
+        this.is_onboard = is_onboard;
+        this.notification = notification;
     }
 
     public static User create(String nickname, String profileUrl) {
-        return new User(null, nickname, profileUrl, Role.USER);
+        return new User(null, nickname, profileUrl, true, false);
     }
 
 }

@@ -7,9 +7,16 @@ public record UserMyInfoResponse(
         Long id,
         String nickname,
         String profileImageUrl,
-        Role role
+        boolean is_onboard,
+        boolean notification
 ) {
     public static UserMyInfoResponse of(User user) {
-        return new UserMyInfoResponse(user.getId(), user.getNickname(), user.getProfileUrl(), user.getRole());
+        return new UserMyInfoResponse(
+                user.getId(),
+                user.getNickname(),
+                user.getProfileUrl(),
+                user.is_onboard(),
+                user.isNotification()
+        );
     }
 }
