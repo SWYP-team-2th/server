@@ -1,22 +1,16 @@
 package com.chooz.common.dev;
 
-import com.chooz.auth.application.jwt.JwtClaim;
 import com.chooz.auth.application.jwt.JwtService;
-import com.chooz.auth.application.jwt.TokenPair;
-import com.chooz.auth.presentation.dto.TokenResponse;
-import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
-import com.chooz.image.presentation.dto.ImageFileDto;
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.CloseType;
 import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.PollType;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.domain.Scope;
-import com.chooz.user.domain.NicknameAdjective;
 import com.chooz.user.domain.NicknameAdjectiveRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
@@ -25,11 +19,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
-@Profile({"dev", "local"})
+@Profile({"!prod", "!test"})
 @Component
 public class DataInitializer {
 
@@ -59,12 +51,17 @@ public class DataInitializer {
 
     @Transactional
     public void init() {
-//        if (userRepository.count() > 0) {
-//            return;
-//        }
-//        List<NicknameAdjective> adjectives = nicknameAdjectiveRepository.findAll();
-//        User testUser = userRepository.save(User.create("nickname", "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
-        User user = userRepository.save(User.create("chooz", "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
+        User user = userRepository.save(User.create("chooz1", "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
+        User user2 = userRepository.save(User.create("chooz2", "https://t1.kakaocdn.net/account_images/default_profile.jpeg"));
+        postRepository.save(Post.create(
+                user.getId(),
+                "title",
+                "description",
+                "imageUrl",
+                List.of(PollChoice.create("title1", "imageUrl1"), PollChoice.create("title1", "imageUrl1")),
+                "shareUrl",
+                PollOption.create(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
+                CloseOption.create(CloseType.VOTER, null, 2)));
 //        TokenResponse tokenResponse = jwtService.createToken(new JwtClaim(testUser.getId(), testUser.getRole()));
 //        TokenPair tokenPair = tokenResponse.tokenPair();
 //        System.out.println("accessToken = " + tokenPair.accessToken());

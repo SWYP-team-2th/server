@@ -22,7 +22,7 @@ public class CorsConfig {
     }
 
     @Bean
-    @Profile({"local", "dev", "default", "test"})
+    @Profile("!prod")
     public UrlBasedCorsConfigurationSource corsConfigurationSourceLocal() {
         CorsConfiguration configuration = getCorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://dev.chooz.site", "https://www.dev.photopic.site"));
