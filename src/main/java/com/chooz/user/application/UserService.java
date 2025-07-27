@@ -50,6 +50,18 @@ public class UserService {
         return UserMyInfoResponse.of(user);
     }
 
+    public UserInfoResponse findByIdFetchOnboardingSteps(Long userId) {
+        User user = userRepository.findByIdFetchOnboardingSteps(userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+        return UserInfoResponse.of(user);
+    }
+
+    public UserMyInfoResponse findByMeFetchOnboardingSteps(Long userId) {
+        User user = userRepository.findByIdFetchOnboardingSteps(userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+        return UserMyInfoResponse.of(user);
+    }
+
     @Transactional
     public UserMyInfoResponse completeStep(Long userId, OnboardingStep step) {
         User user = userRepository.findById(userId)

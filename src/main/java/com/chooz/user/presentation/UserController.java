@@ -19,14 +19,14 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserInfoResponse> findUserInfo(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(userService.findById(userId));
+        return ResponseEntity.ok(userService.findByIdFetchOnboardingSteps(userId));
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserMyInfoResponse> findMyInfo(
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        return ResponseEntity.ok(userService.findByMe(userInfo.userId()));
+        return ResponseEntity.ok(userService.findByMeFetchOnboardingSteps(userInfo.userId()));
     }
 
     @PostMapping("/onboarding")

@@ -1,12 +1,16 @@
 package com.chooz.user.presentation.dto;
 
+import com.chooz.user.domain.OnboardingStep;
 import com.chooz.user.domain.User;
+import com.chooz.user.domain.UserOnboardingStep;
+
+import java.util.List;
 
 public record UserInfoResponse(
         Long id,
         String nickname,
-        String profileUrl,
-        boolean is_onboard,
+        String profileImageUrl,
+        List<OnboardingStep> onboardingSteps,
         boolean notification
 ) {
     public static UserInfoResponse of(User user) {
@@ -14,7 +18,7 @@ public record UserInfoResponse(
                 user.getId(),
                 user.getNickname(),
                 user.getProfileUrl(),
-                user.is_onboard(),
+                user.getOnboardingSteps().stream().map(UserOnboardingStep::getStep).toList(),
                 user.isNotification()
         );
     }
