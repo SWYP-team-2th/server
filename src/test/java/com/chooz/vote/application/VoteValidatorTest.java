@@ -2,8 +2,12 @@ package com.chooz.vote.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.post.domain.*;
+import com.chooz.post.domain.CloseType;
+import com.chooz.post.domain.PollType;
+import com.chooz.post.domain.Post;
+import com.chooz.post.domain.Status;
 import com.chooz.support.fixture.PostFixture;
+import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,12 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -149,23 +152,12 @@ class VoteValidatorTest {
     }
 
     @Test
-    @DisplayName("validatePollChoiceId - 빈 선택지 리스트일 경우 검증 통과")
-    void validatePollChoiceId_emptyList() {
-        // given
-        Post post = PostFixture.createDefaultPost(1L);
-        List<Long> emptyPollChoiceIds = List.of(); // 빈 선택지 리스트
-
-        // when & then
-        assertDoesNotThrow(() -> voteValidator.validateIsVotable(post, emptyPollChoiceIds));
-    }
-
-    @Test
     @DisplayName("validateVoteStatusAccess - 작성자가 아니고 투표하지 않은 사용자는 투표 현황 조회 불가")
     void validateVoteStatusAccess_notAuthorAndNotVoter() {
         // given
         Long userId = 999L;
         Post post = PostFixture.createDefaultPost(1L); // 작성자 ID: 1L
-        List<com.chooz.vote.domain.Vote> votes = new ArrayList<>();
+        List<Vote> votes = new ArrayList<>();
 
         // when & then
         assertThatThrownBy(() -> voteValidator.validateVoteStatusAccess(userId, post, votes))

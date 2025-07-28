@@ -42,9 +42,9 @@ class VoteConcurrentTest {
 
     @AfterEach
     void setUp() {
-//        voteRepository.deleteAll();
-//        postRepository.deleteAll();
-//        userRepository.deleteAll();
+        voteRepository.deleteAll();
+        postRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

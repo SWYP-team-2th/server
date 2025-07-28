@@ -9,11 +9,9 @@ import com.chooz.support.fixture.UserFixture;
 import com.chooz.support.fixture.VoteFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +27,6 @@ class VoteRepositoryTest extends RepositoryTest {
     UserRepository userRepository;
 
     @Test
-    @Disabled
     @DisplayName("단일 투표 참여자 수 조회")
     void countVoterByPostId_single() throws Exception {
         //given
@@ -49,7 +46,6 @@ class VoteRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("단일 투표 참여자 수 조회")
     void countVoterByPostId_multiple() throws Exception {
         //given
