@@ -8,10 +8,10 @@ import com.chooz.vote.application.VotedEvent;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -24,10 +24,12 @@ public class PostVotedEventListener {
     public void handle(VotedEvent event) {
         Post post = postRepository.findById(event.postId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        if (!post.isCloseTypeVoter()) {
-            return;
-        }
-        long voterCount = voteRepository.countVoterByPostId(event.postId());
+
+        handleClosePost(post);
+    }
+
+    private void handleClosePost(Post post) {
+        long voterCount = voteRepository.countVoterByPostId(post.getId());
         if (post.isClosableByVoterCount(voterCount)) {
             post.close();
         }
