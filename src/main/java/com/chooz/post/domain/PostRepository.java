@@ -56,7 +56,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     )
     Optional<Post> findByIdFetchPollChoicesWithLock(@Param("postId") Long postId);
 
-
     @Query(""" 
             SELECT new com.chooz.post.presentation.dto.FeedDto(
                     p.id,
