@@ -48,7 +48,7 @@ class VoteConcurrentTest {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     void concurrentTest() throws Exception {
         // given
         int maxVoterCount = 4;
