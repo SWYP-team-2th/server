@@ -89,4 +89,5 @@ public class PostCommandService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.closeByAuthor(userId);
     }
+
 }

@@ -2,6 +2,7 @@ package com.chooz.post.domain;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.support.fixture.PostFixture;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.chooz.support.fixture.PostFixture.SELF_CREATE_OPTION;
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
 import static com.chooz.support.fixture.PostFixture.createPostBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -131,7 +133,7 @@ class PostTest {
 
     @Test
     @DisplayName("투표 마감 - 이미 마감된 게시글인 경우")
-    void close_ByAuthor_alreadyClosed() throws Exception {
+    void closeByAuthor_alreadyClosed() throws Exception {
         //given
         long userId = 1L;
         Post post = createPostBuilder()
@@ -147,7 +149,7 @@ class PostTest {
 
     @Test
     @DisplayName("투표 마감 - 게시글 작성자가 아닌 경우")
-    void close_ByAuthor_notPostAuthor() throws Exception {
+    void closeByAuthor_notPostAuthor() throws Exception {
         //given
         long userId = 1L;
         Post post = createPostBuilder()
@@ -158,5 +160,21 @@ class PostTest {
         assertThatThrownBy(() -> post.closeByAuthor(2L))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.NOT_POST_AUTHOR.getMessage());
+    }
+
+    @Test
+    @DisplayName("투표 마감 - 마감 방식이 SELF가 아닌 경우")
+    void closeByAuthor_onlySelfCanClose() throws Exception {
+        //given
+        long userId = 1L;
+        Post post = createPostBuilder()
+                .closeOption(PostFixture.voterCloseOption(5))
+                .userId(userId)
+                .build();
+
+        //when then
+        assertThatThrownBy(() -> post.closeByAuthor(userId))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.ONLY_SELF_CAN_CLOSE.getMessage());
     }
 }

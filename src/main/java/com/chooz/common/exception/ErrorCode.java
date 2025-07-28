@@ -45,6 +45,7 @@ public enum ErrorCode {
     SINGLE_POLL_ALLOWS_MAXIMUM_ONE_CHOICE("단일 투표인 경우 최대 하나의 선택지만 투표 가능"),
     DUPLICATE_POLL_CHOICE("복수 투표의 경우 중복된 선택지가 있으면 안 됨"),
     NOT_POST_POLL_CHOICE_ID("게시글의 투표 선택지가 아님"),
+    ONLY_SELF_CAN_CLOSE("작성자 마감의 경우, SELF 마감 방식만이 마감 가능합니다."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

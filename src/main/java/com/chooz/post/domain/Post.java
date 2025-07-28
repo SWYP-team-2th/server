@@ -140,6 +140,9 @@ public class Post extends BaseEntity {
         if (!isAuthor(userId)) {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
+        if (closeOption.getCloseType() != CloseType.SELF) {
+            throw new BadRequestException(ErrorCode.ONLY_SELF_CAN_CLOSE);
+        }
         close();
     }
 
