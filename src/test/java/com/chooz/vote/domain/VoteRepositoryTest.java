@@ -12,7 +12,6 @@ import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

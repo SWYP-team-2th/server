@@ -28,7 +28,7 @@ public class VoteService {
 
     @Transactional
     public List<Long> vote(Long voterId, Long postId, List<Long> pollChoiceIds) {
-        Post post = postRepository.findByIdFetchPollChoices(postId)
+        Post post = postRepository.findByIdFetchPollChoicesWithLock(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
 
         voteValidator.validateIsVotable(post, pollChoiceIds);

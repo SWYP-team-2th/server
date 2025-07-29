@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-@Profile({"dev", "local"})
+@Profile("dev")
 @Component
 @RequiredArgsConstructor
 public class DataInitConfig {
