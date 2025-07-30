@@ -3,9 +3,11 @@ package com.chooz.post.application;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.*;
+import com.chooz.post.presentation.dto.CloseOptionDto;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceRequestDto;
+import com.chooz.post.presentation.dto.PollOptionDto;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
@@ -55,8 +57,8 @@ public class PostCommandServiceTest extends IntegrationTest {
                         new PollChoiceRequestDto("title1", "http://image1.com"),
                         new PollChoiceRequestDto("title2", "http://image2.com")
                 ),
-                new CreatePostRequest.PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
-                new CreatePostRequest.CloseOptionDto(CloseType.SELF, null, null)
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
         String shareUrl = "shareUrl";
         given(shareUrlService.generateShareUrl())
