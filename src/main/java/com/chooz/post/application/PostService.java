@@ -6,6 +6,7 @@ import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PostResponse;
+import com.chooz.post.presentation.dto.UpdatePostRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,11 @@ public class PostService {
     @Transactional
     public void close(Long userId, Long postId) {
         postCommandService.close(userId, postId);
+    }
+
+    @Transactional
+    public void update(Long userId, Long postId, UpdatePostRequest request) {
+        postCommandService.update(userId, postId, request);
     }
 
     public PostResponse findById(Long userId, Long postId) {
