@@ -46,7 +46,7 @@ class VoteRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("단일 투표 참여자 수 조회")
+    @DisplayName("복수 투표 참여자 수 조회")
     void countVoterByPostId_multiple() throws Exception {
         //given
         User user1 = userRepository.save(UserFixture.createDefaultUser());

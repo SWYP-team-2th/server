@@ -12,6 +12,7 @@ import java.util.List;
 public class VoteRepositoryImpl implements VoteRepository {
 
     private final VoteJpaRepository voteRepository;
+    private final VoteQueryDslRepository voteQueryDslRepository;
 
     @Override
     public Vote save(Vote vote) {
@@ -35,11 +36,6 @@ public class VoteRepositoryImpl implements VoteRepository {
 
     @Override
     public long countVoterByPostId(Long postId) {
-        return voteRepository.countVoterByPostId(postId);
-    }
-
-    @Override
-    public void deleteAll(List<Vote> votes) {
-        voteRepository.deleteAll(votes);
+        return voteQueryDslRepository.countVoterByPostId(postId);
     }
 }
