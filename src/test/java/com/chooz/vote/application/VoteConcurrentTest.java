@@ -7,7 +7,6 @@ import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
-import com.chooz.vote.domain.VoteRepository;
 import com.chooz.vote.persistence.VoteJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
@@ -85,7 +84,7 @@ class VoteConcurrentTest {
         latch.await();
 
         // then
-        List<Vote> voteList = voteRepository.findAllByPostId(post.getId());
+        List<Vote> voteList = voteRepository.findAllByPostIdAndDeletedFalse(post.getId());
         assertThat(voteList).hasSize(maxVoterCount);
     }
 }

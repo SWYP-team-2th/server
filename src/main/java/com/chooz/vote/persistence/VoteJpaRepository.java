@@ -10,16 +10,16 @@ import java.util.List;
 
 @Repository
 public interface VoteJpaRepository extends JpaRepository<Vote, Long> {
-    List<Vote> findByUserIdAndPostId(Long userId, Long postId);
+    List<Vote> findByUserIdAndPostIdAndDeletedFalse(Long userId, Long postId);
 
-    List<Vote> findAllByPostId(Long postId);
+    List<Vote> findAllByPostIdAndDeletedFalse(Long postId);
 
     List<Vote> findByPostIdAndDeletedFalse(Long id);
 
     @Query("""
             SELECT COUNT(DISTINCT v.userId)
             FROM Vote v
-            WHERE v.postId = :postId
+            WHERE v.postId = :postId and v.deleted = false
             """)
     long countVoterByPostId(@Param("postId") Long postId);
 

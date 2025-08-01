@@ -20,12 +20,12 @@ public class VoteRepositoryImpl implements VoteRepository {
 
     @Override
     public List<Vote> findByUserIdAndPostId(Long userId, Long postId) {
-        return voteRepository.findByUserIdAndPostId(userId, postId);
+        return voteRepository.findByUserIdAndPostIdAndDeletedFalse(userId, postId);
     }
 
     @Override
     public List<Vote> findAllByPostId(Long postId) {
-        return voteRepository.findAllByPostId(postId);
+        return voteRepository.findAllByPostIdAndDeletedFalse(postId);
     }
 
     @Override
