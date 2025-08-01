@@ -12,19 +12,14 @@ import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
-import org.assertj.core.api.Assertions;
+import com.chooz.vote.persistence.VoteJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +36,7 @@ class VoteServiceTest extends IntegrationTest {
     UserRepository userRepository;
 
     @Autowired
-    VoteRepository voteRepository;
+    VoteJpaRepository voteRepository;
 
     @Autowired
     PostRepository postRepository;

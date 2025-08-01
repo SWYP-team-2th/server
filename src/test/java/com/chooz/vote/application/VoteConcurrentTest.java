@@ -8,11 +8,11 @@ import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
+import com.chooz.vote.persistence.VoteJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -35,7 +35,7 @@ class VoteConcurrentTest {
     UserRepository userRepository;
 
     @Autowired
-    VoteRepository voteRepository;
+    VoteJpaRepository voteRepository;
 
     @Autowired
     PostRepository postRepository;
