@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -29,18 +30,34 @@ public class PostValidator {
             throw new BadRequestException(ErrorCode.POST_ALREADY_CLOSED);
         }
 
-        // 추후에 voterCount 수정 후 리팩터링
+        LocalDateTime newClosedAt = request.closeOption().closedAt();
+        Integer newMaxVoterCount = request.closeOption().maxVoterCount();
         if (closeType == CloseType.DATE) {
-            LocalDateTime newClosedAt = request.closeOption().closedAt();
-            if (newClosedAt.isBefore(LocalDateTime.now()) || newClosedAt.isBefore(post.getCreatedAt().plusHours(1))) {
-                throw new BadRequestException(ErrorCode.INVALID_DATE_CLOSE_OPTION);
-            }
+            validateUpdateClosedAt(post, newClosedAt, newMaxVoterCount);
         } else if (closeType == CloseType.VOTER) {
-            int newMaxVoterCount = request.closeOption().maxVoterCount();
-            long voterCount = voteRepository.countVoterByPostId(post.getId());
-            if (newMaxVoterCount < voterCount) {
-                throw new BadRequestException(ErrorCode.INVALID_VOTER_CLOSE_OPTION);
-            }
+            validateUpdateMaxVoter(post, newClosedAt, newMaxVoterCount);
+        }
+    }
+
+    private void validateUpdateMaxVoter(Post post, LocalDateTime newClosedAt, Integer newMaxVoterCount) {
+        if (Objects.nonNull(newClosedAt) || Objects.isNull(newMaxVoterCount)) {
+            throw new BadRequestException(ErrorCode.INVALID_VOTER_CLOSE_OPTION);
+        }
+        long voterCount = voteRepository.countVoterByPostId(post.getId());
+        if (newMaxVoterCount < 1 || newMaxVoterCount > 999) {
+            throw new BadRequestException(ErrorCode.INVALID_VOTER_CLOSE_OPTION);
+        }
+        if (newMaxVoterCount < voterCount) {
+            throw new BadRequestException(ErrorCode.INVALID_VOTER_CLOSE_OPTION);
+        }
+    }
+
+    private static void validateUpdateClosedAt(Post post, LocalDateTime newClosedAt, Integer newMaxVoterCount) {
+        if (Objects.isNull(newClosedAt) || Objects.nonNull(newMaxVoterCount)) {
+            throw new BadRequestException(ErrorCode.INVALID_DATE_CLOSE_OPTION);
+        }
+        if (newClosedAt.isBefore(LocalDateTime.now()) || newClosedAt.isBefore(post.getCreatedAt().plusHours(1))) {
+            throw new BadRequestException(ErrorCode.INVALID_DATE_CLOSE_OPTION);
         }
     }
 }
