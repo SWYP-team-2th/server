@@ -79,10 +79,7 @@ public class PostCommandService {
     public void delete(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        if (!post.isAuthor(userId)) {
-            throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
-        }
-        postRepository.delete(post);
+        post.delete(userId);
     }
 
     @Transactional
