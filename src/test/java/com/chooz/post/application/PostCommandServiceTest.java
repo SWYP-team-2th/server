@@ -242,8 +242,12 @@ public class PostCommandServiceTest extends IntegrationTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PRIVATE, PollType.MULTIPLE, CommentActive.CLOSED)
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new PollOptionDto(Scope.PRIVATE, PollType.MULTIPLE, CommentActive.CLOSED),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
 
         //when
@@ -271,9 +275,14 @@ public class PostCommandServiceTest extends IntegrationTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new PollOptionDto(Scope.PRIVATE, PollType.MULTIPLE, CommentActive.CLOSED),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
+
 
         //when then
         assertThatThrownBy(() -> postService.update(anotherUser.getId(), post.getId(), request))
@@ -295,9 +304,14 @@ public class PostCommandServiceTest extends IntegrationTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new PollOptionDto(Scope.PRIVATE, PollType.MULTIPLE, CommentActive.CLOSED),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
+
 
         //when then
         assertThatThrownBy(() -> postService.update(user.getId(), post.getId(), request))
@@ -312,11 +326,16 @@ public class PostCommandServiceTest extends IntegrationTest {
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
         UpdatePostRequest request = new UpdatePostRequest(
-                "a".repeat(51),
+                "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new PollOptionDto(Scope.PRIVATE, PollType.MULTIPLE, CommentActive.CLOSED),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
+
 
         //when then
         assertThatThrownBy(() -> postService.update(user.getId(), post.getId(), request))
@@ -332,10 +351,15 @@ public class PostCommandServiceTest extends IntegrationTest {
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
-                "a".repeat(101),
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                "Updated Description",
+                List.of(
+                        new PollChoiceRequestDto("title1", "http://image1.com"),
+                        new PollChoiceRequestDto("title2", "http://image2.com")
+                ),
+                new PollOptionDto(Scope.PRIVATE, PollType.MULTIPLE, CommentActive.CLOSED),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
+
 
         //when then
         assertThatThrownBy(() -> postService.update(user.getId(), post.getId(), request))
@@ -360,8 +384,9 @@ public class PostCommandServiceTest extends IntegrationTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.DATE, LocalDateTime.now().minusDays(1), null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.DATE, LocalDateTime.now().minusDays(1), null)
         );
 
         //when then
@@ -387,8 +412,9 @@ public class PostCommandServiceTest extends IntegrationTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.DATE, LocalDateTime.now().plusMinutes(30), null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.DATE, LocalDateTime.now().plusMinutes(30), null)
         );
 
         //when then
@@ -421,8 +447,9 @@ public class PostCommandServiceTest extends IntegrationTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
                 "Updated Description",
-                new CloseOptionDto(CloseType.VOTER, null, 1), // 1명으로 설정 (현재 2명 투표함)
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.VOTER, null, 1) // 1명으로 설정 (현재 2명 투표함)
         );
 
         //when then

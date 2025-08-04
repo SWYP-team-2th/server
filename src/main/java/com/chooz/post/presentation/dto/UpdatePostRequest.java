@@ -1,11 +1,14 @@
 package com.chooz.post.presentation.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 public record UpdatePostRequest(
 
-        @NotNull
+        @NotBlank
         String title,
 
         @NotNull
@@ -13,10 +16,14 @@ public record UpdatePostRequest(
 
         @Valid
         @NotNull
-        CloseOptionDto closeOption,
+        List<PollChoiceRequestDto> pollChoices,
 
         @Valid
         @NotNull
-        PollOptionDto pollOption
+        PollOptionDto pollOption,
+
+        @Valid
+        @NotNull
+        CloseOptionDto closeOption
 ) {
 }

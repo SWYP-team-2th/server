@@ -43,6 +43,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -502,12 +503,13 @@ class PostControllerTest extends RestDocsTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "title",
                 "description",
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
 
         //when then
-        mockMvc.perform(post("/posts/{postId}/update", 1)
+        mockMvc.perform(put("/posts/{postId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))

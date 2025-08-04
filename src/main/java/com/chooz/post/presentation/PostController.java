@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,7 +52,6 @@ public class PostController {
         return ResponseEntity.ok(postService.findById(userId, postId));
     }
 
-
     @GetMapping("/shareUrl/{shareUrl}")
     public ResponseEntity<PostResponse> findPostByShareUrl(
             @PathVariable("shareUrl") String shareUrl,
@@ -63,7 +63,7 @@ public class PostController {
         return ResponseEntity.ok(postService.findByShareUrl(userId, shareUrl));
     }
 
-    @PostMapping("/{postId}/update")
+    @PutMapping("/{postId}")
     public ResponseEntity<Void> updatePost(
             @PathVariable("postId") Long postId,
             @Valid @RequestBody UpdatePostRequest request,
