@@ -1,6 +1,7 @@
 package com.chooz.post.application;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
+import com.chooz.post.presentation.UpdatePostResponse;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
@@ -57,5 +58,9 @@ public class PostService {
 
     public CursorBasePaginatedResponse<FeedResponse> findFeed(Long userId, Long cursor, int size) {
         return postQueryService.findFeed(userId, cursor, size);
+    }
+
+    public UpdatePostResponse findUpdatePost(Long userId, Long postId) {
+        return postQueryService.findUpdatePost(userId, postId);
     }
 }

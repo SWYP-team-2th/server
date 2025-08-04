@@ -73,6 +73,15 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{postId}/update")
+    public ResponseEntity<UpdatePostResponse> updatePost(
+            @PathVariable("postId") Long postId,
+            @AuthenticationPrincipal UserInfo userInfo
+    ) {
+        UpdatePostResponse response = postService.findUpdatePost(userInfo.userId(), postId);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/{postId}/close")
     public ResponseEntity<Void> closePost(
             @PathVariable("postId") Long postId,

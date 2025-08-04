@@ -1,48 +1,43 @@
-package com.chooz.post.presentation.dto;
+package com.chooz.post.presentation;
 
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.Status;
-import com.chooz.user.domain.User;
+import com.chooz.post.presentation.dto.CloseOptionDto;
+import com.chooz.post.presentation.dto.PollChoiceResponse;
+import com.chooz.post.presentation.dto.PollOptionDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record PostResponse(
+public record UpdatePostResponse(
         Long id,
         String title,
         String description,
-        AuthorDto author,
-        List<PollChoiceVoteResponse> pollChoices,
+        List<PollChoiceResponse> pollChoices,
         String shareUrl,
-        boolean isAuthor,
         Status status,
         PollOptionDto pollOption,
         CloseOptionDto closeOption,
-        long commentCount,
-        long voterCount,
         LocalDateTime createdAt
 ) {
 
-    public static PostResponse of(
-            Post post,
-            User user,
-            List<PollChoiceVoteResponse> pollChoices,
-            boolean isAuthor,
-            long commentCount,
-            long voterCount
-    ) {
+    public static UpdatePostResponse of(Post post) {
         PollOption pollOption = post.getPollOption();
         CloseOption closeOption = post.getCloseOption();
-        return new PostResponse(
+        return new UpdatePostResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getDescription(),
-                AuthorDto.of(user),
-                pollChoices,
+                post.getPollChoices()
+                        .stream()
+                        .map(pollChoice -> new PollChoiceResponse(
+                            pollChoice.getId(),
+                            pollChoice.getTitle(),
+                            pollChoice.getImageUrl()
+                )).toList(),
                 post.getShareUrl(),
-                isAuthor,
                 post.getStatus(),
                 new PollOptionDto(
                         pollOption.getScope(),
@@ -54,8 +49,6 @@ public record PostResponse(
                         closeOption.getClosedAt(),
                         closeOption.getMaxVoterCount()
                 ),
-                commentCount,
-                voterCount,
                 post.getCreatedAt()
         );
     }

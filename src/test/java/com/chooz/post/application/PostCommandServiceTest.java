@@ -326,7 +326,7 @@ public class PostCommandServiceTest extends IntegrationTest {
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
         UpdatePostRequest request = new UpdatePostRequest(
-                "Updated Title",
+                "a".repeat(51),
                 "Updated Description",
                 List.of(
                         new PollChoiceRequestDto("title1", "http://image1.com"),
@@ -351,7 +351,7 @@ public class PostCommandServiceTest extends IntegrationTest {
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
         UpdatePostRequest request = new UpdatePostRequest(
                 "Updated Title",
-                "Updated Description",
+                "a".repeat(101),
                 List.of(
                         new PollChoiceRequestDto("title1", "http://image1.com"),
                         new PollChoiceRequestDto("title2", "http://image2.com")
