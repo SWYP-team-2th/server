@@ -528,6 +528,10 @@ class PostControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.STRING)
                                         .description("설명")
                                         .attributes(constraints("0~100자 사이")),
+                                fieldWithPath("pollChoices")
+                                        .type(JsonFieldType.ARRAY)
+                                        .description("투표 선택지")
+                                        .attributes(constraints("최소 2개 최대 10개")),
                                 fieldWithPath("pollOption")
                                         .type(JsonFieldType.OBJECT)
                                         .description("투표 옵션"),

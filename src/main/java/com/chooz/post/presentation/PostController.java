@@ -69,6 +69,7 @@ public class PostController {
             @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
+        postService.update(userInfo.userId(), postId, request);
         return ResponseEntity.ok().build();
     }
 
