@@ -2,6 +2,7 @@ package com.chooz.vote.application;
 
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
+import com.chooz.post.persistence.PostJpaRepository;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.User;
@@ -37,7 +38,7 @@ class VoteConcurrentTest {
     VoteJpaRepository voteRepository;
 
     @Autowired
-    PostRepository postRepository;
+    PostJpaRepository postRepository;
 
     @AfterEach
     void setUp() {

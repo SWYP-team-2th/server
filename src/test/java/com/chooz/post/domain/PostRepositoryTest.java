@@ -1,7 +1,7 @@
 package com.chooz.post.domain;
 
 import com.chooz.post.application.dto.PostWithVoteCount;
-import com.chooz.post.presentation.dto.FeedDto;
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.support.RepositoryTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
@@ -81,26 +81,6 @@ class PostRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("id 리스트에 포함되는 게시글 조회")
-    void findByIdIn() throws Exception {
-        //given
-        List<Post> posts = createPosts(1L, 15);
-        List<Long> postIds = List.of(posts.get(0).getId(), posts.get(1).getId(), posts.get(2).getId());
-
-        //when
-        Slice<Post> postSlice = postRepository.findByIdIn(postIds, null, PageRequest.ofSize(10));
-
-        //then
-        assertAll(
-                () -> assertThat(postSlice.getContent().size()).isEqualTo(postIds.size()),
-                () -> assertThat(postSlice.getContent().get(0).getId()).isEqualTo(postIds.get(2)),
-                () -> assertThat(postSlice.getContent().get(1).getId()).isEqualTo(postIds.get(1)),
-                () -> assertThat(postSlice.getContent().get(2).getId()).isEqualTo(postIds.get(0)),
-                () -> assertThat(postSlice.hasNext()).isFalse()
-        );
-    }
-
-    @Test
     @DisplayName("피드 조회")
     void findByScopeAndDeletedFalse() {
         //given
@@ -112,7 +92,7 @@ class PostRepositoryTest extends RepositoryTest {
         int size = 10;
 
         //when
-        Slice<FeedDto> res = postRepository.findFeedByScopeWithUser(1L, null, PageRequest.ofSize(size));
+        Slice<FeedDto> res = postRepository.findFeed(null, PageRequest.ofSize(size));
 
         //then
         assertAll(

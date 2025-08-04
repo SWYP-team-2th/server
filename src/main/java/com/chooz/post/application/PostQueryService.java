@@ -11,7 +11,7 @@ import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.AuthorDto;
-import com.chooz.post.presentation.dto.FeedDto;
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MostVotedPollChoiceDto;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
@@ -168,7 +168,7 @@ public class PostQueryService {
     }
 
     public CursorBasePaginatedResponse<FeedResponse> findFeed(Long userId, Long cursor, int size) {
-        Slice<FeedDto> postSlice = postRepository.findFeedByScopeWithUser(userId, cursor, PageRequest.ofSize(size));
+        Slice<FeedDto> postSlice = postRepository.findFeed(cursor, PageRequest.ofSize(size));
         return CursorBasePaginatedResponse.of(postSlice.map(post -> createFeedResponse(userId, post)));
     }
 

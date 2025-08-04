@@ -1,6 +1,7 @@
 package com.chooz.post.presentation.dto;
 
 import com.chooz.common.dto.CursorDto;
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.domain.Status;
 
 import java.time.LocalDateTime;
