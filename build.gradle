@@ -100,3 +100,17 @@ tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
 }
+
+def generated = 'src/main/generated'
+
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+sourceSets {
+    main.java.srcDirs += [ generated ]
+}
+
+clean {
+    delete file(generated)
+}
