@@ -1,6 +1,8 @@
 package com.chooz.post.persistence;
 
+import com.chooz.post.application.dto.PostWithVoteCount;
 import com.chooz.post.application.dto.QFeedDto;
+import com.chooz.post.application.dto.QPostWithVoteCount;
 import com.chooz.post.domain.Post;
 import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.domain.Scope;
@@ -8,6 +10,7 @@ import com.chooz.user.domain.QUser;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +58,12 @@ public class PostQueryDslRepository {
         return results.size() > pageable.getPageSize();
     }
 
+    /**
+     * 피드 관련 데이터 조회
+     * @param postId
+     * @param pageable
+     * @return
+     */
     public Slice<FeedDto> findFeed(Long postId, Pageable pageable) {
         List<FeedDto> results = queryFactory
                 .select(new QFeedDto(
@@ -87,6 +96,79 @@ public class PostQueryDslRepository {
                         post.deleted.isFalse()
                 )
                 .orderBy(post.createdAt.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = isHasNext(pageable, results);
+
+        if (hasNext) {
+            results.removeLast();
+        }
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+    /**
+     * 유저가 작성한 게시글 리스트 조회
+     * @param userId
+     * @param postId
+     * @param pageable
+     * @return
+     */
+    public Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long postId, Pageable pageable) {
+        List<PostWithVoteCount> results = queryFactory
+                .select(new QPostWithVoteCount(
+                        post,
+                        JPAExpressions
+                                .select(vote.userId.countDistinct())
+                                .from(vote)
+                                .where(vote.postId.eq(post.id))
+                ))
+                .from(post)
+                .where(
+                        post.userId.eq(userId),
+                        cursor(postId, post.id),
+                        post.deleted.isFalse()
+                )
+                .orderBy(post.id.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = isHasNext(pageable, results);
+
+        if (hasNext) {
+            results.removeLast();
+        }
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+    /**
+     * 유저가 투표한 게시글 리스트 조회
+     * @param userId
+     * @param postId
+     * @param pageable
+     * @return
+     */
+    public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable) {
+        List<PostWithVoteCount> results = queryFactory
+                .select(new QPostWithVoteCount(
+                        post,
+                        JPAExpressions
+                                .select(vote.userId.countDistinct())
+                                .from(vote)
+                                .where(vote.postId.eq(post.id))
+                ))
+                .from(post)
+                .where(
+                        post.id.in(
+                                JPAExpressions
+                                        .select(vote.postId)
+                                        .from(vote)
+                                        .where(vote.userId.eq(userId))
+                        ),
+                        cursor(postId, post.id),
+                        post.deleted.isFalse()
+                )
+                .orderBy(post.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 

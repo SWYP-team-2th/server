@@ -16,7 +16,7 @@ public interface PostRepository {
 
     Post save(Post post);
 
-    Slice<Post> findByUserId(Long userId, Long postId, Pageable pageable);
+    Slice<Post> findAllByUserId(Long userId, Long postId, Pageable pageable);
 
     Optional<Post> findByIdFetchPollChoices(Long postId);
 

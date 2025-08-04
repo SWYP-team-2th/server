@@ -31,7 +31,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Slice<Post> findByUserId(Long userId, Long postId, Pageable pageable) {
+    public Slice<Post> findAllByUserId(Long userId, Long postId, Pageable pageable) {
         return postQueryDslRepository.findByUserId(userId, postId, pageable);
     }
 
@@ -67,11 +67,11 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long postId, Pageable pageable) {
-        return postJpaRepository.findPostsWithVoteCountByUserId(userId, postId, pageable);
+        return postQueryDslRepository.findPostsWithVoteCountByUserId(userId, postId, pageable);
     }
 
     @Override
     public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable) {
-        return postJpaRepository.findVotedPostsWithVoteCount(userId, postId, pageable);
+        return postQueryDslRepository.findVotedPostsWithVoteCount(userId, postId, pageable);
     }
 }

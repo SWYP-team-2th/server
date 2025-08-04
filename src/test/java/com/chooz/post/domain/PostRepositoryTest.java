@@ -39,14 +39,14 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("유저가 작성한 게시글 조회 - 게시글이 15개일 경우 15번쨰부터 10개 조회해야 함")
-    void findByUserId1() throws Exception {
+    void findAllByUserId1() throws Exception {
         //given
         long userId = 1L;
         List<Post> posts = createPosts(userId, 15);
         int size = 10;
 
         //when
-        Slice<Post> res = postRepository.findByUserId(userId, null, PageRequest.ofSize(size));
+        Slice<Post> res = postRepository.findAllByUserId(userId, null, PageRequest.ofSize(size));
 
         //then
         assertAll(
@@ -60,7 +60,7 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("유저가 작성한 게시글 조회 - 15개 중에 커서가 5번째 게시글의 id면 4번째부터 0번째까지 조회해야 함")
-    void findByUserId2() throws Exception {
+    void findAllByUserId2() throws Exception {
         //given
         long userId = 1L;
         List<Post> posts = createPosts(userId, 15);
@@ -68,7 +68,7 @@ class PostRepositoryTest extends RepositoryTest {
         int cursorIndex = 5;
 
         //when
-        Slice<Post> res = postRepository.findByUserId(userId, posts.get(cursorIndex).getId(), PageRequest.ofSize(size));
+        Slice<Post> res = postRepository.findAllByUserId(userId, posts.get(cursorIndex).getId(), PageRequest.ofSize(size));
 
         //then
         assertAll(
