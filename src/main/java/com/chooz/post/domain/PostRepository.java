@@ -2,9 +2,11 @@ package com.chooz.post.domain;
 
 import com.chooz.post.application.dto.PostWithVoteCount;
 import com.chooz.post.presentation.dto.FeedDto;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -43,6 +45,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """
     )
     Optional<Post> findByIdFetchPollChoices(@Param("postId") Long postId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            SELECT p
+            FROM Post p
+            JOIN FETCH p.pollChoices
+            WHERE p.id = :postId
+            """
+    )
+    Optional<Post> findByIdFetchPollChoicesWithLock(@Param("postId") Long postId);
 
     @Query(""" 
             SELECT new com.chooz.post.presentation.dto.FeedDto(

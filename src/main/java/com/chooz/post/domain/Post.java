@@ -60,7 +60,7 @@ public class Post extends BaseEntity {
 
     @Embedded
     private PollOption pollOption;
-    
+
     @Embedded
     private CloseOption closeOption;
 
@@ -129,7 +129,7 @@ public class Post extends BaseEntity {
             throw new BadRequestException(ErrorCode.DESCRIPTION_LENGTH_EXCEEDED);
         }
     }
-    
+
     private static void validateTitle(String title) {
         if (StringUtils.hasText(title) && title.length() > 50) {
             throw new BadRequestException(ErrorCode.TITLE_LENGTH_EXCEEDED);
@@ -183,15 +183,19 @@ public class Post extends BaseEntity {
         return PollType.SINGLE.equals(pollOption.getPollType());
     }
 
-    public boolean isCloseTypeVoter() {
-        return CloseType.VOTER.equals(closeOption.getCloseType());
+    public boolean isClosableByVoterCount(long voterCount) {
+        if (!isCloseTypeVoter()) {
+            return false;
+        }
+        return closeOption.getMaxVoterCount() == voterCount;
     }
 
-    public boolean isClosableByVoterCount(long voterCount) {
-        return closeOption.getMaxVoterCount() == voterCount;
+    private boolean isCloseTypeVoter() {
+        return CloseType.VOTER.equals(closeOption.getCloseType());
     }
 
     public boolean isClosed() {
         return this.status.equals(Status.CLOSED);
     }
+
 }

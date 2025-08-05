@@ -61,6 +61,12 @@ public class PostFixture {
         return new CloseOption(CloseType.DATE, LocalDateTime.now().minusMinutes(5), null);
     }
 
+    public static CloseOption voterCloseOption(int maxVoterCount) {
+        return new CloseOption(CloseType.VOTER, null, maxVoterCount);
+    }
+
+    public static final CloseOption SELF_CREATE_OPTION = new CloseOption(CloseType.SELF, null, null);
+
     public static PollOption.PollOptionBuilder createPollOptionBuilder() {
         return PollOption.builder()
                 .pollType(PollType.SINGLE)
