@@ -4,14 +4,11 @@ import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.*;
 import com.chooz.user.presentation.dto.OnboardingRequest;
-import com.chooz.user.presentation.dto.UserInfoResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;

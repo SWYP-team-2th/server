@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static com.chooz.common.util.Validator.validateNull;
 
 @Getter
 @Entity
