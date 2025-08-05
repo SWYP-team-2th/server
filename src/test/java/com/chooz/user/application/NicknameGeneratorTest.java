@@ -1,8 +1,6 @@
 package com.chooz.user.application;
 
-import com.chooz.user.domain.NicknameAdjective;
-import com.chooz.user.domain.NicknameAdjectiveRepository;
-import com.chooz.user.domain.Role;
+import com.chooz.user.domain.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +23,9 @@ class NicknameGeneratorTest {
     @Mock
     NicknameAdjectiveRepository nicknameAdjectiveRepository;
 
+    @Mock
+    UserRepository userRepository;
+
     @Test
     @DisplayName("닉네임 생성 테스트")
     void generate() throws Exception {
@@ -38,5 +39,4 @@ class NicknameGeneratorTest {
         //then
         Assertions.assertThat(nickname).isEqualTo("호기심 많은 츄");
     }
-
 }
