@@ -1,26 +1,35 @@
 package com.chooz.user.presentation.dto;
 
 import com.chooz.user.domain.OnboardingStep;
-import com.chooz.user.domain.Role;
+import com.chooz.user.domain.OnboardingStepType;
 import com.chooz.user.domain.User;
-import com.chooz.user.domain.UserOnboardingStep;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public record UserMyInfoResponse(
         Long id,
         String nickname,
         String profileImageUrl,
-        List<OnboardingStep> onboardingSteps,
-        boolean notification
+        boolean notification,
+        Map<String, Boolean> onboardingStep
+
 ) {
     public static UserMyInfoResponse of(User user) {
         return new UserMyInfoResponse(
                 user.getId(),
                 user.getNickname(),
                 user.getProfileUrl(),
-                user.getOnboardingSteps().stream().map(UserOnboardingStep::getStep).toList(),
-                user.isNotification()
+                user.isNotification(),
+                convertStepStatus(user.getOnboardingStep())
         );
+    }
+
+    private static Map<String, Boolean> convertStepStatus(OnboardingStep step) {
+        return Arrays.stream(OnboardingStepType.values())
+                .collect(Collectors.toMap(
+                        Enum::name,
+                        stepType -> step != null && stepType.check(step)
+                ));
     }
 }

@@ -9,11 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("""
-    SELECT u
-    FROM User u
-    JOIN FETCH u.onboardingSteps
-    where u.id = :userId
-    """)
-    Optional<User> findByIdFetchOnboardingSteps(@Param("userId") Long userId);
+    boolean existsByNickname(String nickName);
 }

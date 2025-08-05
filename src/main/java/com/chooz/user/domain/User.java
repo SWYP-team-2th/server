@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.chooz.common.util.Validator.validateNull;
 
@@ -17,7 +18,7 @@ import static com.chooz.common.util.Validator.validateNull;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-    public static final String DEFAULT_PROFILE_URL = "https://image.chooz.site/default_profile.png";
+    private static final String DEFAULT_PROFILE_URL = "https://cdn.chooz.site/default_profile.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,28 +30,35 @@ public class User extends BaseEntity {
 
     private boolean notification;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserOnboardingStep> onboardingSteps = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "onboarding_step_id", unique = true)
+    private OnboardingStep onboardingStep;
 
     @Builder
     private User(
             Long id,
             String nickname,
             String profileUrl,
-            List<UserOnboardingStep> onboardingSteps,
-            boolean notification
+            boolean notification,
+            OnboardingStep onboardingStep
     ) {
-        validateNull(nickname, nickname, onboardingSteps, notification);
         this.id = id;
         this.nickname = nickname;
         this.profileUrl = profileUrl;
-        this.onboardingSteps = onboardingSteps;
-        onboardingSteps.forEach(step -> step.setUser(this));
         this.notification = notification;
+        this.onboardingStep = onboardingStep;
     }
 
-    public static User create(String nickname, String profileUrl, List<UserOnboardingStep>onboardingSteps) {
-        return new User(null, nickname, profileUrl, onboardingSteps, false);
+    public static User create(String nickname, String profileUrl) {
+        return new User(null, nickname, getOrDefaultProfileImage(profileUrl), false, new OnboardingStep());
     }
 
+    private static String getOrDefaultProfileImage(String profileImageUrl) {
+        return Optional.ofNullable(profileImageUrl)
+                .orElse(User.DEFAULT_PROFILE_URL);
+    }
+
+    public boolean hasCompletedOnboarding() {
+        return onboardingStep != null && onboardingStep.isCompletedAll();
+    }
 }
