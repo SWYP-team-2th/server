@@ -1,9 +1,29 @@
 package com.chooz.post.presentation.dto;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 public record UpdatePostRequest(
+
+        @NotBlank
+        String title,
+
         @NotNull
-        String description
+        String description,
+
+        @Valid
+        @NotNull
+        List<PollChoiceRequestDto> pollChoices,
+
+        @Valid
+        @NotNull
+        PollOptionDto pollOption,
+
+        @Valid
+        @NotNull
+        CloseOptionDto closeOption
 ) {
 }

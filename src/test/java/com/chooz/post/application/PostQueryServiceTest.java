@@ -5,7 +5,7 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.post.domain.*;
 import com.chooz.post.presentation.dto.FeedResponse;
-import com.chooz.post.presentation.dto.PollChoiceResponse;
+import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.VoteFixture;
@@ -64,7 +64,7 @@ class PostQueryServiceTest extends IntegrationTest {
         PostResponse response = postService.findById(user1.getId(), post.getId());
 
         //then
-        List<PollChoiceResponse> pollChoices = response.pollChoices();
+        List<PollChoiceVoteResponse> pollChoices = response.pollChoices();
         assertAll(
                 () -> assertThat(response.id()).isEqualTo(post.getId()),
                 () -> assertThat(response.description()).isEqualTo(post.getDescription()),

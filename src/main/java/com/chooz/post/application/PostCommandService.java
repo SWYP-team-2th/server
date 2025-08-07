@@ -9,6 +9,7 @@ import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
+import com.chooz.post.presentation.dto.UpdatePostRequest;
 import com.chooz.thumbnail.domain.Thumbnail;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class PostCommandService {
     private final PostRepository postRepository;
     private final ShareUrlService shareUrlService;
     private final ThumbnailRepository thumbnailRepository;
+    private final PostValidator postValidator;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         Post post = createPost(userId, request);
@@ -88,5 +90,29 @@ public class PostCommandService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.closeByAuthor(userId);
+    }
+
+    @Transactional
+    public void update(Long userId, Long postId, UpdatePostRequest request) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+
+        postValidator.validateUpdate(post, userId, request);
+
+        post.update(
+                userId,
+                request.title(),
+                request.description(),
+                PollOption.create(
+                        request.pollOption().pollType(),
+                        request.pollOption().scope(),
+                        request.pollOption().commentActive()
+                ),
+                new CloseOption(
+                        request.closeOption().closeType(),
+                        request.closeOption().closedAt(),
+                        request.closeOption().maxVoterCount()
+                )
+        );
     }
 }

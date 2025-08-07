@@ -1,11 +1,13 @@
 package com.chooz.post.application;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
+import com.chooz.post.presentation.UpdatePostResponse;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PostResponse;
+import com.chooz.post.presentation.dto.UpdatePostRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,11 @@ public class PostService {
         postCommandService.close(userId, postId);
     }
 
+    @Transactional
+    public void update(Long userId, Long postId, UpdatePostRequest request) {
+        postCommandService.update(userId, postId, request);
+    }
+
     public PostResponse findById(Long userId, Long postId) {
         return postQueryService.findById(userId, postId);
     }
@@ -51,5 +58,9 @@ public class PostService {
 
     public CursorBasePaginatedResponse<FeedResponse> findFeed(Long userId, Long cursor, int size) {
         return postQueryService.findFeed(userId, cursor, size);
+    }
+
+    public UpdatePostResponse findUpdatePost(Long userId, Long postId) {
+        return postQueryService.findUpdatePost(userId, postId);
     }
 }
