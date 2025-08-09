@@ -13,6 +13,9 @@ public class UserFixture {
     public static User createDefaultUser() {
         return createUserBuilder().build();
     }
+    public static User createUserWithNickname (String nickname) {
+        return createUserBuilder().nickname(nickname).build();
+    }
 
     public static User.UserBuilder createUserBuilder() {
         return User.builder()
