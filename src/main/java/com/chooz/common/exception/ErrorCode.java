@@ -46,7 +46,6 @@ public enum ErrorCode {
     DUPLICATE_POLL_CHOICE("복수 투표의 경우 중복된 선택지가 있으면 안 됨"),
     NOT_POST_POLL_CHOICE_ID("게시글의 투표 선택지가 아님"),
     INVALID_ONBOARDING_STEP("잘못된 온보딩 단계"),
-    ONBOARDING_NOT_INITIALIZED("온보딩이 초기화 되지 않음."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

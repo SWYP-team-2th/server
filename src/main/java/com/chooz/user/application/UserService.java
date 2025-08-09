@@ -51,9 +51,6 @@ public class UserService {
     public UserInfoResponse completeStep(Long userId, OnboardingRequest onboardingRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        if (user.getOnboardingStep() == null) {
-            throw new BadRequestException(ErrorCode.ONBOARDING_NOT_INITIALIZED);
-        }
         UpdateOnboardingStep(user, onboardingRequest);
         return UserInfoResponse.of(userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND)));
