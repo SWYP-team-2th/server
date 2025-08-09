@@ -1,15 +1,10 @@
 package com.chooz.user.application;
 
-import com.chooz.common.exception.BadRequestException;
-import com.chooz.common.exception.ErrorCode;
 import com.chooz.user.domain.NicknameAdjectiveRepository;
 import com.chooz.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
