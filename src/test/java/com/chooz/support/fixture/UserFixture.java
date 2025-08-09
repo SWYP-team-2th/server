@@ -1,10 +1,6 @@
 package com.chooz.support.fixture;
 
-import com.chooz.user.domain.Role;
 import com.chooz.user.domain.User;
-
-import java.util.List;
-import java.util.Map;
 
 import static com.chooz.support.fixture.OnboardingStepFixture.createDefaultOnboardingStep;
 

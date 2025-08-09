@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -28,22 +27,26 @@ class UserServiceTest extends IntegrationTest {
     @Autowired
     UserService userService;
 
+    private void saveNickNameAdjective(String... adjectives) {
+        for(String adjective : adjectives){
+            nicknameAdjectiveRepository.save(new NicknameAdjective(adjective));
+        }
+    }
+    private User saveUser(){
+        User user = UserFixture.createUserWithNickname(nicknameGenerator.generate());
+        return userRepository.save(user);
+    }
     @Test
     @DisplayName("유저생성 테스트")
     void createUser() {
         // given
-        User user = User.create(null, "https://cdn.chooz.site/default_profile.png");
+        saveNickNameAdjective("호기심 많은", "배려 깊은");
+        User user = saveUser();
 
-        nicknameAdjectiveRepository.save(new NicknameAdjective("호기심 많은"));
-        nicknameAdjectiveRepository.save(new NicknameAdjective("배려 깊은"));
-
-        // when
-        Long userId = userService.createUser(user.getNickname(), user.getProfileUrl());
-        Optional<User> returnUser = userRepository.findById(userId);
         // when then
         assertAll(
-                () -> assertThat(returnUser.get().getNickname()).isNotNull(),
-                () -> assertThat(returnUser.get().getNickname()).contains("츄")
+                () -> assertThat(user.getNickname()).isNotNull(),
+                () -> assertThat(user.getNickname()).contains("츄")
         );
     }
 
@@ -51,50 +54,37 @@ class UserServiceTest extends IntegrationTest {
     @DisplayName("유저생성 닉넥임 중복 테스트")
     void createUser_duplicateNickname() {
         // given
-        User user = User.create(null, "https://cdn.chooz.site/default_profile.png");
-
-        nicknameAdjectiveRepository.save(new NicknameAdjective("호기심 많은"));
-
-        // when
-        Long userId1 = userService.createUser(user.getNickname(), user.getProfileUrl());
-        Long userId2 = userService.createUser(user.getNickname(), user.getProfileUrl());
-
-        User returnUser1 = userRepository.findById(userId1).get();
-        User returnUser2 = userRepository.findById(userId2).get();
+        saveNickNameAdjective("호기심 많은");
+        User user = saveUser();
+        User user2 = saveUser();
 
         // when then
         assertAll(
-                () -> assertThat(returnUser1.getNickname()).isNotNull(),
-                () -> assertThat(returnUser1.getNickname()).contains("츄"),
-                () -> assertThat(returnUser1.getNickname()).isNotEqualTo(returnUser2.getNickname()),
-                () -> assertThat(returnUser1.getNickname()).isEqualTo("호기심 많은 츄"),
-                () -> assertThat(returnUser2.getNickname()).isEqualTo("호기심 많은 츄1")
+                () -> assertThat(user.getNickname()).isNotNull(),
+                () -> assertThat(user.getNickname()).contains("츄"),
+                () -> assertThat(user.getNickname()).isNotEqualTo(user2.getNickname()),
+                () -> assertThat(user.getNickname()).isEqualTo("호기심 많은 츄"),
+                () -> assertThat(user2.getNickname()).isEqualTo("호기심 많은 츄1")
         );
     }
     @Test
     @DisplayName("유저생성 닉넥임 사용가능한 가장 작은 suffix 선택 테스트")
     void createUser_minSuffix() {
         // given
-        nicknameAdjectiveRepository.save(new NicknameAdjective("호기심 많은"));
-        User user = UserFixture.createUserWithNickname(nicknameGenerator.generate());
-        User returnUser = userRepository.save(user);
-        User user1 = UserFixture.createUserWithNickname(nicknameGenerator.generate());
-        User returnUser1 = userRepository.save(user1);
-        User user2 = UserFixture.createUserWithNickname(nicknameGenerator.generate());
-        User returnUser2 = userRepository.save(user2);
+        saveNickNameAdjective("호기심 많은");
+        User user = saveUser();
+        User user1 = saveUser();
+        User user2 = saveUser();
+        userRepository.delete(user1);
 
         // when
-        userRepository.delete(returnUser1);
-        User user3 = UserFixture.createUserWithNickname(nicknameGenerator.generate());
-        User returnUser3 = userRepository.save(user3);
+        User user3 = saveUser();
 
         // when then
         assertAll(
-                () -> assertThat(returnUser3.getNickname()).isNotNull(),
-                () -> assertThat(returnUser3.getNickname()).contains("츄"),
-                () -> assertThat(returnUser.getNickname()).isEqualTo("호기심 많은 츄"),
-                () -> assertThat(returnUser2.getNickname()).isEqualTo("호기심 많은 츄2"),
-                () -> assertThat(returnUser3.getNickname()).isEqualTo("호기심 많은 츄1")
+                () -> assertThat(user.getNickname()).isEqualTo("호기심 많은 츄"),
+                () -> assertThat(user2.getNickname()).isEqualTo("호기심 많은 츄2"),
+                () -> assertThat(user3.getNickname()).isEqualTo("호기심 많은 츄1")
         );
     }
 
@@ -102,8 +92,7 @@ class UserServiceTest extends IntegrationTest {
     @DisplayName("온보딩 수행 테스트")
     void user_complete_onboarding_step() {
         // given
-        User user = UserFixture.createDefaultUser();
-        Long userId = userService.createUser(user.getNickname(), user.getProfileUrl());
+        Long userId = saveUser().getId();
         OnboardingRequest onboardingRequest = new OnboardingRequest(
                 Map.of(
                         OnboardingStepType.WELCOME_GUIDE, true,
