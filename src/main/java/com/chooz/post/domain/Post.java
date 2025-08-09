@@ -140,6 +140,9 @@ public class Post extends BaseEntity {
         if (!isAuthor(userId)) {
             throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
         }
+        if (closeOption.getCloseType() != CloseType.SELF) {
+            throw new BadRequestException(ErrorCode.ONLY_SELF_CAN_CLOSE);
+        }
         close();
     }
 
@@ -198,4 +201,18 @@ public class Post extends BaseEntity {
         return this.status.equals(Status.CLOSED);
     }
 
+    public void update(
+            Long userId,
+            String title,
+            String description,
+            PollOption pollOption,
+            CloseOption closeOption
+    ) {
+        validateTitle(title);
+        validateDescription(description);
+        this.title = title;
+        this.description = description;
+        this.pollOption = pollOption;
+        this.closeOption = closeOption;
+    }
 }

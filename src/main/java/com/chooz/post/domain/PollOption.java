@@ -14,13 +14,13 @@ import static com.chooz.common.util.Validator.validateNull;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PollOption {
-    
+
     @Enumerated(EnumType.STRING)
     private PollType pollType;
-    
+
     @Enumerated(EnumType.STRING)
     private Scope scope;
-    
+
     @Enumerated(EnumType.STRING)
     private CommentActive commentActive;
 
@@ -35,12 +35,4 @@ public class PollOption {
         validateNull(pollType, scope, commentActive);
         return new PollOption(pollType, scope, commentActive);
     }
-
-    public void toggleScope() {
-        this.scope = scope.equals(Scope.PRIVATE) ? Scope.PUBLIC : Scope.PRIVATE;
-    }
-    
-    public void toggleCommentStatus() {
-        this.commentActive = commentActive.equals(CommentActive.CLOSED) ? CommentActive.OPEN : CommentActive.CLOSED;
-    }
-} 
+}
