@@ -2,7 +2,9 @@ package com.chooz.user.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.user.domain.*;
+import com.chooz.user.domain.UserRepository;
+import com.chooz.user.domain.OnboardingStepRepository;
+import com.chooz.user.domain.User;
 import com.chooz.user.presentation.dto.OnboardingRequest;
 import com.chooz.user.presentation.dto.UserInfoResponse;
 import com.chooz.user.presentation.dto.UserMyInfoResponse;

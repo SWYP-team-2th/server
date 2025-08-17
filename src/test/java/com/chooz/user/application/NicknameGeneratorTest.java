@@ -1,6 +1,8 @@
 package com.chooz.user.application;
 
-import com.chooz.user.domain.*;
+import com.chooz.user.domain.NicknameAdjective;
+import com.chooz.user.domain.NicknameAdjectiveRepository;
+import com.chooz.user.domain.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

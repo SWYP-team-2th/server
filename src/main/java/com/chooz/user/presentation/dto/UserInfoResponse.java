@@ -4,7 +4,8 @@ import com.chooz.user.domain.OnboardingStep;
 import com.chooz.user.domain.OnboardingStepType;
 import com.chooz.user.domain.User;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public record UserInfoResponse(
