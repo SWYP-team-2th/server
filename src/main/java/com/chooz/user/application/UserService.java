@@ -49,6 +49,9 @@ public class UserService {
 
     @Transactional
     public UserInfoResponse completeStep(Long userId, OnboardingRequest onboardingRequest) {
+        if (onboardingRequest.onboardingStep().values().stream().noneMatch(Boolean.TRUE::equals)) {
+            throw new BadRequestException(ErrorCode.INVALID_ONBOARDING_STEP);
+        }
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
         UpdateOnboardingStep(user, onboardingRequest);

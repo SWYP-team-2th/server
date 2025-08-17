@@ -5,6 +5,7 @@ import com.chooz.user.application.UserService;
 import com.chooz.user.presentation.dto.OnboardingRequest;
 import com.chooz.user.presentation.dto.UserInfoResponse;
 import com.chooz.user.presentation.dto.UserMyInfoResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +32,7 @@ public class UserController {
 
     @PatchMapping("/onboarding")
     public ResponseEntity<UserInfoResponse> findUserInfo(
-            @RequestBody OnboardingRequest request,
+            @Valid @RequestBody OnboardingRequest request,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
         return ResponseEntity.ok(userService.completeStep(userInfo.userId(), request));

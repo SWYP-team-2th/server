@@ -1,5 +1,7 @@
 package com.chooz.user.application;
 
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.*;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class UserServiceTest extends IntegrationTest {
@@ -108,5 +111,25 @@ class UserServiceTest extends IntegrationTest {
                 () -> assertThat(onboardingStep.isWelcomeGuide()).isTrue(),
                 () -> assertThat(onboardingStep.isFirstVote()).isFalse()
         );
+    }
+    @Test
+    @DisplayName("온보딩 요청 예외 테스트")
+    void user_complete_onboarding_step_exception() {
+        // given
+        Long userId = saveUser().getId();
+        OnboardingRequest onboardingRequest = new OnboardingRequest(
+                Map.of(
+                        OnboardingStepType.WELCOME_GUIDE, false,
+                        OnboardingStepType.FIRST_VOTE, false
+                )
+        );
+
+        // when then
+        assertThatThrownBy(
+                () -> userService.completeStep(userId, onboardingRequest))
+                .isInstanceOf(BadRequestException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.INVALID_ONBOARDING_STEP
+                );
     }
 }

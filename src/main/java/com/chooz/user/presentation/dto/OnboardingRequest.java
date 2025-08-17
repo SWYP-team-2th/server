@@ -1,20 +1,13 @@
 package com.chooz.user.presentation.dto;
 
-import com.chooz.common.exception.BadRequestException;
-import com.chooz.common.exception.ErrorCode;
 import com.chooz.user.domain.OnboardingStepType;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.Map;
 
 public record OnboardingRequest(
+        @NotNull
+        @Size(min = 1)
         Map<OnboardingStepType, Boolean> onboardingStep
-) {
-        public OnboardingRequest {
-                if (onboardingStep == null
-                        || onboardingStep.isEmpty()
-                        || onboardingStep.values().stream().noneMatch(Boolean.TRUE::equals)
-                ) {
-                        throw new BadRequestException(ErrorCode.INVALID_ONBOARDING_STEP);
-                }
-        }
-}
+) {}
