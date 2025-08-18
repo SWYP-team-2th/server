@@ -1,6 +1,8 @@
 package com.chooz.user.domain;
 
 import com.chooz.common.domain.BaseEntity;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +15,7 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -46,6 +49,7 @@ public class User extends BaseEntity {
             boolean notification,
             OnboardingStep onboardingStep
     ) {
+        validateNickname(nickname);
         this.id = id;
         this.nickname = nickname;
         this.profileUrl = profileUrl;
@@ -56,12 +60,21 @@ public class User extends BaseEntity {
     public static User create(String nickname, String profileUrl) {
         return new User(null, nickname, getOrDefaultProfileImage(profileUrl), false, new OnboardingStep());
     }
+    public void update(String nickname, String profileUrl) {
+        validateNickname(nickname);
+        this.nickname = nickname;
+        this.profileUrl = getOrDefaultProfileImage(profileUrl);
 
+    }
+    private static void validateNickname(String nickname) {
+        if(StringUtils.hasText(nickname) && nickname.length() > 15) {
+            throw new BadRequestException(ErrorCode.NICKNAME_LENGTH_EXCEEDED);
+        }
+    }
     private static String getOrDefaultProfileImage(String profileImageUrl) {
         return Optional.ofNullable(profileImageUrl)
                 .orElse(User.DEFAULT_PROFILE_URL);
     }
-
     public boolean hasCompletedOnboarding() {
         return onboardingStep != null && onboardingStep.isCompletedAll();
     }
