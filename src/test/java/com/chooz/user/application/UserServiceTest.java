@@ -11,6 +11,7 @@ import com.chooz.user.domain.OnboardingStepType;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.user.presentation.dto.OnboardingRequest;
+import com.chooz.user.presentation.dto.UpdateUserRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,7 @@ class UserServiceTest extends IntegrationTest {
                 () -> assertThat(user2.getNickname()).isEqualTo("호기심 많은 츄1")
         );
     }
+
     @Test
     @DisplayName("유저생성 닉넥임 사용가능한 가장 작은 suffix 선택 테스트")
     void createUser_minSuffix() {
@@ -93,6 +95,29 @@ class UserServiceTest extends IntegrationTest {
                 () -> assertThat(user3.getNickname()).isEqualTo("호기심 많은 츄1")
         );
     }
+
+
+    @Test
+    @DisplayName("유저 정보 수정 테스트")
+    void updateUser() {
+        // given
+        saveNickNameAdjective("호기심 많은");
+        User user = saveUser();
+
+        // when
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest(
+                "이직 하는 츄",
+                "https://cdn.chooz.site/looking_job_chu.png"
+        );
+        userService.updateUser(user.getId(), updateUserRequest);
+
+        // when then
+        assertAll(
+                () -> assertThat(user.getNickname()).isEqualTo("이직 하는 츄"),
+                () -> assertThat(user.getProfileUrl()).contains("looking_job_chu.png")
+        );
+    }
+
 
     @Test
     @DisplayName("온보딩 수행 테스트")
@@ -115,6 +140,7 @@ class UserServiceTest extends IntegrationTest {
                 () -> assertThat(onboardingStep.isFirstVote()).isFalse()
         );
     }
+
     @Test
     @DisplayName("온보딩 요청 예외 테스트")
     void user_complete_onboarding_step_exception() {
