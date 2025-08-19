@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByMe(userInfo.userId()));
     }
 
-    @PutMapping("/me/profile")
+    @PutMapping("/me")
     public ResponseEntity<Void> updateMyInfo(
             @AuthenticationPrincipal UserInfo userInfo,
             @Valid @RequestBody UpdateUserRequest updateUserRequest
