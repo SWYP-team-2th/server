@@ -47,6 +47,7 @@ public enum ErrorCode {
     NOT_POST_POLL_CHOICE_ID("게시글의 투표 선택지가 아님"),
     ONLY_SELF_CAN_CLOSE("작성자 마감의 경우, SELF 마감 방식만이 마감 가능합니다."),
     INVALID_ONBOARDING_STEP("유효하지 않은 온보딩 단계."),
+    NICKNAME_LENGTH_EXCEEDED("닉네임 길이 초과"),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

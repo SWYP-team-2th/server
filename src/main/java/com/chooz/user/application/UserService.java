@@ -6,6 +6,7 @@ import com.chooz.user.domain.UserRepository;
 import com.chooz.user.domain.OnboardingStepRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.presentation.dto.OnboardingRequest;
+import com.chooz.user.presentation.dto.UpdateUserRequest;
 import com.chooz.user.presentation.dto.UserInfoResponse;
 import com.chooz.user.presentation.dto.UserMyInfoResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,13 @@ public class UserService {
     private String getOrGenerateNickname(String nickname) {
         return Optional.ofNullable(nickname)
                 .orElseGet(nicknameGenerator::generate);
+    }
+
+    @Transactional
+    public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+        user.update(updateUserRequest.nickname(), updateUserRequest.imageUrl());
     }
 
     @Transactional(readOnly = true)

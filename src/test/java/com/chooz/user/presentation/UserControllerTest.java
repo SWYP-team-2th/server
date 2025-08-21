@@ -1,13 +1,19 @@
 package com.chooz.user.presentation;
 
+import com.chooz.post.domain.CloseType;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollType;
+import com.chooz.post.domain.Scope;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
 import com.chooz.user.domain.OnboardingStepType;
 import com.chooz.user.presentation.dto.OnboardingRequest;
+import com.chooz.user.presentation.dto.UpdateUserRequest;
 import com.chooz.user.presentation.dto.UserInfoResponse;
 import com.chooz.user.presentation.dto.UserMyInfoResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -17,11 +23,13 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,10 +55,12 @@ class UserControllerTest extends RestDocsTest {
                 .willReturn(response);
         System.out.println(objectMapper.writeValueAsString(response));
         //when then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/{userId}", "1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/{userId}", "1")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
                         pathParameters(
                                 parameterWithName("userId").description("유저 아이디")
                         ),
@@ -100,10 +110,12 @@ class UserControllerTest extends RestDocsTest {
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/me"))
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/me")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
                         responseFields(
                                 fieldWithPath("id")
                                         .description("유저 아이디")
@@ -129,6 +141,37 @@ class UserControllerTest extends RestDocsTest {
                         )
                 ));
     }
+
+    @Test
+    @WithMockUserInfo
+    @DisplayName("본인 정보 수정")
+    void updateMe() throws Exception {
+        //given
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest(
+                "nickname",
+                "https://cdn.chooz.site/default_profile.png"
+        );
+
+        //when then
+        mockMvc.perform(put("/users/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateUserRequest))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
+                        requestFields(
+                                fieldWithPath("nickname")
+                                        .type(JsonFieldType.STRING)
+                                        .description("닉네임")
+                                        .attributes(constraints("1~15자 사이")),
+                                fieldWithPath("imageUrl")
+                                        .type(JsonFieldType.STRING)
+                                        .description("이미지 경로")
+                        )
+                ));
+    }
+
     @Test
     @WithMockUserInfo
     @DisplayName("온보딩 수행")
@@ -160,10 +203,12 @@ class UserControllerTest extends RestDocsTest {
         // when & then
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/users/onboarding")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
                         requestFields(
                                 fieldWithPath("onboardingStep")
                                         .description("온보딩 단계")
