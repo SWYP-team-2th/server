@@ -153,14 +153,14 @@ class VoteValidatorTest {
 
     @Test
     @DisplayName("validateVoteStatusAccess - 작성자가 아니고 투표하지 않은 사용자는 투표 현황 조회 불가")
-    void validateVoteStatusAccess_notAuthorAndNotVoter() {
+    void validateVoteResultAccess_notAuthorAndNotVoter() {
         // given
         Long userId = 999L;
         Post post = PostFixture.createDefaultPost(1L); // 작성자 ID: 1L
         List<Vote> votes = new ArrayList<>();
 
         // when & then
-        assertThatThrownBy(() -> voteValidator.validateVoteStatusAccess(userId, post, votes))
+        assertThatThrownBy(() -> voteValidator.validateVoteResultAccess(userId, post, votes))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.ACCESS_DENIED_VOTE_STATUS.getMessage());
     }

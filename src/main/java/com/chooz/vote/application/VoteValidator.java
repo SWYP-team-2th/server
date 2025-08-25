@@ -74,7 +74,7 @@ public class VoteValidator {
         }
     }
 
-    public void validateVoteStatusAccess(Long userId, Post post, List<Vote> totalVoteList) {
+    public void validateVoteResultAccess(Long userId, Post post, List<Vote> totalVoteList) {
         if (post.isClosed()) {
             return;
         }

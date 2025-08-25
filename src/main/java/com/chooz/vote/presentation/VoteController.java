@@ -1,14 +1,13 @@
 package com.chooz.vote.presentation;
 
 import com.chooz.auth.domain.UserInfo;
-import com.chooz.vote.presentation.dto.VoteStatusResponse;
+import com.chooz.vote.presentation.dto.VoteResultResponse;
 import com.chooz.vote.application.VoteService;
 import com.chooz.vote.presentation.dto.VoteRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,11 +31,11 @@ public class VoteController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/posts/{postId}/votes/status")
-    public ResponseEntity<List<VoteStatusResponse>> findVoteStatus(
+    @GetMapping("/posts/{postId}/votes/result")
+    public ResponseEntity<List<VoteResultResponse>> findVoteResult(
             @PathVariable("postId") Long postId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        return ResponseEntity.ok(voteService.findVoteStatus(userInfo.userId(), postId));
+        return ResponseEntity.ok(voteService.findVoteResult(userInfo.userId(), postId));
     }
 }

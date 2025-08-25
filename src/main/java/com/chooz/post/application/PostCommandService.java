@@ -105,7 +105,7 @@ public class PostCommandService {
                         request.pollOption().scope(),
                         request.pollOption().commentActive()
                 ),
-                new CloseOption( // 수정 예정
+                new CloseOption(
                         request.closeOption().closeType(),
                         request.closeOption().closedAt(),
                         request.closeOption().maxVoterCount()

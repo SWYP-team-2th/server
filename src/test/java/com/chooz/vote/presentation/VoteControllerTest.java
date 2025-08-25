@@ -1,6 +1,6 @@
 package com.chooz.vote.presentation;
 
-import com.chooz.vote.presentation.dto.VoteStatusResponse;
+import com.chooz.vote.presentation.dto.VoteResultResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
 import com.chooz.vote.presentation.dto.VoteRequest;
@@ -61,17 +61,17 @@ class VoteControllerTest extends RestDocsTest {
     @Test
     @WithMockUserInfo
     @DisplayName("게시글 투표 상태 조회")
-    void findVoteStatus() throws Exception {
+    void findVoteResult() throws Exception {
         //given
         var response = List.of(
-                new VoteStatusResponse(1L, "title1", "http://example.com/image/1", 2, "66.7"),
-                new VoteStatusResponse(2L, "title2", "http://example.com/image/2", 1, "33.3")
+                new VoteResultResponse(1L, "title1", "http://example.com/image/1", 2, "66.7"),
+                new VoteResultResponse(2L, "title2", "http://example.com/image/2", 1, "33.3")
         );
-        given(voteService.findVoteStatus(1L, 1L))
+        given(voteService.findVoteResult(1L, 1L))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}/votes/status", 1)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}/votes/result", 1)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))

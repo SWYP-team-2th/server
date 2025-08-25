@@ -10,12 +10,13 @@ import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
+import com.chooz.post.presentation.UpdatePostResponse;
 import com.chooz.post.presentation.dto.AuthorDto;
 import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MostVotedPollChoiceDto;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
-import com.chooz.post.presentation.dto.PollChoiceResponse;
+import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
@@ -70,18 +71,18 @@ public class PostQueryService {
                 .distinct()
                 .count();
         boolean isAuthor = post.getUserId().equals(userId);
-        List<PollChoiceResponse> pollChoiceResponseList = createPollChoiceResponse(
+        List<PollChoiceVoteResponse> pollChoiceVoteResponseList = createPollChoiceResponse(
                 userId,
                 post.getPollChoices(),
                 voteList
         );
 
-        return PostResponse.of(post, author, pollChoiceResponseList, isAuthor, commentCount, voterCount);
+        return PostResponse.of(post, author, pollChoiceVoteResponseList, isAuthor, commentCount, voterCount);
     }
 
-    private List<PollChoiceResponse> createPollChoiceResponse(Long userId, List<PollChoice> pollChoices, List<Vote> voteList) {
+    private List<PollChoiceVoteResponse> createPollChoiceResponse(Long userId, List<PollChoice> pollChoices, List<Vote> voteList) {
         return pollChoices.stream()
-                .map(pollChoice -> new PollChoiceResponse(
+                .map(pollChoice -> new PollChoiceVoteResponse(
                         pollChoice.getId(),
                         pollChoice.getTitle(),
                         pollChoice.getImageUrl(),
@@ -176,5 +177,12 @@ public class PostQueryService {
         AuthorDto author = new AuthorDto(feedDto.postUserId(), feedDto.nickname(), feedDto.profileUrl());
         boolean isAuthor = feedDto.postUserId().equals(userId);
         return FeedResponse.of(feedDto, author, isAuthor);
+    }
+
+    public UpdatePostResponse findUpdatePost(Long userId, Long postId) {
+        Post post = postRepository.findByIdAndUserId(postId, userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+
+        return UpdatePostResponse.of(post);
     }
 }

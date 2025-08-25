@@ -33,4 +33,5 @@ public interface PostRepository {
     Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long postId, Pageable pageable);
 
     Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable);
+
 }

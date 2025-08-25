@@ -15,6 +15,7 @@ import com.chooz.post.presentation.dto.MostVotedPollChoiceDto;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceRequestDto;
 import com.chooz.post.presentation.dto.PollChoiceResponse;
+import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PollOptionDto;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
@@ -43,6 +44,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -147,13 +149,13 @@ class PostControllerTest extends RestDocsTest {
                         "https://image.chooz.site/profile-image"
                 ),
                 List.of(
-                        new PollChoiceResponse(1L, "title1", "https://image.chooz.site/image/1", 1L),
-                        new PollChoiceResponse(2L, "title2", "https://image.chooz.site/image/2", null)
+                        new PollChoiceVoteResponse(1L, "title1", "https://image.chooz.site/image/1", 1L),
+                        new PollChoiceVoteResponse(2L, "title2", "https://image.chooz.site/image/2", null)
                 ),
                 "https://chooz.site/shareurl",
                 true,
                 Status.PROGRESS,
-                new PostResponse.PollOptionDto(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
                 new CloseOptionDto(CloseType.SELF, null, null),
                 0L,
                 1L,
@@ -216,13 +218,13 @@ class PostControllerTest extends RestDocsTest {
                         "https://image.chooz.site/profile-image"
                 ),
                 List.of(
-                        new PollChoiceResponse(1L, "title1", "https://image.chooz.site/image/1", 1L),
-                        new PollChoiceResponse(2L, "title2", "https://image.chooz.site/image/2", null)
+                        new PollChoiceVoteResponse(1L, "title1", "https://image.chooz.site/image/1", 1L),
+                        new PollChoiceVoteResponse(2L, "title2", "https://image.chooz.site/image/2", null)
                 ),
                 "https://chooz.site/shareurl",
                 true,
                 Status.PROGRESS,
-                new PostResponse.PollOptionDto(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
                 new CloseOptionDto(CloseType.SELF, null, null),
                 0L,
                 1L,
@@ -502,12 +504,13 @@ class PostControllerTest extends RestDocsTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "title",
                 "description",
-                new CloseOptionDto(CloseType.SELF, null, null),
-                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN)
+                List.of(),
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.SELF, null, null)
         );
 
         //when then
-        mockMvc.perform(post("/posts/{postId}/update", 1)
+        mockMvc.perform(put("/posts/{postId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
@@ -526,6 +529,10 @@ class PostControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.STRING)
                                         .description("설명")
                                         .attributes(constraints("0~100자 사이")),
+                                fieldWithPath("pollChoices")
+                                        .type(JsonFieldType.ARRAY)
+                                        .description("투표 선택지")
+                                        .attributes(constraints("최소 2개 최대 10개")),
                                 fieldWithPath("pollOption")
                                         .type(JsonFieldType.OBJECT)
                                         .description("투표 옵션"),
@@ -552,6 +559,60 @@ class PostControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.NUMBER)
                                         .optional()
                                         .description("투표 최대 참여자 수 (1 or 현재 투표 참여자 수 < maxVoterCount < 999)")
+                        )
+                ));
+    }
+
+    @Test
+    @WithMockUserInfo
+    @DisplayName("게시글 수정 조회")
+    void findPost_update() throws Exception {
+        UpdatePostResponse response = new UpdatePostResponse(
+                1L,
+                "title",
+                "description",
+                List.of(
+                        new PollChoiceResponse(1L, "title1", "https://image.chooz.site/image/1"),
+                        new PollChoiceResponse(2L, "title2", "https://image.chooz.site/image/2")
+                ),
+                "https://chooz.site/shareurl",
+                Status.PROGRESS,
+                new PollOptionDto(Scope.PUBLIC, PollType.SINGLE, CommentActive.OPEN),
+                new CloseOptionDto(CloseType.SELF, null, null),
+                LocalDateTime.of(2025, 2, 13, 12, 0)
+        );
+        //given
+        given(postService.findUpdatePost(any(), any()))
+                .willReturn(response);
+
+        //when then
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}/update", "1")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("postId").description("게시글 Id")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 Id"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("게시글 설명"),
+                                fieldWithPath("pollChoices[]").type(JsonFieldType.ARRAY).description("투표 선택지 목록"),
+                                fieldWithPath("pollChoices[].id").type(JsonFieldType.NUMBER).description("투표 선택지 Id"),
+                                fieldWithPath("pollChoices[].title").type(JsonFieldType.STRING).description("사진 이름"),
+                                fieldWithPath("pollChoices[].imageUrl").type(JsonFieldType.STRING).description("사진 이미지"),
+                                fieldWithPath("shareUrl").type(JsonFieldType.STRING).description("게시글 공유 URL"),
+                                fieldWithPath("pollOption").type(JsonFieldType.OBJECT).description("투표 설정"),
+                                fieldWithPath("pollOption.pollType").type(JsonFieldType.STRING).description(enumDescription("단일/복수 투표", PollType.class)),
+                                fieldWithPath("pollOption.scope").type(JsonFieldType.STRING).description(enumDescription("공개 여부", Scope.class)),
+                                fieldWithPath("pollOption.commentActive").type(JsonFieldType.STRING).description(enumDescription("댓글 활성화 여부", CommentActive.class)),
+                                fieldWithPath("closeOption").type(JsonFieldType.OBJECT).description("마감 설정"),
+                                fieldWithPath("closeOption.closeType").type(JsonFieldType.STRING).description(enumDescription("마감 방식", CloseType.class)),
+                                fieldWithPath("closeOption.closedAt").type(JsonFieldType.STRING).optional().description("마감 시간, (closeType이 DATE일 경우 NN)"),
+                                fieldWithPath("closeOption.maxVoterCount").type(JsonFieldType.NUMBER).optional().description("남은 투표 참여자 수 (closeType이 VOTER_COUNT일 경우 NN)"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("게시글 마감 여부 (PROGRESS, CLOSED)"),
+                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("게시글 작성 시간")
                         )
                 ));
     }
