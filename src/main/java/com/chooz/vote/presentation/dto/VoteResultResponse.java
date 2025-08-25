@@ -1,6 +1,6 @@
 package com.chooz.vote.presentation.dto;
 
-public record VoteStatusResponse(
+public record VoteResultResponse(
         Long id,
         String title,
         String imageUrl,
