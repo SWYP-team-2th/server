@@ -12,19 +12,13 @@ import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -293,7 +287,7 @@ class VoteServiceTest extends IntegrationTest {
 
     @Test
     @DisplayName("투표 현황 조회")
-    void findVoteStatus() {
+    void findVoteResult() {
         //given
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
@@ -301,7 +295,7 @@ class VoteServiceTest extends IntegrationTest {
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(voteIndex).getId()));
 
         //when
-        var response = voteService.findVoteStatus(user.getId(), post.getId());
+        var response = voteService.findVoteResult(user.getId(), post.getId());
 
         //then
         assertAll(
@@ -328,7 +322,7 @@ class VoteServiceTest extends IntegrationTest {
         voteRepository.save(VoteFixture.createDefaultVote(voter.getId(), post.getId(), post.getPollChoices().getFirst().getId()));
 
         //when
-        var response = voteService.findVoteStatus(voter.getId(), post.getId());
+        var response = voteService.findVoteResult(voter.getId(), post.getId());
 
         //then
         assertThat(response).isNotNull();
@@ -336,13 +330,13 @@ class VoteServiceTest extends IntegrationTest {
 
     @Test
     @DisplayName("투표 현황 조회 - 작성자 아니고 투표 안 한 사람인 경우")
-    void findVoteStatus_notAuthorAndVoter() {
+    void findVoteResult_notAuthorAndVoter() {
         //given
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
 
         //when
-        assertThatThrownBy(() -> voteService.findVoteStatus(2L, post.getId()))
+        assertThatThrownBy(() -> voteService.findVoteResult(2L, post.getId()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.ACCESS_DENIED_VOTE_STATUS.getMessage());
     }

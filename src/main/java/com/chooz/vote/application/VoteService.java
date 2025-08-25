@@ -7,7 +7,7 @@ import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
-import com.chooz.vote.presentation.dto.VoteStatusResponse;
+import com.chooz.vote.presentation.dto.VoteResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +23,7 @@ public class VoteService {
     private final PostRepository postRepository;
     private final EventPublisher eventPublisher;
     private final VoteValidator voteValidator;
-    private final VoteStatusReader voteStatusReader;
+    private final VoteResultReader voteResultReader;
     private final VoteWriter voteWriter;
 
     @Transactional
@@ -40,12 +40,12 @@ public class VoteService {
         return voteIds;
     }
 
-    public List<VoteStatusResponse> findVoteStatus(Long userId, Long postId) {
+    public List<VoteResultResponse> findVoteResult(Long userId, Long postId) {
         Post post = postRepository.findByIdFetchPollChoices(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         List<Vote> totalVoteList = voteRepository.findAllByPostId(postId);
-        voteValidator.validateVoteStatusAccess(userId, post, totalVoteList);
+        voteValidator.validateVoteResultAccess(userId, post, totalVoteList);
 
-        return voteStatusReader.getVoteStatus(totalVoteList, post);
+        return voteResultReader.getVoteResult(totalVoteList, post);
     }
 }
