@@ -74,4 +74,9 @@ public class PostRepositoryImpl implements PostRepository {
     public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable) {
         return postQueryDslRepository.findVotedPostsWithVoteCount(userId, postId, pageable);
     }
+
+    @Override
+    public Optional<Post> findByIdAndUserId(Long postId, Long userId) {
+        return postJpaRepository.findByIdAndUserIdAndDeletedFalse(postId, userId);
+    }
 }

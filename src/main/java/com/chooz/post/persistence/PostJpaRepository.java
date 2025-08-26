@@ -90,4 +90,6 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
             @Param("postId") Long postId,
             Pageable pageable
     );
+
+    Optional<Post> findByIdAndUserIdAndDeletedFalse(Long postId, Long userId);
 }
