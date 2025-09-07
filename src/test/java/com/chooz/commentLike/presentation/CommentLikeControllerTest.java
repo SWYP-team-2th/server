@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -47,7 +46,7 @@ class CommentLikeControllerTest extends RestDocsTest {
                                         .description("댓글좋아요 ID"),
                                 fieldWithPath("likeCount")
                                         .type(JsonFieldType.NUMBER)
-                                        .description("댓글좋아요 ID")
+                                        .description("댓글좋아요 수")
                         )
                 ));
     }
@@ -58,7 +57,7 @@ class CommentLikeControllerTest extends RestDocsTest {
     void deleteCommentLike() throws Exception {
         //given
         CommentLikeIdResponse commentLikeIdResponse =
-                new CommentLikeIdResponse(commentLikeId, 10);
+                new CommentLikeIdResponse(null, 10);
         given(commentLikeService.deleteCommentLike(commentId, commentLikeId, userId))
                 .willReturn(commentLikeIdResponse);
         //when then
@@ -73,10 +72,11 @@ class CommentLikeControllerTest extends RestDocsTest {
                         responseFields(
                                 fieldWithPath("commentLikeId")
                                         .type(JsonFieldType.NUMBER)
-                                        .description("댓글좋아요 ID"),
+                                        .description("댓글좋아요 ID")
+                                        .optional(),
                                 fieldWithPath("likeCount")
                                         .type(JsonFieldType.NUMBER)
-                                        .description("댓글좋아요 ID")
+                                        .description("댓글좋아요 수")
                         )
                 ));
     }
