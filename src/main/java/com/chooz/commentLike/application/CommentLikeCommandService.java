@@ -22,16 +22,24 @@ public class CommentLikeCommandService {
         if(commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)){
             throw new BadRequestException(ErrorCode.COMMENT_LIKE_NOT_FOUND);
         }
-        return new CommentLikeIdResponse(commentLikeRepository.save(CommentLike.create(commentId, userId)).getId());
+
+        return new CommentLikeIdResponse(
+                commentLikeRepository.save(CommentLike.create(commentId, userId)).getId(),
+                commentLikeRepository.countByCommentId(commentId)
+        );
     }
 
-    public void deleteCommentLike(Long commentLikeId, Long userId) {
+    public CommentLikeIdResponse deleteCommentLike(Long commentId, Long commentLikeId, Long userId) {
         CommentLike commentLike = commentLikeRepository.findById(commentLikeId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_LIKE_NOT_FOUND));
         if(!commentLike.getUserId().equals(userId)){
             throw new BadRequestException(ErrorCode.NOT_COMMENT_LIKE_AUTHOR);
         }
         commentLikeRepository.delete(commentLike);
+        return new CommentLikeIdResponse(
+                null,
+                commentLikeRepository.countByCommentId(commentId)
+        );
     }
 
     public void deleteCommentLikeByCommentId(Long commentId) {

@@ -20,7 +20,7 @@ public class CommentLikeService {
     }
 
     @Transactional
-    public void deleteCommentLike(Long commentLikeId, Long userId) {
-        commentLikeCommandService.deleteCommentLike(commentLikeId, userId);
+    public CommentLikeIdResponse deleteCommentLike(Long commentId, Long commentLikeId, Long userId) {
+        return commentLikeCommandService.deleteCommentLike(commentId, commentLikeId, userId);
     }
 }

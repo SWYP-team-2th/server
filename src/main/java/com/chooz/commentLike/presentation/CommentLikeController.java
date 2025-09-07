@@ -25,12 +25,12 @@ public class CommentLikeController {
         return ResponseEntity.ok(commentLikeService.createCommentLike(commentId, userInfo.userId()));
     }
 
-    @DeleteMapping("/{commentLikeId}")
-    public ResponseEntity<Void> deleteCommentLike(
+    @DeleteMapping("/{commentId}/{commentLikeId}")
+    public ResponseEntity<CommentLikeIdResponse> deleteCommentLike(
+            @PathVariable("commentId") Long commentId,
             @PathVariable("commentLikeId") Long commentLikeId,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
-        commentLikeService.deleteCommentLike(commentLikeId, userInfo.userId());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(commentLikeService.deleteCommentLike(commentId, commentLikeId, userInfo.userId()));
     }
 }
