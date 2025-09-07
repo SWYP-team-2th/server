@@ -34,6 +34,8 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
     void createCommentLike() {
         //given, when
         CommentLike commentLike = createAndGetSavedCommentLike();
+        int count = commentLikeRepository.countByCommentId(commentLike.getCommentId());
+
         //then
         assertThat(commentLike).isNotNull();
     }
@@ -46,7 +48,7 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
 
         // when
         commentLikeService.deleteCommentLike(commentLike.getCommentId(),commentLike.getId(), commentLike.getUserId());
-
+        int count = commentLikeRepository.countByCommentId(commentLike.getCommentId());
         // then
         assertThat(commentLikeRepository.existsById(commentLike.getId())).isFalse();
     }
