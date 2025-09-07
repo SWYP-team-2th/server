@@ -29,7 +29,8 @@ class CommentLikeControllerTest extends RestDocsTest {
     @DisplayName("댓글 좋아요 생성")
     void createCommentLike() throws Exception {
         //given
-        CommentLikeIdResponse commentLikeIdResponse = new CommentLikeIdResponse(commentLikeId);
+        CommentLikeIdResponse commentLikeIdResponse =
+                new CommentLikeIdResponse(commentLikeId, 11);
         given(commentLikeService.createCommentLike(commentId, userId))
                 .willReturn(commentLikeIdResponse);
 
@@ -43,6 +44,9 @@ class CommentLikeControllerTest extends RestDocsTest {
                         responseFields(
                                 fieldWithPath("commentLikeId")
                                         .type(JsonFieldType.NUMBER)
+                                        .description("댓글좋아요 ID"),
+                                fieldWithPath("likeCount")
+                                        .type(JsonFieldType.NUMBER)
                                         .description("댓글좋아요 ID")
                         )
                 ));
@@ -52,16 +56,27 @@ class CommentLikeControllerTest extends RestDocsTest {
     @WithMockUserInfo
     @DisplayName("댓글 좋아요 삭제")
     void deleteCommentLike() throws Exception {
-        //when
-        doNothing().when(commentLikeService).deleteCommentLike(commentLikeId, userId);
         //given
-        mockMvc.perform(delete("/comment-likes/{commentLikeId}", commentLikeId)
+        CommentLikeIdResponse commentLikeIdResponse =
+                new CommentLikeIdResponse(commentLikeId, 10);
+        given(commentLikeService.deleteCommentLike(commentId, commentLikeId, userId))
+                .willReturn(commentLikeIdResponse);
+        //when then
+        mockMvc.perform(delete("/comment-likes/{commentId}/{commentLikeId}", commentId, commentLikeId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         requestHeaders(authorizationHeader()),
                         pathParameters(
-                                parameterWithName("commentLikeId").description("댓글 좋아요 ID")
+                                parameterWithName("commentId").description("댓글 ID"),
+                                parameterWithName("commentLikeId").description("댓글 좋아요 ID")),
+                        responseFields(
+                                fieldWithPath("commentLikeId")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("댓글좋아요 ID"),
+                                fieldWithPath("likeCount")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("댓글좋아요 ID")
                         )
                 ));
     }
