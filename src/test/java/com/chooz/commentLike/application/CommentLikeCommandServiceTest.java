@@ -45,7 +45,7 @@ class CommentLikeCommandServiceTest extends IntegrationTest {
         CommentLike commentLike = createAndGetSavedCommentLike();
 
         // when
-        commentLikeService.deleteCommentLike(commentLike.getId(), commentLike.getUserId());
+        commentLikeService.deleteCommentLike(commentLike.getCommentId(),commentLike.getId(), commentLike.getUserId());
 
         // then
         assertThat(commentLikeRepository.existsById(commentLike.getId())).isFalse();
