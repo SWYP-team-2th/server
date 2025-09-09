@@ -14,7 +14,7 @@ operation::user-controller-test/find-me[snippets='http-request,curl-request,requ
 [[본인-정보-조회]]
 === `PUT` 내 정보 수정
 
-operation::user-controller-test/find-me[snippets='http-request,curl-request,request-headers,http-response']
+operation::user-controller-test/find-me[snippets='http-request,curl-request,request-headers,request-fields,http-response']
 
 [[온보딩-단계-완료]]
 === `PATCH` 온보딩 단계 완료
