@@ -29,14 +29,14 @@ public class ApplicationControllerAdvice {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handle(BadRequestException e) {
-        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        ErrorResponse response = ErrorResponse.of(e.getErrorCode());
         return ResponseEntity.badRequest()
                 .body(response);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handle(UnauthorizedException e) {
-        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        ErrorResponse response = ErrorResponse.of(e.getErrorCode());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(response);
     }
@@ -50,7 +50,7 @@ public class ApplicationControllerAdvice {
     public ResponseEntity<ErrorResponse> invalidArgument(Exception e) {
         log.debug("invalidArgument: {}", e.getMessage());
         return ResponseEntity.badRequest()
-                .body(new ErrorResponse(ErrorCode.INVALID_ARGUMENT));
+                .body(ErrorResponse.of(ErrorCode.INVALID_ARGUMENT));
     }
 
     @ExceptionHandler({
@@ -61,19 +61,19 @@ public class ApplicationControllerAdvice {
     public ResponseEntity<ErrorResponse> notFound(Exception e) {
         log.debug("notFound: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(ErrorCode.NOT_FOUND));
+                .body(ErrorResponse.of(ErrorCode.NOT_FOUND));
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handle(AuthenticationException e) {
         log.debug(e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ErrorCode.INVALID_TOKEN));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(ErrorCode.INVALID_TOKEN));
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handle(ForbiddenException e) {
         log.debug(e.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(ErrorCode.FORBIDDEN));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponse.of(ErrorCode.FORBIDDEN));
     }
 
     @ExceptionHandler(Exception.class)
@@ -83,6 +83,6 @@ public class ApplicationControllerAdvice {
             discordMessageSender.sendDiscordAlarm(e, webRequest);
         }
         return ResponseEntity.internalServerError()
-                .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
+                .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }
