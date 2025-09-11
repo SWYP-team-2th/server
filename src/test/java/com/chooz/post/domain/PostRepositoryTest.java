@@ -1,7 +1,7 @@
 package com.chooz.post.domain;
 
 import com.chooz.post.application.dto.PostWithVoteCount;
-import com.chooz.post.presentation.dto.FeedDto;
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.support.RepositoryTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
@@ -9,8 +9,6 @@ import com.chooz.support.fixture.VoteFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.VoteRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +18,6 @@ import org.springframework.data.domain.Slice;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
 import static com.chooz.support.fixture.PostFixture.createPostBuilder;
@@ -43,14 +39,14 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("유저가 작성한 게시글 조회 - 게시글이 15개일 경우 15번쨰부터 10개 조회해야 함")
-    void findByUserId1() throws Exception {
+    void findAllByUserId1() throws Exception {
         //given
         long userId = 1L;
         List<Post> posts = createPosts(userId, 15);
         int size = 10;
 
         //when
-        Slice<Post> res = postRepository.findByUserId(userId, null, PageRequest.ofSize(size));
+        Slice<Post> res = postRepository.findAllByUserId(userId, null, PageRequest.ofSize(size));
 
         //then
         assertAll(
@@ -64,7 +60,7 @@ class PostRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("유저가 작성한 게시글 조회 - 15개 중에 커서가 5번째 게시글의 id면 4번째부터 0번째까지 조회해야 함")
-    void findByUserId2() throws Exception {
+    void findAllByUserId2() throws Exception {
         //given
         long userId = 1L;
         List<Post> posts = createPosts(userId, 15);
@@ -72,7 +68,7 @@ class PostRepositoryTest extends RepositoryTest {
         int cursorIndex = 5;
 
         //when
-        Slice<Post> res = postRepository.findByUserId(userId, posts.get(cursorIndex).getId(), PageRequest.ofSize(size));
+        Slice<Post> res = postRepository.findAllByUserId(userId, posts.get(cursorIndex).getId(), PageRequest.ofSize(size));
 
         //then
         assertAll(
@@ -81,26 +77,6 @@ class PostRepositoryTest extends RepositoryTest {
                 () -> assertThat(res.getContent().get(1).getId()).isEqualTo(posts.get(cursorIndex - 2).getId()),
                 () -> assertThat(res.getContent().get(2).getId()).isEqualTo(posts.get(cursorIndex - 3).getId()),
                 () -> assertThat(res.hasNext()).isFalse()
-        );
-    }
-
-    @Test
-    @DisplayName("id 리스트에 포함되는 게시글 조회")
-    void findByIdIn() throws Exception {
-        //given
-        List<Post> posts = createPosts(1L, 15);
-        List<Long> postIds = List.of(posts.get(0).getId(), posts.get(1).getId(), posts.get(2).getId());
-
-        //when
-        Slice<Post> postSlice = postRepository.findByIdIn(postIds, null, PageRequest.ofSize(10));
-
-        //then
-        assertAll(
-                () -> assertThat(postSlice.getContent().size()).isEqualTo(postIds.size()),
-                () -> assertThat(postSlice.getContent().get(0).getId()).isEqualTo(postIds.get(2)),
-                () -> assertThat(postSlice.getContent().get(1).getId()).isEqualTo(postIds.get(1)),
-                () -> assertThat(postSlice.getContent().get(2).getId()).isEqualTo(postIds.get(0)),
-                () -> assertThat(postSlice.hasNext()).isFalse()
         );
     }
 
@@ -116,7 +92,7 @@ class PostRepositoryTest extends RepositoryTest {
         int size = 10;
 
         //when
-        Slice<FeedDto> res = postRepository.findFeedByScopeWithUser(1L, null, PageRequest.ofSize(size));
+        Slice<FeedDto> res = postRepository.findFeed(null, PageRequest.ofSize(size));
 
         //then
         assertAll(

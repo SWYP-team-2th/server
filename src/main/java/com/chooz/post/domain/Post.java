@@ -215,4 +215,11 @@ public class Post extends BaseEntity {
         this.pollOption = pollOption;
         this.closeOption = closeOption;
     }
+
+    public void delete(Long userId) {
+        if (!isAuthor(userId)) {
+            throw new BadRequestException(ErrorCode.NOT_POST_AUTHOR);
+        }
+        this.delete();
+    }
 }

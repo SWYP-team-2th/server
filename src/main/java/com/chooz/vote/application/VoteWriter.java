@@ -1,5 +1,6 @@
 package com.chooz.vote.application;
 
+import com.chooz.common.domain.BaseEntity;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +29,9 @@ public class VoteWriter {
     }
 
     private void deleteUnselectedVotes(List<Long> pollChoiceIds, List<Vote> existingVotes) {
-        List<Vote> voteToDelete = existingVotes.stream()
+        existingVotes.stream()
                 .filter(existingVote -> isUnselectedVote(pollChoiceIds, existingVote))
-                .toList();
-        voteRepository.deleteAll(voteToDelete);
+                .forEach(BaseEntity::delete);
     }
 
     private boolean isUnselectedVote(List<Long> pollChoiceIds, Vote existingVote) {

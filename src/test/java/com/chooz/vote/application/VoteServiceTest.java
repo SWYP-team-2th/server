@@ -11,7 +11,7 @@ import com.chooz.support.fixture.VoteFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
-import com.chooz.vote.domain.VoteRepository;
+import com.chooz.vote.persistence.VoteJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ class VoteServiceTest extends IntegrationTest {
     UserRepository userRepository;
 
     @Autowired
-    VoteRepository voteRepository;
+    VoteJpaRepository voteRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -113,7 +113,7 @@ class VoteServiceTest extends IntegrationTest {
         voteService.vote(user.getId(), post.getId(), List.of());
 
         // then
-        List<Vote> votes = voteRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        List<Vote> votes = voteRepository.findByUserIdAndPostIdAndDeletedFalse(user.getId(), post.getId());
         assertThat(votes).isEmpty();
     }
 
@@ -137,7 +137,7 @@ class VoteServiceTest extends IntegrationTest {
         List<Long> voteIds = voteService.vote(user.getId(), post.getId(), choiceIds);
 
         // then
-        List<Vote> votes = voteRepository.findAllByPostId(post.getId());
+        List<Vote> votes = voteRepository.findAllByPostIdAndDeletedFalse(post.getId());
         assertThat(votes).hasSize(2);
         assertThat(votes).allMatch(v -> v.getUserId().equals(user.getId()));
         assertThat(votes).extracting(Vote::getPollChoiceId)
@@ -171,7 +171,7 @@ class VoteServiceTest extends IntegrationTest {
         List<Long> voteIds = voteService.vote(user.getId(), post.getId(), List.of(second, third));
 
         // then
-        List<Vote> votes = voteRepository.findAllByPostId(post.getId());
+        List<Vote> votes = voteRepository.findAllByPostIdAndDeletedFalse(post.getId());
         assertThat(votes).hasSize(2);
         assertThat(votes).allMatch(v -> v.getUserId().equals(user.getId()));
         assertThat(votes).extracting(Vote::getPollChoiceId)
@@ -281,7 +281,7 @@ class VoteServiceTest extends IntegrationTest {
         voteService.vote(user.getId(), post.getId(), List.of());
 
         // then
-        List<Vote> votes = voteRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        List<Vote> votes = voteRepository.findByUserIdAndPostIdAndDeletedFalse(user.getId(), post.getId());
         assertThat(votes).isEmpty();
     }
 

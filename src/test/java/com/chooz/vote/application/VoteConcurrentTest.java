@@ -2,17 +2,17 @@ package com.chooz.vote.application;
 
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
+import com.chooz.post.persistence.PostJpaRepository;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
-import com.chooz.vote.domain.VoteRepository;
+import com.chooz.vote.persistence.VoteJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -35,10 +35,10 @@ class VoteConcurrentTest {
     UserRepository userRepository;
 
     @Autowired
-    VoteRepository voteRepository;
+    VoteJpaRepository voteRepository;
 
     @Autowired
-    PostRepository postRepository;
+    PostJpaRepository postRepository;
 
     @AfterEach
     void setUp() {
@@ -85,7 +85,7 @@ class VoteConcurrentTest {
         latch.await();
 
         // then
-        List<Vote> voteList = voteRepository.findAllByPostId(post.getId());
+        List<Vote> voteList = voteRepository.findAllByPostIdAndDeletedFalse(post.getId());
         assertThat(voteList).hasSize(maxVoterCount);
     }
 }

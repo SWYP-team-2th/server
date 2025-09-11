@@ -7,19 +7,15 @@ import com.chooz.support.fixture.UserFixture;
 import com.chooz.support.fixture.VoteFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
-import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PollChoiceRepositoryTest extends RepositoryTest {
 
