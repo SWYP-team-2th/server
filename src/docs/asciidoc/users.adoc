@@ -11,7 +11,7 @@ operation::user-controller-test/find-user-info[snippets='http-request,curl-reque
 
 operation::user-controller-test/find-me[snippets='http-request,curl-request,request-headers,http-response,response-fields']
 
-[[본인-정보-조회]]
+[[본인-정보-수정]]
 === `PUT` 내 정보 수정
 
 operation::user-controller-test/update-me[snippets='http-request,curl-request,request-headers,request-fields,http-response']

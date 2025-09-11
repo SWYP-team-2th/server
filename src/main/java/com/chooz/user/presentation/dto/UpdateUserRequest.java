@@ -6,6 +6,6 @@ public record UpdateUserRequest(
         @NotBlank
         String nickname,
 
-        String imageUrl
+        String profileImageUrl
 ) {}
 

@@ -40,7 +40,7 @@ public class UserService {
     public void updateUser(Long userId, UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        user.update(updateUserRequest.nickname(), updateUserRequest.imageUrl());
+        user.update(updateUserRequest.nickname(), updateUserRequest.profileImageUrl());
     }
 
     @Transactional(readOnly = true)

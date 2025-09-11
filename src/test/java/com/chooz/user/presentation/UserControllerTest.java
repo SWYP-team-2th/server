@@ -165,9 +165,9 @@ class UserControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.STRING)
                                         .description("닉네임")
                                         .attributes(constraints("1~15자 사이")),
-                                fieldWithPath("imageUrl")
+                                fieldWithPath("profileImageUrl")
                                         .type(JsonFieldType.STRING)
-                                        .description("이미지 경로")
+                                        .description("프로필 이미지 경로")
                         )
                 ));
     }
