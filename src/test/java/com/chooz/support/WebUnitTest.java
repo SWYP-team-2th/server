@@ -1,6 +1,7 @@
 package com.chooz.support;
 
 import com.chooz.image.application.ImageService;
+import com.chooz.notification.application.NotificationQueryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.chooz.auth.application.AuthService;
 import com.chooz.auth.presentation.RefreshTokenCookieGenerator;
@@ -10,7 +11,6 @@ import com.chooz.common.exception.DiscordMessageSender;
 import com.chooz.post.application.PostService;
 import com.chooz.user.application.UserService;
 import com.chooz.vote.application.VoteService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -53,4 +53,7 @@ public abstract class WebUnitTest {
 
     @MockitoBean
     protected DiscordMessageSender discordMessageSender;
+
+    @MockitoBean
+    protected NotificationQueryService notificationQueryService;
 }
