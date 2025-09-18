@@ -110,3 +110,5 @@ include::votes.adoc[]
 include::comments.adoc[]
 
 include::comment-likes.adoc[]
+
+include::notifications.adoc[]
