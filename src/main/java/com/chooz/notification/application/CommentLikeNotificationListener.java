@@ -2,7 +2,6 @@ package com.chooz.notification.application;
 
 import com.chooz.notification.application.dto.CommentLikedContent;
 import com.chooz.notification.domain.Notification;
-import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.domain.event.CommentLikedEvent;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +20,15 @@ public class CommentLikeNotificationListener {
     public void onCommentLiked(CommentLikedEvent e) {
         CommentLikedContent commentLikedContent = notificationContentAssembler.forCommentLiked(e.commentId(), e.likerId());
          Notification.create(
-                commentLikedContent.getCommentAuthorId(),
-                e.likerId(),
-                NotificationType.COMMENT_LIKED,
-                TargetType.COMMENT,
-                e.commentId(),
-                commentLikedContent.getTitle(),
-                commentLikedContent.getBody(),
-                commentLikedContent.getThumbnailUrl(),
-                commentLikedContent.getProfileImageUrl(),
-                e.eventAt()
+                 commentLikedContent.getCommentAuthorId(),
+                 commentLikedContent.getCommentAuthorName(),
+                 e.likerId(),
+                 commentLikedContent.getActorName(),
+                 commentLikedContent.getActorProfileImageUrl(),
+                 e.commentId(),
+                 TargetType.COMMENT,
+                 commentLikedContent.getTargetThumbnailUrl(),
+                 e.eventAt()
         ).ifPresent(notificationCommandService::create);
     }
 }

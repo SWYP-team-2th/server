@@ -1,6 +1,7 @@
 package com.chooz.notification.application;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
+import com.chooz.notification.application.dto.NotificationDto;
 import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationQueryRepository;
 import com.chooz.notification.presentation.dto.NotificationResponse;
@@ -17,8 +18,12 @@ public class NotificationQueryService {
 
     private final NotificationQueryRepository notificationQueryRepository;
 
+//    public CursorBasePaginatedResponse<NotificationResponse> findNotifications(Long userId, Long cursor, int size) {
+//        Slice<Notification> notificationSlice = notificationQueryRepository.findNotifications(userId, cursor, PageRequest.ofSize(size));
+//        return CursorBasePaginatedResponse.of(notificationSlice.map(NotificationResponse::of));
+//    }
     public CursorBasePaginatedResponse<NotificationResponse> findNotifications(Long userId, Long cursor, int size) {
-        Slice<Notification> notificationSlice = notificationQueryRepository.findNotifications(userId, cursor, PageRequest.ofSize(size));
+        Slice<NotificationDto> notificationSlice = notificationQueryRepository.findNotifications(userId, cursor, PageRequest.ofSize(size));
         return CursorBasePaginatedResponse.of(notificationSlice.map(NotificationResponse::of));
     }
 }

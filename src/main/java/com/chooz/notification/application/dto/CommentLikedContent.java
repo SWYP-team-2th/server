@@ -6,15 +6,17 @@ import lombok.Getter;
 public class CommentLikedContent extends NotificationContent {
 
     private final Long commentAuthorId;
+    private final String commentAuthorName;
 
     public CommentLikedContent(
-            String title,
-            String body,
-            String thumbnailUrl,
-            String profileImageUrl,
-            Long commentAuthorId
+            String actorName,
+            String actorProfileImageUrl,
+            String targetThumbnailUrl,
+            Long commentAuthorId,
+            String commentAuthorName
     ) {
-        super(title, body, thumbnailUrl, profileImageUrl);
+        super(actorName, targetThumbnailUrl, actorProfileImageUrl);
         this.commentAuthorId = commentAuthorId;
+        this.commentAuthorName = commentAuthorName;
     }
 }

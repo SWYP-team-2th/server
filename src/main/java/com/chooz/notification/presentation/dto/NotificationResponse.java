@@ -1,40 +1,41 @@
 package com.chooz.notification.presentation.dto;
 
 import com.chooz.common.dto.CursorDto;
+import com.chooz.notification.application.dto.NotificationDto;
+import com.chooz.notification.domain.Actor;
 import com.chooz.notification.domain.Notification;
-import com.chooz.notification.domain.NotificationType;
+import com.chooz.notification.domain.Receiver;
 import com.chooz.notification.domain.Target;
-import com.chooz.notification.domain.TargetType;
 
 import java.time.LocalDateTime;
 
 public record NotificationResponse (
         Long id,
-        Long userId,
-        Long actorId,
-        NotificationType type,
+        Long postId,
+        Receiver receiver,
+        Actor actor,
         Target target,
-        String title,
-        String body,
-        String thumbUrl,
-        String profileImageUrl,
         boolean isRead,
         LocalDateTime eventAt
 )implements CursorDto{
 
-    public static NotificationResponse of (Notification notification){
+    public static NotificationResponse of (NotificationDto notificationDto){
         return new NotificationResponse(
-                notification.getId(),
-                notification.getUserId(),
-                notification.getActorId(),
-                notification.getType(),
-                notification.getTarget(),
-                notification.getTitle(),
-                notification.getBody(),
-                notification.getThumbUrl(),
-                notification.getProfileImageUrl(),
-                notification.isRead(),
-                notification.getEventAt()
+                notificationDto.id(),
+                notificationDto.postId(),
+                new Receiver(notificationDto.receiverId(), notificationDto.receiverNickname()),
+                new Actor(
+                        notificationDto.actorId(),
+                        notificationDto.actorNickname(),
+                        notificationDto.actorProfileUrl()
+                ),
+                new Target(
+                        notificationDto.targetId(),
+                        notificationDto.targetType(),
+                        notificationDto.targetImageUrl()
+                ),
+                notificationDto.isRead(),
+                notificationDto.eventAt()
         );
     }
 

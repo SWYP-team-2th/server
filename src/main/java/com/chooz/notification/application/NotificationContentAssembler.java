@@ -3,10 +3,9 @@ package com.chooz.notification.application;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.notification.application.dto.CommentLikedContent;
-import com.chooz.notification.application.port.PostReadPort;
-import com.chooz.notification.application.port.UserReadPort;
-import com.chooz.notification.application.port.view.PostView;
-import com.chooz.notification.application.port.view.UserView;
+import com.chooz.notification.application.dto.TargetPostDto;
+import com.chooz.notification.application.dto.TargetUserDto;
+import com.chooz.notification.domain.NotificationQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,23 +13,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationContentAssembler {
 
-    private final UserReadPort userReadPort;
-    private final PostReadPort postReadPort;
+    private final NotificationQueryRepository notificationQueryDslRepository;
 
     public CommentLikedContent forCommentLiked(Long commentId, Long likerId) {
-        UserView likerUserView = userReadPort.getUser(likerId)
+        TargetUserDto targetUserDto = notificationQueryDslRepository.getUser(likerId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        UserView commentAuthorView = userReadPort.getUserByCommentId(commentId)
+        TargetUserDto commentAuthorDto = notificationQueryDslRepository.getUserByCommentId(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        PostView postView = postReadPort.getPost(commentId)
+        TargetPostDto targetPostDto = notificationQueryDslRepository.getPost(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
 
         return new CommentLikedContent(
-                likerUserView.nickname() + " 님이 당신의 댓글에 좋아요를 눌렀어요!",
-                "지금 확인해보세요.",
-                postView.imageUrl(),
-                likerUserView.profileUrl(),
-                commentAuthorView.id()
+                targetUserDto.nickname(),
+                targetUserDto.profileUrl(),
+                targetPostDto.imageUrl(),
+                commentAuthorDto.id(),
+                commentAuthorDto.nickname()
         );
     }
 
