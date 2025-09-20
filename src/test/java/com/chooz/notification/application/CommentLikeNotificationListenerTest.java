@@ -3,9 +3,9 @@ package com.chooz.notification.application;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.commentLike.application.CommentLikeService;
+import com.chooz.notification.application.dto.NotificationDto;
 import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationQueryRepository;
-import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
@@ -60,18 +60,19 @@ class CommentLikeNotificationListenerTest extends IntegrationTest {
         TestTransaction.end();
 
         //then
-        Slice<Notification> notificationSlice = notificationQueryRepository.findNotifications(
+        Slice<NotificationDto> notificationSlice = notificationQueryRepository.findNotifications(
                 receiver.getId(),
                 null,
-                PageRequest.ofSize(10));
+                PageRequest.ofSize(10)
+        );
 
         assertAll(
                 () -> assertThat(notificationSlice.getContent().size()).isEqualTo(1),
-                () -> assertThat(notificationSlice.getContent().getFirst().getUserId()).isEqualTo(receiver.getId()),
-                () -> assertThat(notificationSlice.getContent().getFirst().getActorId()).isEqualTo(actor.getId()),
-                () -> assertThat(notificationSlice.getContent().getFirst().getTarget().getType()).isEqualTo(TargetType.COMMENT),
-                () -> assertThat(notificationSlice.getContent().getFirst().getTarget().getId()).isEqualTo(comment.getId()),
-                () -> assertThat(notificationSlice.getContent().getFirst().getType()).isEqualTo(NotificationType.COMMENT_LIKED)
+                () -> assertThat(notificationSlice.getContent().getFirst().receiverId()).isEqualTo(receiver.getId()),
+                () -> assertThat(notificationSlice.getContent().getFirst().actorId()).isEqualTo(actor.getId()),
+                () -> assertThat(notificationSlice.getContent().getFirst().targetType()).isEqualTo(TargetType.COMMENT),
+                () -> assertThat(notificationSlice.getContent().getFirst().targetId()).isEqualTo(comment.getId()),
+                () -> assertThat(notificationSlice.getContent().getFirst().postId()).isEqualTo(post.getId())
         );
     }
 }

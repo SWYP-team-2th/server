@@ -1,7 +1,8 @@
 package com.chooz.notification.presentation;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.notification.domain.NotificationType;
+import com.chooz.notification.domain.Actor;
+import com.chooz.notification.domain.Receiver;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.presentation.dto.NotificationResponse;
@@ -10,12 +11,10 @@ import com.chooz.support.WithMockUserInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -38,14 +37,10 @@ public class NotificationControllerTest extends RestDocsTest {
                 List.of(
                         new NotificationResponse(
                                 1L,
-                                1L,
-                                3L,
-                                NotificationType.COMMENT_LIKED,
-                                new Target(TargetType.COMMENT, 4L),
-                                "숨겨진 츄 님이 당신의 댓글에 좋아요를 눌렀어요!",
-                                "지금 확인해보세요.",
-                                "https://cdn.chooz.site/thumbnail.png",
-                                "https://cdn.chooz.site/default_profile.png",
+                                2L,
+                                new Receiver(1L, "숨겨진 츄"),
+                                new Actor(2L, "공개된 츄", "https://cdn.chooz.site/default_profile.png"),
+                                new Target(3L, TargetType.COMMENT, "https://cdn.chooz.site/thumbnail.png"),
                                 false,
                                 LocalDateTime.now()
                         )
@@ -62,21 +57,36 @@ public class NotificationControllerTest extends RestDocsTest {
                         requestHeaders(authorizationHeader()),
                         queryParameters(cursorQueryParams()),
                         responseFields(
-                                fieldWithPath("nextCursor").type(JsonFieldType.NUMBER).optional().description("다음 조회 커서 값"),
-                                fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부 (기본 값 10)"),
-                                fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("알림 데이터"),
-                                fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
-                                fieldWithPath("data[].userId").type(JsonFieldType.NUMBER).description("알림 받는 유저 ID"),
-                                fieldWithPath("data[].actorId").type(JsonFieldType.NUMBER).description("알림을 발생시킨 유저 ID"),
-                                fieldWithPath("data[].type").type(JsonFieldType.STRING).description("알림 발생 유형"),
-                                fieldWithPath("data[].target.type").type(JsonFieldType.STRING).description("알림 타겟 유형"),
-                                fieldWithPath("data[].target.id").type(JsonFieldType.NUMBER).description("알림 타겟 ID"),
-                                fieldWithPath("data[].title").type(JsonFieldType.STRING).description("알림 제목"),
-                                fieldWithPath("data[].body").type(JsonFieldType.STRING).description("알림 내용"),
-                                fieldWithPath("data[].thumbUrl").type(JsonFieldType.STRING).description("썸네일 이미지 url"),
-                                fieldWithPath("data[].profileImageUrl").type(JsonFieldType.STRING).description("알림을 발생시킨 유저 썸네일 url"),
-                                fieldWithPath("data[].isRead").type(JsonFieldType.BOOLEAN).description("읽음 여부"),
-                                fieldWithPath("data[].eventAt").type(JsonFieldType.STRING).description("이벤트 발생 시간")
+                                fieldWithPath("nextCursor").type(JsonFieldType.NUMBER).optional()
+                                        .description("다음 조회 커서 값"),
+                                fieldWithPath("hasNext")
+                                        .type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부 (기본 값 10)"),
+                                fieldWithPath("data[]")
+                                        .type(JsonFieldType.ARRAY).description("알림 데이터"),
+                                fieldWithPath("data[].id")
+                                        .type(JsonFieldType.NUMBER).description("알림 ID"),
+                                fieldWithPath("data[].postId")
+                                        .type(JsonFieldType.NUMBER).description("게시물 ID"),
+                                fieldWithPath("data[].receiver.id")
+                                        .type(JsonFieldType.NUMBER).description("receiver ID"),
+                                fieldWithPath("data[].receiver.nickname")
+                                        .type(JsonFieldType.STRING).description("receiver 닉네임"),
+                                fieldWithPath("data[].actor.id")
+                                        .type(JsonFieldType.NUMBER).description("actor ID"),
+                                fieldWithPath("data[].actor.nickname")
+                                        .type(JsonFieldType.STRING).description("actor 닉네임"),
+                                fieldWithPath("data[].actor.profileUrl")
+                                        .type(JsonFieldType.STRING).description("actor 프로필 이미지 url"),
+                                fieldWithPath("data[].target.id")
+                                        .type(JsonFieldType.NUMBER).description("알림 타겟 ID"),
+                                fieldWithPath("data[].target.type")
+                                        .type(JsonFieldType.STRING).description("알림 타겟 유형"),
+                                fieldWithPath("data[].target.imageUrl")
+                                        .type(JsonFieldType.STRING).description("알림 타겟 썸네일 이미지 url"),
+                                fieldWithPath("data[].isRead")
+                                        .type(JsonFieldType.BOOLEAN).description("읽음 여부"),
+                                fieldWithPath("data[].eventAt")
+                                        .type(JsonFieldType.STRING).description("이벤트 발생 시간")
                         )
                 ));
     }

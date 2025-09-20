@@ -14,41 +14,38 @@ class NotificationTest {
     @DisplayName("알림 생성")
     void create() throws Exception {
         //given
-        Long userId = 1L;
+        Long receiverId = 1L;
+        String receiverNickname = "공개된 츄";
         Long actorId = 2L;
-        NotificationType type = NotificationType.COMMENT_LIKED;
-        TargetType targetType = TargetType.COMMENT;
+        String actorNickname = "숨겨진 츄";
+        String actorProfileUrl = "https://cdn.chooz.site/default_profile.png";
         Long targetId = 3L;
-        String title = "숨겨진 츄님이 당신의 댓글에 좋아요를 눌렀습니다.";
-        String body = "지금 바로 확인해보세요!";
-        String thumbUrl = "https://cdn.chooz.site/thumbnail.png";
-        String profileImageUrl = "https://cdn.chooz.site/default_profile.png";
+        TargetType targetType = TargetType.COMMENT;
+        String targetImageUrl = "https://cdn.chooz.site/default_target.png";
         LocalDateTime eventAt = LocalDateTime.now();
         //when
         Notification notification = Notification.create(
-                userId,
+                receiverId,
+                receiverNickname,
                 actorId,
-                type,
-                targetType,
+                actorNickname,
+                actorProfileUrl,
                 targetId,
-                title,
-                body,
-                thumbUrl,
-                profileImageUrl,
+                targetType,
+                targetImageUrl,
                 eventAt
         ).get();
 
         //then
         assertAll(
-                () -> assertThat(notification.getUserId()).isEqualTo(userId),
-                () -> assertThat(notification.getActorId()).isEqualTo(actorId),
-                () -> assertThat(notification.getType()).isEqualTo(type),
+                () -> assertThat(notification.getReceiver().getId()).isEqualTo(receiverId),
+                () -> assertThat(notification.getReceiver().getNickname()).isEqualTo(receiverNickname),
+                () -> assertThat(notification.getActor().getId()).isEqualTo(actorId),
+                () -> assertThat(notification.getActor().getNickname()).isEqualTo(actorNickname),
+                () -> assertThat(notification.getActor().getProfileUrl()).isEqualTo(actorProfileUrl),
                 () -> assertThat(notification.getTarget().getId()).isEqualTo(targetId),
                 () -> assertThat(notification.getTarget().getType()).isEqualTo(targetType),
-                () -> assertThat(notification.getTitle()).isEqualTo(title),
-                () -> assertThat(notification.getBody()).isEqualTo(body),
-                () -> assertThat(notification.getThumbUrl()).isEqualTo(thumbUrl),
-                () -> assertThat(notification.getProfileImageUrl()).isEqualTo(profileImageUrl),
+                () -> assertThat(notification.getTarget().getImageUrl()).isEqualTo(targetImageUrl),
                 () -> assertThat(notification.getEventAt()).isEqualTo(eventAt)
         );
     }
@@ -56,27 +53,25 @@ class NotificationTest {
     @DisplayName("알림 읽음 확인")
     void markRead() throws Exception {
         //given
-        Long userId = 1L;
+        Long receiverId = 1L;
+        String receiverNickname = "공개된 츄";
         Long actorId = 2L;
-        NotificationType type = NotificationType.COMMENT_LIKED;
-        TargetType targetType = TargetType.COMMENT;
+        String actorNickname = "숨겨진 츄";
+        String actorProfileUrl = "https://cdn.chooz.site/default_profile.png";
         Long targetId = 3L;
-        String title = "숨겨진 츄님이 당신의 댓글에 좋아요를 눌렀습니다.";
-        String body = "지금 바로 확인해보세요!";
-        String thumbUrl = "https://cdn.chooz.site/thumbnail.png";
-        String profileImageUrl = "https://cdn.chooz.site/default_profile.png";
+        TargetType targetType = TargetType.COMMENT;
+        String targetImageUrl = "https://cdn.chooz.site/default_target.png";
         LocalDateTime eventAt = LocalDateTime.now();
         //when
         Notification notification = Notification.create(
-                userId,
+                receiverId,
+                receiverNickname,
                 actorId,
-                type,
-                targetType,
+                actorNickname,
+                actorProfileUrl,
                 targetId,
-                title,
-                body,
-                thumbUrl,
-                profileImageUrl,
+                targetType,
+                targetImageUrl,
                 eventAt
         ).get();
 
