@@ -13,14 +13,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Target {
-    @Column(name = "target_id", nullable = false)
+public class Receiver {
+    @Column(name = "receiver_id", nullable = false)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "target_type", nullable = false)
-    private TargetType type;
+    @Column(name = "receiver_nickname", nullable = false)
+    private String nickname;
 
-    @Column(name = "target_image_url", nullable = false)
-    private String imageUrl;
 }

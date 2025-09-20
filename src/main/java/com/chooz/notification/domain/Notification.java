@@ -4,12 +4,9 @@ import com.chooz.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,30 +29,14 @@ public class Notification extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Embedded
+    private Receiver receiver;
 
-    @Column(name = "actor_id")
-    private Long actorId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private NotificationType type;
+    @Embedded
+    private Actor actor;
 
     @Embedded
     private Target target;
-
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "body", nullable = false)
-    private String body;
-
-    @Column(name = "thumb_url", length = 255)
-    private String thumbUrl;
-
-    @Column(name = "profile_image_url", length = 255)
-    private String profileImageUrl;
 
     @Column(name = "is_read", nullable = false)
     private boolean isRead;
@@ -64,35 +45,29 @@ public class Notification extends BaseEntity {
     private LocalDateTime eventAt;
 
     public static Optional<Notification> create(
-            Long userId,
+            Long receiverId,
+            String receiverNickname,
             Long actorId,
-            NotificationType type,
-            TargetType targetType,
+            String actorNickname,
+            String actorProfileUrl,
             Long targetId,
-            String title,
-            String body,
-            String thumbUrl,
-            String profileImageUrl,
+            TargetType targetType,
+            String targetImageUrl,
             LocalDateTime eventAt
     ) {
-        if (checkMine(actorId, userId)) {
+        if (checkMine(actorId, receiverId)) {
             return Optional.empty();
         }
         return Optional.of(Notification.builder()
-                .userId(userId)
-                .actorId(actorId)
-                .type(type)
-                .target(new Target(targetType, targetId))
-                .title(title)
-                .body(body)
-                .thumbUrl(thumbUrl)
-                .profileImageUrl(profileImageUrl)
+                .receiver(new Receiver(receiverId, receiverNickname))
+                .actor(new Actor(actorId, actorNickname, actorProfileUrl))
+                .target(new Target(targetId, targetType, targetImageUrl))
                 .isRead(false)
                 .eventAt(eventAt)
                 .build());
     }
-    private static boolean checkMine(Long actorId, Long userId) {
-        return actorId != null && actorId.equals(userId);
+    private static boolean checkMine(Long actorId, Long receiverId) {
+        return actorId != null && actorId.equals(receiverId);
     }
 
     public void markRead() {
