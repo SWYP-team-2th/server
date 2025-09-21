@@ -6,7 +6,7 @@ import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.domain.event.CommentLikedEvent;
+import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class CommentLikeCommandService {
         }
         CommentLike commentLike = commentLikeRepository.save(CommentLike.create(commentId, userId));
 
-        eventPublisher.publish(new CommentLikedEvent(
+        eventPublisher.publish(new CommentLikedNotificationEvent(
                 commentId,
                 commentLike.getId(),
                 userId,

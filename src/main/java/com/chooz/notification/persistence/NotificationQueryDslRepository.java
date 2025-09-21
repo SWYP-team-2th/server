@@ -66,7 +66,7 @@ public class NotificationQueryDslRepository {
         return new SliceImpl<>(notifications, pageable, hasNext);
     }
 
-    Optional<TargetPostDto> getPost(Long commentId) {
+    Optional<TargetPostDto> getPostByCommentId(Long commentId) {
          return Optional.ofNullable(
                  queryFactory.select(new QTargetPostDto(post.id, post.imageUrl))
                          .from(comment)
@@ -89,6 +89,23 @@ public class NotificationQueryDslRepository {
                 queryFactory.select(new QTargetUserDto(user.id, user.nickname, user.profileUrl))
                         .from(user)
                         .where(user.id.eq(userId))
+                        .limit(1)
+                        .fetchFirst());
+    }
+    Optional<TargetUserDto> getUserByPostId(Long postId) {
+        return Optional.ofNullable(
+                queryFactory.select(new QTargetUserDto(user.id, user.nickname, user.profileUrl))
+                        .from(user)
+                        .join(post).on(user.id.eq(post.userId))
+                        .where(post.id.eq(postId))
+                        .limit(1)
+                        .fetchFirst());
+    }
+    Optional<TargetPostDto> getPostById(Long postId) {
+        return Optional.ofNullable(
+                queryFactory.select(new QTargetPostDto(post.id, post.imageUrl))
+                        .from(post)
+                        .where(post.id.eq(postId))
                         .limit(1)
                         .fetchFirst());
     }

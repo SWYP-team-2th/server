@@ -24,8 +24,8 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
     }
 
     @Override
-    public Optional<TargetPostDto> getPost(Long commentId) {
-        return notificationQueryDslRepository.getPost(commentId);
+    public Optional<TargetPostDto> getPostByCommentId(Long commentId) {
+        return notificationQueryDslRepository.getPostByCommentId(commentId);
     }
 
     @Override
@@ -34,7 +34,17 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
     }
 
     @Override
-    public Optional<TargetUserDto> getUser(Long userId) {
+    public Optional<TargetUserDto> getUserById(Long userId) {
         return notificationQueryDslRepository.getUser(userId);
+    }
+
+    @Override
+    public Optional<TargetUserDto> getUserByPostId(Long postId) {
+        return notificationQueryDslRepository.getUserByPostId(postId);
+    }
+
+    @Override
+    public Optional<TargetPostDto> getPostById(Long postId) {
+        return notificationQueryDslRepository.getPostById(postId);
     }
 }

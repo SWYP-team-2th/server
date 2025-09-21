@@ -87,6 +87,7 @@ public class PostCommandService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.closeByAuthor(userId);
+        //마감알림
     }
 
     @Transactional

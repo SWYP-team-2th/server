@@ -22,7 +22,6 @@ public class PostVotedEventListener {
     public void handle(VotedEvent event) {
         Post post = postRepository.findById(event.postId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-
         handleClosePost(post);
     }
 
@@ -30,6 +29,7 @@ public class PostVotedEventListener {
         long voterCount = voteRepository.countVoterByPostId(post.getId());
         if (post.isClosableByVoterCount(voterCount)) {
             post.close();
+            //마감알림
         }
     }
 }

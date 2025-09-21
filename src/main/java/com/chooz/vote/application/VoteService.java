@@ -3,6 +3,7 @@ package com.chooz.vote.application;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.notification.domain.event.VotedNotificationEvent;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.vote.domain.Vote;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,7 +38,7 @@ public class VoteService {
         List<Long> voteIds = voteWriter.vote(voterId, postId, pollChoiceIds);
 
         eventPublisher.publish(new VotedEvent(post.getId(), pollChoiceIds, voterId));
-
+        eventPublisher.publish(new VotedNotificationEvent(postId, voterId, LocalDateTime.now()));
         return voteIds;
     }
 

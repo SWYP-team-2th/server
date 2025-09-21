@@ -22,6 +22,7 @@ public class DateCloseScheduler {
     public void closePostsByDate() {
         log.info("마감 스케줄링 시작");
         List<Post> postsNeedToClose = postRepository.findPostsNeedToClose();
+        //마감 알림
         postsNeedToClose.forEach(Post::close);
         log.info("총 {}개 게시글 마감", postsNeedToClose.size());
     }
