@@ -3,12 +3,16 @@ package com.chooz.commentLike.application;
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeRepository;
 import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
+import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.notification.domain.event.CommentLikedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -17,14 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentLikeCommandService {
 
     private final CommentLikeRepository commentLikeRepository;
+    private final EventPublisher eventPublisher;
 
     public CommentLikeIdResponse createCommentLike(Long commentId, Long userId) {
         if(commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)){
             throw new BadRequestException(ErrorCode.COMMENT_LIKE_NOT_FOUND);
         }
+        CommentLike commentLike = commentLikeRepository.save(CommentLike.create(commentId, userId));
 
+        eventPublisher.publish(new CommentLikedEvent(
+                commentId,
+                commentLike.getId(),
+                userId,
+                LocalDateTime.now()
+                ));
         return new CommentLikeIdResponse(
-                commentLikeRepository.save(CommentLike.create(commentId, userId)).getId(),
+                commentLike.getId(),
                 commentLikeRepository.countByCommentId(commentId)
         );
     }

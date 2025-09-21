@@ -1,0 +1,7 @@
+[[알림-API]]
+== 알림 API
+
+[[알림-조회]]
+=== `GET` 알림 조회
+
+operation::comment-controller-test/find-notifications[snippets='http-request,curl-request,path-parameters,request-headers,query-parameters,http-response,response-fields']
