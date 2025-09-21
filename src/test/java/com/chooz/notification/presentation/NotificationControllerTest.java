@@ -41,6 +41,7 @@ public class NotificationControllerTest extends RestDocsTest {
                                 new Receiver(1L, "숨겨진 츄"),
                                 new Actor(2L, "공개된 츄", "https://cdn.chooz.site/default_profile.png"),
                                 new Target(3L, TargetType.COMMENT, "https://cdn.chooz.site/thumbnail.png"),
+                                true,
                                 false,
                                 LocalDateTime.now()
                         )
@@ -83,6 +84,8 @@ public class NotificationControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.STRING).description("알림 타겟 유형"),
                                 fieldWithPath("data[].target.imageUrl")
                                         .type(JsonFieldType.STRING).description("알림 타겟 썸네일 이미지 url"),
+                                fieldWithPath("data[].isValid")
+                                        .type(JsonFieldType.BOOLEAN).description("알림 상태"),
                                 fieldWithPath("data[].isRead")
                                         .type(JsonFieldType.BOOLEAN).description("읽음 여부"),
                                 fieldWithPath("data[].eventAt")

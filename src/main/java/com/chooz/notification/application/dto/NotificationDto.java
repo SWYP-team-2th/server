@@ -18,6 +18,7 @@ public record NotificationDto(
         Long targetId,
         TargetType targetType,
         String targetImageUrl,
+        boolean isValid,
         boolean isRead,
         LocalDateTime eventAt
 ) {}

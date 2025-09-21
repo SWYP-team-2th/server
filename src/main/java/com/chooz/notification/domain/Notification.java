@@ -38,6 +38,9 @@ public class Notification extends BaseEntity {
     @Embedded
     private Target target;
 
+    @Column(name = "is_valid", nullable = false)
+    private boolean isValid;
+
     @Column(name = "is_read", nullable = false)
     private boolean isRead;
 
@@ -62,6 +65,7 @@ public class Notification extends BaseEntity {
                 .receiver(new Receiver(receiverId, receiverNickname))
                 .actor(new Actor(actorId, actorNickname, actorProfileUrl))
                 .target(new Target(targetId, targetType, targetImageUrl))
+                .isValid(true)
                 .isRead(false)
                 .eventAt(eventAt)
                 .build());
@@ -73,6 +77,11 @@ public class Notification extends BaseEntity {
     public void markRead() {
         if (!isRead) {
             this.isRead = true;
+        }
+    }
+    public void invalidate() {
+        if (isValid) {
+            this.isValid = false;
         }
     }
 }

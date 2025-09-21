@@ -41,6 +41,7 @@ public class NotificationQueryDslRepository {
                         notification.target.id,
                         notification.target.type,
                         notification.target.imageUrl,
+                        notification.isValid,
                         notification.isRead,
                         notification.eventAt
                         )
@@ -53,6 +54,7 @@ public class NotificationQueryDslRepository {
                 .on(post.id.eq(comment.postId))
                 .where(
                         notification.receiver.id.eq(userId),
+                        notification.isValid.eq(true),
                         cursor != null ? notification.id.lt(cursor) : null
                 )
                 .orderBy(notification.id.desc())

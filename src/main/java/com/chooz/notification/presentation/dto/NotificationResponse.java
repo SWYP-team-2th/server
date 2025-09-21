@@ -15,6 +15,7 @@ public record NotificationResponse (
         Receiver receiver,
         Actor actor,
         Target target,
+        boolean isValid,
         boolean isRead,
         LocalDateTime eventAt
 )implements CursorDto{
@@ -34,6 +35,7 @@ public record NotificationResponse (
                         notificationDto.targetType(),
                         notificationDto.targetImageUrl()
                 ),
+                notificationDto.isValid(),
                 notificationDto.isRead(),
                 notificationDto.eventAt()
         );
