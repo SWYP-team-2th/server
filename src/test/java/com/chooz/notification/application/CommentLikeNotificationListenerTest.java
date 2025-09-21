@@ -4,7 +4,6 @@ import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.commentLike.application.CommentLikeService;
 import com.chooz.notification.application.dto.NotificationDto;
-import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationQueryRepository;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.domain.Post;
