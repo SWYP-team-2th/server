@@ -77,7 +77,10 @@ public class PostQueryDslRepository {
                         JPAExpressions
                                 .select(vote.userId.countDistinct())
                                 .from(vote)
-                                .where(vote.postId.eq(post.id)),
+                                .where(
+                                        vote.postId.eq(post.id),
+                                        vote.deleted.isFalse()
+                                ),
                         JPAExpressions
                                 .select(comment.count())
                                 .from(comment)
@@ -121,7 +124,10 @@ public class PostQueryDslRepository {
                         JPAExpressions
                                 .select(vote.userId.countDistinct())
                                 .from(vote)
-                                .where(vote.postId.eq(post.id))
+                                .where(
+                                        vote.postId.eq(post.id),
+                                        vote.deleted.isFalse()
+                                )
                 ))
                 .from(post)
                 .where(
@@ -155,7 +161,10 @@ public class PostQueryDslRepository {
                         JPAExpressions
                                 .select(vote.userId.countDistinct())
                                 .from(vote)
-                                .where(vote.postId.eq(post.id))
+                                .where(
+                                        vote.postId.eq(post.id),
+                                        vote.deleted.isFalse()
+                                )
                 ))
                 .from(post)
                 .where(
