@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NotificationQueryRepositoryImpl implements NotificationQueryRepository {
 
-    private final NotificationJpaRepository notificationJpaRepository;
+//    private final NotificationJpaRepository notificationJpaRepository;
     private final NotificationQueryDslRepository notificationQueryDslRepository;
 
     @Override
@@ -24,27 +24,32 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
     }
 
     @Override
-    public Optional<TargetPostDto> getPostByCommentId(Long commentId) {
-        return notificationQueryDslRepository.getPostByCommentId(commentId);
+    public Optional<TargetPostDto> findPostByCommentId(Long commentId) {
+        return notificationQueryDslRepository.findPostByCommentId(commentId);
     }
 
     @Override
-    public Optional<TargetUserDto> getUserByCommentId(Long commentId) {
-        return notificationQueryDslRepository.getUserByCommentId(commentId);
+    public Optional<TargetUserDto> findUserByCommentId(Long commentId) {
+        return notificationQueryDslRepository.findUserByCommentId(commentId);
     }
 
     @Override
-    public Optional<TargetUserDto> getUserById(Long userId) {
-        return notificationQueryDslRepository.getUser(userId);
+    public Optional<TargetUserDto> findUserById(Long userId) {
+        return notificationQueryDslRepository.findUserById(userId);
     }
 
     @Override
-    public Optional<TargetUserDto> getUserByPostId(Long postId) {
-        return notificationQueryDslRepository.getUserByPostId(postId);
+    public Optional<TargetUserDto> findUserByPostId(Long postId) {
+        return notificationQueryDslRepository.findUserByPostId(postId);
     }
 
     @Override
-    public Optional<TargetPostDto> getPostById(Long postId) {
-        return notificationQueryDslRepository.getPostById(postId);
+    public Optional<TargetPostDto> findPostById(Long postId) {
+        return notificationQueryDslRepository.findPostById(postId);
+    }
+
+    @Override
+    public boolean existsByDedupKey(Long ReceiverId, String dedupKey) {
+        return notificationQueryDslRepository.existsByDedupKey(ReceiverId, dedupKey);
     }
 }

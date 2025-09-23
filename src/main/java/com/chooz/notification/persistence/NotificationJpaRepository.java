@@ -14,7 +14,7 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, L
     @Query("""
         SELECT n
         FROM Notification n
-        WHERE n.receiver.id = :userId
+        WHERE n.receiverId = :userId
             AND (:cursor is null OR n.id < :cursor)
         ORDER BY
             n.id DESC

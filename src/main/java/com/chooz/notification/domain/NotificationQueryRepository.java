@@ -10,9 +10,10 @@ import java.util.Optional;
 
 public interface NotificationQueryRepository {
     Slice<NotificationDto> findNotifications(Long userId, Long cursor, Pageable pageable);
-    Optional<TargetPostDto> getPostByCommentId(Long commentId);
-    Optional<TargetUserDto> getUserByCommentId(Long commentId);
-    Optional<TargetUserDto> getUserById(Long userId);
-    Optional<TargetUserDto> getUserByPostId(Long postId);
-    Optional<TargetPostDto> getPostById(Long postId);
+    Optional<TargetPostDto> findPostByCommentId(Long commentId);
+    Optional<TargetUserDto> findUserByCommentId(Long commentId);
+    Optional<TargetUserDto> findUserById(Long userId);
+    Optional<TargetUserDto> findUserByPostId(Long postId);
+    Optional<TargetPostDto> findPostById(Long postId);
+    boolean existsByDedupKey(Long ReceiverId, String dedupKey);
 }

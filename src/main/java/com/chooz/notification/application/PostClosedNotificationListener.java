@@ -2,7 +2,7 @@
 //
 //import com.chooz.notification.domain.Notification;
 //import com.chooz.notification.domain.TargetType;
-//import com.chooz.notification.domain.event.VotedNotificationEvent;
+//import com.chooz.notification.domain.event.PostClosedNotificationEvent;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.stereotype.Component;
 //import org.springframework.transaction.event.TransactionPhase;
@@ -10,23 +10,23 @@
 //
 //@Component
 //@RequiredArgsConstructor
-//public class VotedNotificationListener {
+//public class PostClosedNotificationListener {
 //
 //    private final NotificationCommandService notificationCommandService;
 //    private final NotificationContentAssembler notificationContentAssembler;
 //
 //    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-//    public void onVoted(VotedNotificationEvent e) {
-//        VotedContent votedContent = notificationContentAssembler.forVoted(e.postId(), e.voterId());
+//    public void onVoted(PostClosedNotificationEvent e) {
+//        PostClosedContent postClosedContent = notificationContentAssembler.forPostClosed(e.postId());
 //        Notification.create(
-//                votedContent.getPostAuthorId(),
-//                votedContent.getPostAuthorName(),
-//                e.voterId(),
-//                votedContent.getActorName(),
-//                votedContent.getActorProfileImageUrl(),
+//                postClosedContent.getPostAuthorId(),
+//                postClosedContent.getPostAuthorName(),
+//                postClosedContent.getPostAuthorId(),
+//                postClosedContent.getActorName(),
+//                postClosedContent.getActorProfileImageUrl(),
 //                e.postId(),
-//                TargetType.VOTE,
-//                votedContent.getTargetThumbnailUrl(),
+//                TargetType.POST,
+//                postClosedContent.getTargetThumbnailUrl(),
 //                e.eventAt()
 //        ).ifPresent(notificationCommandService::create);
 //    }

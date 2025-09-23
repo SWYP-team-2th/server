@@ -3,8 +3,6 @@ package com.chooz.notification.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,4 +20,8 @@ public class Actor {
 
     @Column(name = "actor_profile_url", nullable = false)
     private String profileUrl;
+
+    public static Actor of(Long id, String nickname, String profileUrl) {
+        return new Actor(id, nickname, profileUrl);
+    }
 }

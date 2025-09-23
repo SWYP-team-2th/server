@@ -12,9 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationCommandService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationQueryService notificationQueryService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Notification create(Notification notification) {
-        return notificationRepository.save(notification);
+        return notificationQueryService.existsByDedupKey(notification.getId(), notification.getDedupKey())
+                ? notificationRepository.save(notification)
+                : null;
     }
 }

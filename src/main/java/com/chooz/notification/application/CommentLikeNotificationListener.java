@@ -1,10 +1,13 @@
 package com.chooz.notification.application;
 
-import com.chooz.notification.application.dto.CommentLikedContent;
+import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.Notification;
+import com.chooz.notification.domain.NotificationRepository;
+import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -17,18 +20,15 @@ public class CommentLikeNotificationListener {
     private final NotificationContentAssembler notificationContentAssembler;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onCommentLiked(CommentLikedNotificationEvent e) {
-        CommentLikedContent commentLikedContent = notificationContentAssembler.forCommentLiked(e.commentId(), e.likerId());
+    public void onCommentLiked(CommentLikedNotificationEvent commentLikedNotificationEvent) {
+        NotificationContent notificationContent = notificationContentAssembler.forCommentLiked(
+                commentLikedNotificationEvent.commentId(),
+                commentLikedNotificationEvent.likerId()
+        );
          Notification.create(
-                 commentLikedContent.getCommentAuthorId(),
-                 commentLikedContent.getCommentAuthorName(),
-                 e.likerId(),
-                 commentLikedContent.getActorName(),
-                 commentLikedContent.getActorProfileImageUrl(),
-                 e.commentId(),
-                 TargetType.COMMENT,
-                 commentLikedContent.getTargetThumbnailUrl(),
-                 e.eventAt()
+                 NotificationType.COMMENT_LIKED,
+                 commentLikedNotificationEvent.eventAt(),
+                 notificationContent
         ).ifPresent(notificationCommandService::create);
     }
 }

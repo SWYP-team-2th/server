@@ -1,13 +1,15 @@
 package com.chooz.notification.application.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.chooz.notification.domain.Target;
 
-@Getter
-@RequiredArgsConstructor
-public abstract class NotificationContent {
-    private final String actorName;
-    private final String actorProfileImageUrl;
-    private final String targetThumbnailUrl;
+import java.util.List;
 
+public record NotificationContent (
+        Long receiverId,
+        Long actorId,
+        String actorNickname,
+        String actorProfileUrl,
+        String imageUrl,
+        List<Target> targets
+){
 }

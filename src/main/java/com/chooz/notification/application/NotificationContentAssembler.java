@@ -2,56 +2,62 @@ package com.chooz.notification.application;
 
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.application.dto.CommentLikedContent;
+import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
-import com.chooz.notification.application.dto.VotedContent;
 import com.chooz.notification.domain.NotificationQueryRepository;
+import com.chooz.notification.domain.Target;
+import com.chooz.notification.domain.TargetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationContentAssembler {
 
-    private final NotificationQueryRepository notificationQueryDslRepository;
+    private final NotificationQueryService notificationQueryService;
 
-    public CommentLikedContent forCommentLiked(Long commentId, Long likerId) {
-        TargetUserDto targetUserDto = notificationQueryDslRepository.getUserById(likerId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        TargetUserDto commentAuthorDto = notificationQueryDslRepository.getUserByCommentId(commentId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        TargetPostDto targetPostDto = notificationQueryDslRepository.getPostByCommentId(commentId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-
-        return new CommentLikedContent(
-                targetUserDto.nickname(),
-                targetUserDto.profileUrl(),
-                targetPostDto.imageUrl(),
+    public NotificationContent forCommentLiked(Long commentId, Long likerId) {
+        TargetUserDto commentAuthorDto = notificationQueryService.findUserByCommentId(commentId);
+        TargetUserDto targetUserDto = notificationQueryService.findUserById(likerId);
+        TargetPostDto targetPostDto = notificationQueryService.findPostByCommentId(commentId);
+        return new NotificationContent(
                 commentAuthorDto.id(),
-                commentAuthorDto.nickname()
-        );
-    }
-    public VotedContent forVoted(Long postId, Long voterId) {
-        TargetUserDto targetUserDto = notificationQueryDslRepository.getUserById(voterId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        TargetUserDto postAuthorDto = notificationQueryDslRepository.getUserByPostId(postId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-        TargetPostDto targetPostDto = notificationQueryDslRepository.getPostById(postId)
-                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        return new VotedContent(
+                targetUserDto.id(),
                 targetUserDto.nickname(),
                 targetUserDto.profileUrl(),
                 targetPostDto.imageUrl(),
-                postAuthorDto.id(),
-                postAuthorDto.nickname()
+                List.of(Target.of(targetPostDto.id(), TargetType.POST),
+                        Target.of(targetPostDto.id(), TargetType.COMMENT)
+                )
         );
     }
-//    public NotificationContent forVoteClosed(Long postId) {
-//        String title = postPort.getPostTitle(postId).orElse("투표 마감");
-//        String body = "참여한 투표가 마감되었어요.";
-//        String thumbnail = postPort.getPostThumbnailUrl(postId).orElse(null);
-//        return new NotificationContent(title, body, thumbnail);
+    public NotificationContent forVoted(Long postId, Long voterId) {
+        TargetUserDto postAuthorDto = notificationQueryService.findUserByPostId(postId);
+        TargetUserDto targetUserDto = notificationQueryService.findUserById(voterId);
+        TargetPostDto targetPostDto = notificationQueryService.findPostById(postId);
+        return new NotificationContent(
+                postAuthorDto.id(),
+                targetUserDto.id(),
+                targetUserDto.nickname(),
+                targetUserDto.profileUrl(),
+                targetPostDto.imageUrl(),
+                List.of(Target.of(targetPostDto.id(), TargetType.POST))
+        );
+    }
+//    public NotificationContent forPostClosed(Long postId) {
+//        TargetUserDto postAuthorDto = notificationQueryDslRepository.getUserByPostId(postId)
+//                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+//        TargetPostDto targetPostDto = notificationQueryDslRepository.getPostById(postId)
+//                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+//        return new PostClosedContent(
+//                postAuthorDto.nickname(),
+//                postAuthorDto.profileUrl(),
+//                targetPostDto.imageUrl(),
+//                postAuthorDto.id(),
+//                postAuthorDto.nickname()
+//        );
 //    }
-//
 }
