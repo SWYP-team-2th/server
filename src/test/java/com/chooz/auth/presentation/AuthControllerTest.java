@@ -119,7 +119,7 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("토큰 재발급 - 리프레시 토큰 헤더 없는 경우")
     void reissue_invalidRefreshTokenHeader() throws Exception {
         //given
-        ErrorResponse response = new ErrorResponse(ErrorCode.INVALID_REFRESH_TOKEN_HEADER);
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_REFRESH_TOKEN_HEADER);
 
         //when then
         mockMvc.perform(post("/auth/reissue"))
@@ -131,7 +131,7 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("토큰 재발급 - 리프레시 토큰 헤더가 db에 없는 경우")
     void reissue_refreshTokenNotFound() throws Exception {
         //given
-        ErrorResponse response = new ErrorResponse(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+        ErrorResponse response = ErrorResponse.of(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
         given(authService.reissue(anyString()))
                 .willThrow(new BadRequestException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
@@ -146,7 +146,7 @@ class AuthControllerTest extends RestDocsTest {
     @DisplayName("토큰 재발급 - 리프레시 토큰 헤더가 db에 있는 값과 일치하지 않은 경우")
     void reissue_refreshTokenMismatched() throws Exception {
         //given
-        ErrorResponse response = new ErrorResponse(ErrorCode.REFRESH_TOKEN_MISMATCHED);
+        ErrorResponse response = ErrorResponse.of(ErrorCode.REFRESH_TOKEN_MISMATCHED);
         given(authService.reissue(anyString()))
                 .willThrow(new BadRequestException(ErrorCode.REFRESH_TOKEN_MISMATCHED));
 
