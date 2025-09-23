@@ -5,9 +5,12 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.post.domain.*;
 import com.chooz.post.presentation.dto.FeedResponse;
+import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.support.IntegrationTest;
+import com.chooz.support.fixture.PostFixture;
+import com.chooz.support.fixture.UserFixture;
 import com.chooz.support.fixture.VoteFixture;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
@@ -175,6 +178,74 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(response.data().getLast().commentCount()).isEqualTo(publicPostComments.size()),
                 () -> assertThat(response.data().getLast().isAuthor()).isFalse(),
                 () -> assertThat(response.data().getFirst().isAuthor()).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("투표 현황 조회 - 중복 투표")
+    void findVotedPosts_multiple() {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
+        //유저1 선택지 1, 2 복수 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(1).getId()));
+
+        //when
+        var response = postService.findVotedPosts(user.getId(), null, 10);
+
+        //then
+        List<MyPagePostResponse> data = response.data();
+        assertAll(
+                () -> assertThat(response.data()).hasSize(1),
+                () -> assertThat(response.hasNext()).isFalse(),
+
+                () -> assertThat(data.getFirst().id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(data.getFirst().title()).isEqualTo(post.getTitle()),
+
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post.getPollChoices().get(0).getTitle()),
+                () -> assertThat(data.getFirst().postVoteInfo().totalVoterCount()).isEqualTo(2),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(1),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("50")
+        );
+    }
+
+    @Test
+    @DisplayName("투표 현황 조회 - 중복 투표2")
+    void findVotedPosts_multiple2() {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        User user2 = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
+        //유저1 선택지 1, 2 복수 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(1).getId()));
+
+        //유저2 선택지 1 단일 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
+
+        //when
+        var response = postService.findVotedPosts(user.getId(), null, 10);
+
+        //then
+        List<MyPagePostResponse> data = response.data();
+        assertAll(
+                () -> assertThat(response.data()).hasSize(1),
+                () -> assertThat(response.hasNext()).isFalse(),
+
+                () -> assertThat(data.getFirst().id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(data.getFirst().title()).isEqualTo(post.getTitle()),
+
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post.getPollChoices().get(0).getTitle()),
+                () -> assertThat(data.getFirst().postVoteInfo().totalVoterCount()).isEqualTo(3),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(2),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("67")
         );
     }
 

@@ -159,7 +159,7 @@ public class PostQueryDslRepository {
                 .select(new QPostWithVoteCount(
                         post,
                         JPAExpressions
-                                .select(vote.userId.countDistinct())
+                                .select(vote.userId.count())
                                 .from(vote)
                                 .where(
                                         vote.postId.eq(post.id),
