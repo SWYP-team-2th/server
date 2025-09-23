@@ -36,39 +36,30 @@ public class CloseOption {
     }
 
     public static CloseOption create(CloseType closeType, LocalDateTime closedAt, Integer maxVoterCount) {
-        validateCloseOption(closeType, closedAt, maxVoterCount);
-        return new CloseOption(closeType, closedAt, maxVoterCount);
-    }
-
-    private static void validateCloseOption(CloseType closeType, LocalDateTime closedAt, Integer maxVoterCount) {
         switch (closeType) {
-            case SELF -> validateSelfCloseType(closedAt, maxVoterCount);
-            case DATE -> validateDateCloseType(closedAt, maxVoterCount);
-            case VOTER -> validateVoterCloseType(closedAt, maxVoterCount);
+            case SELF -> {
+                return new CloseOption(closeType, null, null);
+            }
+            case DATE -> {
+                validateDateCloseType(closedAt);
+                return new CloseOption(closeType, closedAt, null);
+            }
+            case VOTER -> {
+                validateVoterCloseType(maxVoterCount);
+                return new CloseOption(closeType, closedAt, maxVoterCount);
+            }
             default -> throw new BadRequestException(ErrorCode.INVALID_CLOSE_OPTION);
         }
     }
 
-    private static void validateSelfCloseType(LocalDateTime closedAt, Integer maxVoterCount) {
-        if (Objects.nonNull(closedAt) || Objects.nonNull(maxVoterCount)) {
-            throw new BadRequestException(ErrorCode.INVALID_SELF_CLOSE_OPTION);
-        }
-    }
-
-    private static void validateVoterCloseType(LocalDateTime closedAt, Integer maxVoterCount) {
-        if (Objects.nonNull(closedAt) || Objects.isNull(maxVoterCount)) {
-            throw new BadRequestException(ErrorCode.INVALID_VOTER_CLOSE_OPTION);
-        }
-        if (maxVoterCount < 1 || maxVoterCount > 999) {
+    private static void validateVoterCloseType(Integer maxVoterCount) {
+        if (Objects.isNull(maxVoterCount) || (maxVoterCount < 1 || maxVoterCount > 999)) {
             throw new BadRequestException(ErrorCode.INVALID_VOTER_CLOSE_OPTION);
         }
     }
 
-    private static void validateDateCloseType(LocalDateTime closedAt, Integer maxVoterCount) {
-        if (Objects.isNull(closedAt) || Objects.nonNull(maxVoterCount)) {
-            throw new BadRequestException(ErrorCode.INVALID_DATE_CLOSE_OPTION);
-        }
-        if (closedAt.isBefore(LocalDateTime.now().plusHours(1))) {
+    private static void validateDateCloseType(LocalDateTime closedAt) {
+        if (Objects.isNull(closedAt) || closedAt.isBefore(LocalDateTime.now().plusHours(1))) {
             throw new BadRequestException(ErrorCode.INVALID_DATE_CLOSE_OPTION);
         }
     }
