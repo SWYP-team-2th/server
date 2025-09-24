@@ -303,12 +303,42 @@ class VoteServiceTest extends IntegrationTest {
                 () -> assertThat(response.getFirst().id()).isEqualTo(post.getPollChoices().get(1).getId()),
                 () -> assertThat(response.getFirst().title()).isEqualTo(post.getPollChoices().get(1).getTitle()),
                 () -> assertThat(response.getFirst().voteCount()).isEqualTo(1),
-                () -> assertThat(response.getFirst().voteRatio()).isEqualTo("100.0"),
+                () -> assertThat(response.getFirst().voteRatio()).isEqualTo("100"),
 
                 () -> assertThat(response.get(1).id()).isEqualTo(post.getPollChoices().getFirst().getId()),
                 () -> assertThat(response.get(1).title()).isEqualTo(post.getPollChoices().getFirst().getTitle()),
                 () -> assertThat(response.get(1).voteCount()).isEqualTo(0),
-                () -> assertThat(response.get(1).voteRatio()).isEqualTo("0.0")
+                () -> assertThat(response.get(1).voteRatio()).isEqualTo("0")
+        );
+    }
+
+    @Test
+    @DisplayName("투표 현황 조회 - 중복 투표")
+    void findVoteResult_multiple() {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(1).getId()));
+
+        //when
+        var response = voteService.findVoteResult(user.getId(), post.getId());
+
+        //then
+        assertAll(
+                () -> assertThat(response).hasSize(2),
+                () -> assertThat(response.getFirst().id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(response.getFirst().title()).isEqualTo(post.getPollChoices().get(0).getTitle()),
+                () -> assertThat(response.getFirst().voteCount()).isEqualTo(1),
+                () -> assertThat(response.getFirst().voteRatio()).isEqualTo("50"),
+
+                () -> assertThat(response.get(1).id()).isEqualTo(post.getPollChoices().get(1).getId()),
+                () -> assertThat(response.get(1).title()).isEqualTo(post.getPollChoices().get(1).getTitle()),
+                () -> assertThat(response.get(1).voteCount()).isEqualTo(1),
+                () -> assertThat(response.get(1).voteRatio()).isEqualTo("50")
         );
     }
 

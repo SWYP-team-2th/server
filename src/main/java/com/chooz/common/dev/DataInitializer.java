@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Profile({"!prod", "!test"})
@@ -62,6 +63,15 @@ public class DataInitializer {
                 "shareUrl",
                 PollOption.create(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
                 CloseOption.create(CloseType.VOTER, null, 2)));
+        postRepository.save(Post.create(
+                user.getId(),
+                "title",
+                "description",
+                "imageUrl",
+                List.of(PollChoice.create("title1", "imageUrl1"), PollChoice.create("title1", "imageUrl1")),
+                "shareUrl",
+                PollOption.create(PollType.SINGLE, Scope.PUBLIC, CommentActive.OPEN),
+                new CloseOption(CloseType.DATE, LocalDateTime.now().plusMinutes(5), null)));
 //        TokenResponse tokenResponse = jwtService.createToken(new JwtClaim(testUser.getId(), testUser.getRole()));
 //        TokenPair tokenPair = tokenResponse.tokenPair();
 //        System.out.println("accessToken = " + tokenPair.accessToken());

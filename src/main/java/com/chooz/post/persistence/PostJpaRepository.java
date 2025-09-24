@@ -71,25 +71,5 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
     )
     Optional<CommentActive> findCommentActiveByPostId(@Param("postId") Long postId);
 
-    @Query("""
-        select new com.chooz.post.application.dto.PostWithVoteCount(
-                p,
-                count(distinct v2.userId)
-            )
-        from Post p
-        inner join Vote v on v.postId = p.id and v.userId = :userId
-        left join Vote v2 on v2.postId = p.id
-        where (:postId is null or p.id < :postId)
-        AND p.deleted = false
-        group by p
-        order by p.id desc
-        """
-    )
-    Slice<PostWithVoteCount> findVotedPostsWithVoteCount(
-            @Param("userId") Long userId,
-            @Param("postId") Long postId,
-            Pageable pageable
-    );
-
     Optional<Post> findByIdAndUserIdAndDeletedFalse(Long postId, Long userId);
 }
