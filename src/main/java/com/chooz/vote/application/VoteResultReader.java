@@ -23,7 +23,8 @@ public class VoteResultReader {
         Map<PollChoice, Long> pollChoiceVoteCountMap = getPollChoiceVoteCountMap(totalVoteList, post);
         return pollChoiceVoteCountMap.entrySet().stream()
                 .map(entry -> getVoteResultResponse(entry, totalVoteCount))
-                .sorted(Comparator.comparingLong(VoteResultResponse::voteCount).reversed())
+                .sorted(Comparator.comparing(VoteResultResponse::voteCount, Comparator.reverseOrder())
+                        .thenComparing(VoteResultResponse::id))
                 .toList();
     }
 

@@ -73,4 +73,10 @@ public class PostFixture {
                 .scope(Scope.PUBLIC)
                 .commentActive(CommentActive.OPEN);
     }
+
+    public static PollOption multiplePollOption() {
+        return createPollOptionBuilder()
+                .pollType(PollType.MULTIPLE)
+                .build();
+    }
 }

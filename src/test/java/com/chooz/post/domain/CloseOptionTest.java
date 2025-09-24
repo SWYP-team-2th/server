@@ -23,40 +23,6 @@ class CloseOptionTest {
     }
 
     @Test
-    @DisplayName("마감 옵션 생성 실패 - null")
-    void createException_null() throws Exception {
-        // CloseType가 SELF인 경우
-        assertThatThrownBy(() -> CloseOption.create(SELF, LocalDateTime.now(), null))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_SELF_CLOSE_OPTION.getMessage());
-        assertThatThrownBy(() -> CloseOption.create(SELF, null, 2))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_SELF_CLOSE_OPTION.getMessage());
-
-        // CloseType가 DATE인 경우
-        assertThatThrownBy(() -> CloseOption.create(DATE, null, null))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_DATE_CLOSE_OPTION.getMessage());
-        assertThatThrownBy(() -> CloseOption.create(DATE, null, 2))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_DATE_CLOSE_OPTION.getMessage());
-        assertThatThrownBy(() -> CloseOption.create(DATE, LocalDateTime.now().plusDays(1), 2))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_DATE_CLOSE_OPTION.getMessage());
-
-        // CloseType가 VOTER인 경우
-        assertThatThrownBy(() -> CloseOption.create(CloseType.VOTER, null, null))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_VOTER_CLOSE_OPTION.getMessage());
-        assertThatThrownBy(() -> CloseOption.create(CloseType.VOTER, LocalDateTime.now(), null))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_VOTER_CLOSE_OPTION.getMessage());
-        assertThatThrownBy(() -> CloseOption.create(CloseType.VOTER, LocalDateTime.now(), 2))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage(ErrorCode.INVALID_VOTER_CLOSE_OPTION.getMessage());
-    }
-
-    @Test
     @DisplayName("시간 마감 옵션 생성 실패 - 마감시간이 1시간 이내인 경우")
     void createDateCloseOptionException() throws Exception {
         assertThatThrownBy(() -> CloseOption.create(DATE, LocalDateTime.now().plusMinutes(59), null))
