@@ -203,7 +203,7 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(response.data()).hasSize(1),
                 () -> assertThat(response.hasNext()).isFalse(),
 
-                () -> assertThat(data.getFirst().id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(data.getFirst().id()).isEqualTo(post.getId()),
                 () -> assertThat(data.getFirst().title()).isEqualTo(post.getTitle()),
 
                 () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post.getPollChoices().get(0).getTitle()),
@@ -239,7 +239,7 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(response.data()).hasSize(1),
                 () -> assertThat(response.hasNext()).isFalse(),
 
-                () -> assertThat(data.getFirst().id()).isEqualTo(post.getPollChoices().get(0).getId()),
+                () -> assertThat(data.getFirst().id()).isEqualTo(post.getId()),
                 () -> assertThat(data.getFirst().title()).isEqualTo(post.getTitle()),
 
                 () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post.getPollChoices().get(0).getTitle()),
