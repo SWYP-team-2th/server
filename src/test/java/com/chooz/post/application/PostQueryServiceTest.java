@@ -15,6 +15,7 @@ import com.chooz.support.fixture.VoteFixture;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
+import com.chooz.vote.application.VoteService;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +54,8 @@ class PostQueryServiceTest extends IntegrationTest {
 
     @Autowired
     ThumbnailRepository thumbnailRepository;
+    @Autowired
+    private VoteService voteService;
 
     @Test
     @DisplayName("게시글 조회")
@@ -242,10 +245,18 @@ class PostQueryServiceTest extends IntegrationTest {
                 .userId(user.getId())
                 .pollOption(PostFixture.multiplePollOption())
                 .build());
+        Post post2 = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
         //유저1 선택지 1, 2 복수 투표
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(1).getId()));
 
+        //유저1 게시글2 투표 후 취소
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post2.getId(), post2.getPollChoices().get(1).getId()));
+        voteService.vote(user.getId(), post2.getId(), List.of());
+        
         //when
         var response = postService.findVotedPosts(user.getId(), null, 10);
 
