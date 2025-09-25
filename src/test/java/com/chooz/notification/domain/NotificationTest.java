@@ -1,9 +1,11 @@
 package com.chooz.notification.domain;
 
+import com.chooz.notification.application.dto.NotificationContent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -15,37 +17,38 @@ class NotificationTest {
     void create() throws Exception {
         //given
         Long receiverId = 1L;
-        String receiverNickname = "공개된 츄";
-        Long actorId = 2L;
-        String actorNickname = "숨겨진 츄";
-        String actorProfileUrl = "https://cdn.chooz.site/default_profile.png";
-        Long targetId = 3L;
-        TargetType targetType = TargetType.COMMENT;
-        String targetImageUrl = "https://cdn.chooz.site/default_target.png";
+        Actor actor = Actor.of(2L,"숨겨진 츄", "https://cdn.chooz.site/default_profile.png");
+        List<Target> targets = List.of(Target.of(3L, TargetType.POST));
+        String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
         LocalDateTime eventAt = LocalDateTime.now();
-        //when
+        NotificationType notificationType = NotificationType.COMMENT_LIKED;
+
         Notification notification = Notification.create(
-                receiverId,
-                receiverNickname,
-                actorId,
-                actorNickname,
-                actorProfileUrl,
-                targetId,
-                targetType,
-                targetImageUrl,
-                eventAt
+                notificationType,
+                eventAt,
+                NotificationContent.of(
+                        receiverId,
+                        actor,
+                        imageUrl,
+                        targets
+                )
         ).get();
 
-        //then
+        //when then
         assertAll(
-                () -> assertThat(notification.getReceiver().getId()).isEqualTo(receiverId),
-                () -> assertThat(notification.getReceiver().getNickname()).isEqualTo(receiverNickname),
-                () -> assertThat(notification.getActor().getId()).isEqualTo(actorId),
-                () -> assertThat(notification.getActor().getNickname()).isEqualTo(actorNickname),
-                () -> assertThat(notification.getActor().getProfileUrl()).isEqualTo(actorProfileUrl),
-                () -> assertThat(notification.getTarget().getId()).isEqualTo(targetId),
-                () -> assertThat(notification.getTarget().getType()).isEqualTo(targetType),
-                () -> assertThat(notification.getTarget().getImageUrl()).isEqualTo(targetImageUrl),
+                () -> assertThat(notification.getReceiverId()).isEqualTo(receiverId),
+                () -> assertThat(notification.getActor().getId()).isEqualTo(actor.getId()),
+                () -> assertThat(notification.getActor().getNickname()).isEqualTo(actor.getNickname()),
+                () -> assertThat(notification.getActor().getProfileUrl()).isEqualTo(actor.getProfileUrl()),
+                () -> assertThat(notification.getTargets())
+                        .allSatisfy(target -> {
+                                    assertThat(target.getId()).isEqualTo(3L);
+                                    assertThat(target.getType()).isEqualTo(TargetType.POST);
+                                }
+                        ),
+                () -> assertThat(notification.getImageUrl()).isEqualTo(imageUrl),
+                () -> assertThat(notification.isValid()).isEqualTo(true),
+                () -> assertThat(notification.isRead()).isEqualTo(false),
                 () -> assertThat(notification.getEventAt()).isEqualTo(eventAt)
         );
     }
@@ -54,27 +57,24 @@ class NotificationTest {
     void markRead() throws Exception {
         //given
         Long receiverId = 1L;
-        String receiverNickname = "공개된 츄";
-        Long actorId = 2L;
-        String actorNickname = "숨겨진 츄";
-        String actorProfileUrl = "https://cdn.chooz.site/default_profile.png";
-        Long targetId = 3L;
-        TargetType targetType = TargetType.COMMENT;
-        String targetImageUrl = "https://cdn.chooz.site/default_target.png";
+        Actor actor = Actor.of(2L,"숨겨진 츄", "https://cdn.chooz.site/default_profile.png");
+        List<Target> targets = List.of(Target.of(3L, TargetType.COMMENT));
+        String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
         LocalDateTime eventAt = LocalDateTime.now();
-        //when
+        NotificationType notificationType = NotificationType.COMMENT_LIKED;
+
         Notification notification = Notification.create(
-                receiverId,
-                receiverNickname,
-                actorId,
-                actorNickname,
-                actorProfileUrl,
-                targetId,
-                targetType,
-                targetImageUrl,
-                eventAt
+                notificationType,
+                eventAt,
+                NotificationContent.of(
+                        receiverId,
+                        actor,
+                        imageUrl,
+                        targets
+                )
         ).get();
 
+        //when
         notification.markRead();
 
         //then

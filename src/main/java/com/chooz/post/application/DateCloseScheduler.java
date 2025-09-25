@@ -1,13 +1,17 @@
 package com.chooz.post.application;
 
+import com.chooz.common.event.EventPublisher;
+import com.chooz.notification.domain.event.PostClosedNotificationEvent;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -16,14 +20,21 @@ import java.util.List;
 public class DateCloseScheduler {
 
     private final PostRepository postRepository;
+    private final EventPublisher eventPublisher;
 
     @Transactional
     @Scheduled(fixedDelay = 1000 * 60)
     public void closePostsByDate() {
         log.info("마감 스케줄링 시작");
         List<Post> postsNeedToClose = postRepository.findPostsNeedToClose();
-        //마감 알림
         postsNeedToClose.forEach(Post::close);
+        postsNeedToClose.forEach(
+                post -> eventPublisher.publish(
+                        new PostClosedNotificationEvent(
+                                post.getId(), post.getCloseOption().getCloseType(), LocalDateTime.now()
+                        )
+                )
+        );
         log.info("총 {}개 게시글 마감", postsNeedToClose.size());
     }
 }

@@ -1,5 +1,6 @@
 package com.chooz.notification.application.dto;
 
+import com.chooz.notification.domain.Actor;
 import com.chooz.notification.domain.Target;
 
 import java.util.List;
@@ -12,4 +13,19 @@ public record NotificationContent (
         String imageUrl,
         List<Target> targets
 ){
+    public static NotificationContent of(
+            Long receiverId,
+            Actor actor,
+            String imageUrl,
+            List<Target> targets
+            ) {
+        return new NotificationContent(
+                receiverId,
+                actor.getId(),
+                actor.getNickname(),
+                actor.getProfileUrl(),
+                imageUrl,
+                targets
+        );
+    }
 }

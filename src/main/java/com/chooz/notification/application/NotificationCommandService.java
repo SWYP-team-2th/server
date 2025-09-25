@@ -16,8 +16,8 @@ public class NotificationCommandService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Notification create(Notification notification) {
-        return notificationQueryService.existsByDedupKey(notification.getId(), notification.getDedupKey())
-                ? notificationRepository.save(notification)
-                : null;
+        return notificationQueryService.existsByDedupKey(notification.getReceiverId(), notification.getDedupKey())
+                ? null
+                : notificationRepository.save(notification);
     }
 }

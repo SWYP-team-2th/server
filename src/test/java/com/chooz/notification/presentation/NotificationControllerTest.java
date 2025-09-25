@@ -2,6 +2,7 @@ package com.chooz.notification.presentation;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.notification.domain.Actor;
+import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Receiver;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
@@ -38,9 +39,10 @@ public class NotificationControllerTest extends RestDocsTest {
                         new NotificationResponse(
                                 1L,
                                 2L,
-                                new Receiver(1L, "숨겨진 츄"),
                                 new Actor(2L, "공개된 츄", "https://cdn.chooz.site/default_profile.png"),
-                                new Target(3L, TargetType.COMMENT, "https://cdn.chooz.site/thumbnail.png"),
+                                NotificationType.COMMENT_LIKED,
+                                List.of(Target.of(1L, TargetType.POST)),
+                                "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d",
                                 true,
                                 false,
                                 LocalDateTime.now()
@@ -66,24 +68,22 @@ public class NotificationControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.ARRAY).description("알림 데이터"),
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER).description("알림 ID"),
-                                fieldWithPath("data[].postId")
-                                        .type(JsonFieldType.NUMBER).description("게시물 ID"),
-                                fieldWithPath("data[].receiver.id")
+                                fieldWithPath("data[].receiverId")
                                         .type(JsonFieldType.NUMBER).description("receiver ID"),
-                                fieldWithPath("data[].receiver.nickname")
-                                        .type(JsonFieldType.STRING).description("receiver 닉네임"),
                                 fieldWithPath("data[].actor.id")
                                         .type(JsonFieldType.NUMBER).description("actor ID"),
                                 fieldWithPath("data[].actor.nickname")
                                         .type(JsonFieldType.STRING).description("actor 닉네임"),
                                 fieldWithPath("data[].actor.profileUrl")
                                         .type(JsonFieldType.STRING).description("actor 프로필 이미지 url"),
-                                fieldWithPath("data[].target.id")
+                                fieldWithPath("data[].notificationType")
+                                        .type(JsonFieldType.STRING).description("알림 유형"),
+                                fieldWithPath("data[].targets[].id")
                                         .type(JsonFieldType.NUMBER).description("알림 타겟 ID"),
-                                fieldWithPath("data[].target.type")
+                                fieldWithPath("data[].targets[].type")
                                         .type(JsonFieldType.STRING).description("알림 타겟 유형"),
-                                fieldWithPath("data[].target.imageUrl")
-                                        .type(JsonFieldType.STRING).description("알림 타겟 썸네일 이미지 url"),
+                                fieldWithPath("data[].imageUrl")
+                                        .type(JsonFieldType.STRING).description("알림 썸네일 이미지 url"),
                                 fieldWithPath("data[].isValid")
                                         .type(JsonFieldType.BOOLEAN).description("알림 상태"),
                                 fieldWithPath("data[].isRead")

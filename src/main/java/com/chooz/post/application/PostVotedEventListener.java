@@ -29,7 +29,7 @@ public class PostVotedEventListener {
         long voterCount = voteRepository.countVoterByPostId(post.getId());
         if (post.isClosableByVoterCount(voterCount)) {
             post.close();
-            //마감알림
+            //마감알림..
         }
     }
 }

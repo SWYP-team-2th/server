@@ -3,6 +3,7 @@ package com.chooz.notification.domain;
 import com.chooz.common.domain.BaseEntity;
 import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
+import com.chooz.post.domain.CloseType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -81,6 +82,9 @@ public class Notification extends BaseEntity {
         if (checkMine(notificationContent.actorId(), notificationContent.receiverId())) {
             return Optional.empty();
         }
+//        if(checkMySelfClosePost(notificationType, closeType)){
+//            return Optional.empty();
+//        }
         return Optional.of(Notification.builder()
                 .receiverId(notificationContent.receiverId())
                 .actor(Actor.of(
@@ -100,6 +104,9 @@ public class Notification extends BaseEntity {
     private static boolean checkMine(Long actorId, Long receiverId) {
         return actorId != null && actorId.equals(receiverId);
     }
+//    private static boolean checkMySelfClosePost(NotificationType notificationType, CloseType closeType) {
+//        return notificationType == NotificationType.MY_POST_CLOSED && closeType == CloseType.SELF;
+//    }
     public static String makeDedupKey(NotificationType notificationType, Long actorId, List<Target> targets) {
         StringBuilder key = new StringBuilder(100)
                 .append(actorId).append('|')

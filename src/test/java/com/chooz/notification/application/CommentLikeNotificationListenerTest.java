@@ -59,19 +59,27 @@ class CommentLikeNotificationListenerTest extends IntegrationTest {
         TestTransaction.end();
 
         //then
-        Slice<NotificationDto> notificationSlice = notificationQueryRepository.findNotifications(
+        NotificationDto notification = notificationQueryRepository.findNotifications(
                 receiver.getId(),
                 null,
                 PageRequest.ofSize(10)
-        );
+        ).getContent().getFirst();
 
         assertAll(
-                () -> assertThat(notificationSlice.getContent().size()).isEqualTo(1),
-                () -> assertThat(notificationSlice.getContent().getFirst().receiverId()).isEqualTo(receiver.getId()),
-                () -> assertThat(notificationSlice.getContent().getFirst().actorId()).isEqualTo(actor.getId()),
-                () -> assertThat(notificationSlice.getContent().getFirst().targetType()).isEqualTo(TargetType.COMMENT),
-                () -> assertThat(notificationSlice.getContent().getFirst().targetId()).isEqualTo(comment.getId()),
-                () -> assertThat(notificationSlice.getContent().getFirst().postId()).isEqualTo(post.getId())
+                () -> assertThat(notification.notificationRowDto().receiverId()).isEqualTo(receiver.getId()),
+                () -> assertThat(notification.notificationRowDto().actorId()).isEqualTo(actor.getId()),
+                () -> assertThat(notification.notificationRowDto().actorNickname()).isEqualTo(actor.getNickname()),
+                () -> assertThat(notification.notificationRowDto().actorProfileUrl()).isEqualTo(actor.getProfileUrl()),
+                () -> assertThat(notification.targets())
+                        .hasSize(2)
+                        .anySatisfy(target -> {
+                                    assertThat(target.id()).isEqualTo(1L);
+                                    assertThat(target.type()).isEqualTo(TargetType.POST);
+                                }
+                        ),
+                () -> assertThat(notification.notificationRowDto().imageUrl()).isEqualTo(post.getImageUrl()),
+                () -> assertThat(notification.notificationRowDto().isValid()).isEqualTo(true),
+                () -> assertThat(notification.notificationRowDto().isRead()).isEqualTo(false)
         );
     }
 }

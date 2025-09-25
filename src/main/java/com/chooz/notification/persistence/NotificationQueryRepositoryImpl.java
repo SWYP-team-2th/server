@@ -15,7 +15,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class NotificationQueryRepositoryImpl implements NotificationQueryRepository {
 
-//    private final NotificationJpaRepository notificationJpaRepository;
     private final NotificationQueryDslRepository notificationQueryDslRepository;
 
     @Override
