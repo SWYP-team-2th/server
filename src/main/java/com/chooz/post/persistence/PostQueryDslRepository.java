@@ -172,7 +172,10 @@ public class PostQueryDslRepository {
                                 JPAExpressions
                                         .select(vote.postId)
                                         .from(vote)
-                                        .where(vote.userId.eq(userId))
+                                        .where(
+                                                vote.userId.eq(userId),
+                                                vote.deleted.isFalse()
+                                        )
                         ),
                         cursor(postId, post.id),
                         post.deleted.isFalse()
