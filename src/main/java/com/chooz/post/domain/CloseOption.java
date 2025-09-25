@@ -59,7 +59,7 @@ public class CloseOption {
     }
 
     private static void validateDateCloseType(LocalDateTime closedAt) {
-        if (Objects.isNull(closedAt) || closedAt.isBefore(LocalDateTime.now().plusHours(1))) {
+        if (Objects.isNull(closedAt) || closedAt.isBefore(LocalDateTime.now().plusMinutes(59))) {
             throw new BadRequestException(ErrorCode.INVALID_DATE_CLOSE_OPTION);
         }
     }
