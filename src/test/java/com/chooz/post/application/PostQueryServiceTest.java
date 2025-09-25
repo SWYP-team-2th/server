@@ -127,6 +127,89 @@ class PostQueryServiceTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("유저가 작성한 게시글 조회 - 중복 투표")
+    void findUserPosts_multiple() {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post1 = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
+        Post post2 = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
+        //유저1 게시글1 선택지 1, 2 복수 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post1.getId(), post1.getPollChoices().get(0).getId()));
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post1.getId(), post1.getPollChoices().get(1).getId()));
+
+        //유저1 게시글2 선택지 1 단일 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post2.getId(), post2.getPollChoices().get(0).getId()));
+
+        //when
+        var response = postService.findUserPosts(user.getId(), null, 10);
+
+        //then
+        List<MyPagePostResponse> data = response.data();
+        assertAll(
+                () -> assertThat(response.data()).hasSize(2),
+                () -> assertThat(response.hasNext()).isFalse(),
+
+                () -> assertThat(data.getFirst().id()).isEqualTo(post2.getId()),
+                () -> assertThat(data.getFirst().title()).isEqualTo(post2.getTitle()),
+
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post2.getPollChoices().get(0).getTitle()),
+                () -> assertThat(data.getFirst().postVoteInfo().totalVoterCount()).isEqualTo(1),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(1),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("100"),
+
+                () -> assertThat(data.get(1).id()).isEqualTo(post1.getId()),
+                () -> assertThat(data.get(1).title()).isEqualTo(post1.getTitle()),
+
+                () -> assertThat(data.get(1).postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post1.getPollChoices().get(0).getTitle()),
+                () -> assertThat(data.get(1).postVoteInfo().totalVoterCount()).isEqualTo(2),
+                () -> assertThat(data.get(1).postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(1),
+                () -> assertThat(data.get(1).postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("50")
+        );
+    }
+
+    @Test
+    @DisplayName("유저가 작성한 게시글 조회 - 중복 투표2")
+    void findUserPosts_multiple2() {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        User user2 = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.multiplePollOption())
+                .build());
+        //유저1 선택지 1, 2 복수 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(1).getId()));
+
+        //유저2 선택지 1 단일 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
+
+        //when
+        var response = postService.findUserPosts(user.getId(), null, 10);
+
+        //then
+        List<MyPagePostResponse> data = response.data();
+        assertAll(
+                () -> assertThat(response.data()).hasSize(1),
+                () -> assertThat(response.hasNext()).isFalse(),
+
+                () -> assertThat(data.getFirst().id()).isEqualTo(post.getId()),
+                () -> assertThat(data.getFirst().title()).isEqualTo(post.getTitle()),
+
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().title()).isEqualTo(post.getPollChoices().get(0).getTitle()),
+                () -> assertThat(data.getFirst().postVoteInfo().totalVoterCount()).isEqualTo(3),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(2),
+                () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("67")
+        );
+    }
+
+    @Test
     @DisplayName("유저가 투표한 게시글 조회 - 커서 null인 경우")
     void findVotedPosts() throws Exception {
         //given
@@ -151,38 +234,7 @@ class PostQueryServiceTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("피드 조회 - 내 게시글 1개, 공개 게시글 15개, 투표 10개, 댓글 20개")
-    void findFeed() throws Exception {
-        //given
-        int size = 20;
-        User user1 = userRepository.save(createUserBuilder().build());
-        User user2 = userRepository.save(createUserBuilder().build());
-
-        List<Post> publicPosts = createPostsWithScope(user2, Scope.PUBLIC, 15);
-        createPostsWithScope(user2, Scope.PRIVATE, 3);
-        Post myPost = postRepository.save(createPostBuilder().userId(user1.getId()).build());
-
-        createVotes(user1, publicPosts.getFirst(), 10);
-        createComments(user1, publicPosts.getFirst(), 20);
-
-        List<Vote> publicPostVotes = voteRepository.findByPostIdAndDeletedFalse(publicPosts.getFirst().getId());
-        List<Comment> publicPostComments = commentRepository.findByPostIdAndDeletedFalse(publicPosts.getFirst().getId());
-
-        //when
-        CursorBasePaginatedResponse<FeedResponse> response = postService.findFeed(user1.getId(), null, size);
-
-        //then
-        assertAll(
-                () -> assertThat(response.data().size()).isEqualTo(16),
-                () -> assertThat(response.data().getLast().voterCount()).isEqualTo(1),
-                () -> assertThat(response.data().getLast().commentCount()).isEqualTo(publicPostComments.size()),
-                () -> assertThat(response.data().getLast().isAuthor()).isFalse(),
-                () -> assertThat(response.data().getFirst().isAuthor()).isTrue()
-        );
-    }
-
-    @Test
-    @DisplayName("투표 현황 조회 - 중복 투표")
+    @DisplayName("유저가 투표한 게시글 조회 - 중복 투표")
     void findVotedPosts_multiple() {
         //given
         User user = userRepository.save(UserFixture.createDefaultUser());
@@ -214,7 +266,7 @@ class PostQueryServiceTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("투표 현황 조회 - 중복 투표2")
+    @DisplayName("유저가 투표한 게시글 조회 - 중복 투표2")
     void findVotedPosts_multiple2() {
         //given
         User user = userRepository.save(UserFixture.createDefaultUser());
@@ -246,6 +298,37 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(data.getFirst().postVoteInfo().totalVoterCount()).isEqualTo(3),
                 () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(2),
                 () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("67")
+        );
+    }
+
+    @Test
+    @DisplayName("피드 조회 - 내 게시글 1개, 공개 게시글 15개, 투표 10개, 댓글 20개")
+    void findFeed() throws Exception {
+        //given
+        int size = 20;
+        User user1 = userRepository.save(createUserBuilder().build());
+        User user2 = userRepository.save(createUserBuilder().build());
+
+        List<Post> publicPosts = createPostsWithScope(user2, Scope.PUBLIC, 15);
+        createPostsWithScope(user2, Scope.PRIVATE, 3);
+        Post myPost = postRepository.save(createPostBuilder().userId(user1.getId()).build());
+
+        createVotes(user1, publicPosts.getFirst(), 10);
+        createComments(user1, publicPosts.getFirst(), 20);
+
+        List<Vote> publicPostVotes = voteRepository.findByPostIdAndDeletedFalse(publicPosts.getFirst().getId());
+        List<Comment> publicPostComments = commentRepository.findByPostIdAndDeletedFalse(publicPosts.getFirst().getId());
+
+        //when
+        CursorBasePaginatedResponse<FeedResponse> response = postService.findFeed(user1.getId(), null, size);
+
+        //then
+        assertAll(
+                () -> assertThat(response.data().size()).isEqualTo(16),
+                () -> assertThat(response.data().getLast().voterCount()).isEqualTo(1),
+                () -> assertThat(response.data().getLast().commentCount()).isEqualTo(publicPostComments.size()),
+                () -> assertThat(response.data().getLast().isAuthor()).isFalse(),
+                () -> assertThat(response.data().getFirst().isAuthor()).isTrue()
         );
     }
 
