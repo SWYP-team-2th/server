@@ -66,10 +66,9 @@ class CommentLikeNotificationListenerTest extends IntegrationTest {
         ).getContent().getFirst();
 
         assertAll(
-                () -> assertThat(notification.notificationRowDto().receiverId()).isEqualTo(receiver.getId()),
-                () -> assertThat(notification.notificationRowDto().actorId()).isEqualTo(actor.getId()),
-                () -> assertThat(notification.notificationRowDto().actorNickname()).isEqualTo(actor.getNickname()),
-                () -> assertThat(notification.notificationRowDto().actorProfileUrl()).isEqualTo(actor.getProfileUrl()),
+                () -> assertThat(notification.notificationRowDto().title()).contains("좋아요를 눌렀어요!"),
+                () -> assertThat(notification.notificationRowDto().content()).contains("확인해보세요."),
+                () -> assertThat(notification.notificationRowDto().profileUrl()).isEqualTo(actor.getProfileUrl()),
                 () -> assertThat(notification.targets())
                         .hasSize(2)
                         .anySatisfy(target -> {
@@ -78,7 +77,6 @@ class CommentLikeNotificationListenerTest extends IntegrationTest {
                                 }
                         ),
                 () -> assertThat(notification.notificationRowDto().imageUrl()).isEqualTo(post.getImageUrl()),
-                () -> assertThat(notification.notificationRowDto().isValid()).isEqualTo(true),
                 () -> assertThat(notification.notificationRowDto().isRead()).isEqualTo(false)
         );
     }

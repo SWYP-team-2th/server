@@ -38,12 +38,12 @@ public class NotificationControllerTest extends RestDocsTest {
                 List.of(
                         new NotificationResponse(
                                 1L,
-                                2L,
-                                new Actor(2L, "공개된 츄", "https://cdn.chooz.site/default_profile.png"),
                                 NotificationType.COMMENT_LIKED,
-                                List.of(Target.of(1L, TargetType.POST)),
+                                "https://cdn.chooz.site/default_profile.png",
+                                "숨겨진 츄님이 좋아요를 눌렀어요!",
+                                "지금 바로 확인해보세요.",
                                 "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d",
-                                true,
+                                List.of(Target.of(1L, TargetType.POST)),
                                 false,
                                 LocalDateTime.now()
                         )
@@ -68,24 +68,20 @@ public class NotificationControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.ARRAY).description("알림 데이터"),
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER).description("알림 ID"),
-                                fieldWithPath("data[].receiverId")
-                                        .type(JsonFieldType.NUMBER).description("receiver ID"),
-                                fieldWithPath("data[].actor.id")
-                                        .type(JsonFieldType.NUMBER).description("actor ID"),
-                                fieldWithPath("data[].actor.nickname")
-                                        .type(JsonFieldType.STRING).description("actor 닉네임"),
-                                fieldWithPath("data[].actor.profileUrl")
-                                        .type(JsonFieldType.STRING).description("actor 프로필 이미지 url"),
                                 fieldWithPath("data[].notificationType")
                                         .type(JsonFieldType.STRING).description("알림 유형"),
+                                fieldWithPath("data[].title")
+                                        .type(JsonFieldType.STRING).description("알림 내용(제목)"),
+                                fieldWithPath("data[].content")
+                                        .type(JsonFieldType.STRING).description("알림 내용(내용)"),
+                                fieldWithPath("data[].profileUrl")
+                                        .type(JsonFieldType.STRING).description("알림 프로필 이미지 url"),
+                                fieldWithPath("data[].imageUrl")
+                                        .type(JsonFieldType.STRING).description("알림 썸네일 이미지 url"),
                                 fieldWithPath("data[].targets[].id")
                                         .type(JsonFieldType.NUMBER).description("알림 타겟 ID"),
                                 fieldWithPath("data[].targets[].type")
                                         .type(JsonFieldType.STRING).description("알림 타겟 유형"),
-                                fieldWithPath("data[].imageUrl")
-                                        .type(JsonFieldType.STRING).description("알림 썸네일 이미지 url"),
-                                fieldWithPath("data[].isValid")
-                                        .type(JsonFieldType.BOOLEAN).description("알림 상태"),
                                 fieldWithPath("data[].isRead")
                                         .type(JsonFieldType.BOOLEAN).description("읽음 여부"),
                                 fieldWithPath("data[].eventAt")

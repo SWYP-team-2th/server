@@ -17,7 +17,10 @@ class NotificationTest {
     void create() throws Exception {
         //given
         Long receiverId = 1L;
-        Actor actor = Actor.of(2L,"숨겨진 츄", "https://cdn.chooz.site/default_profile.png");
+        Long actorId = 2L;
+        String title = "숨겨진 츄님이 좋아요를 눌렀어요!";
+        String content = "지금 바로 확인해보세요.";
+        String profileUrl =  "https://cdn.chooz.site/default_profile.png";
         List<Target> targets = List.of(Target.of(3L, TargetType.POST));
         String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
         LocalDateTime eventAt = LocalDateTime.now();
@@ -28,7 +31,10 @@ class NotificationTest {
                 eventAt,
                 NotificationContent.of(
                         receiverId,
-                        actor,
+                        actorId,
+                        title,
+                        content,
+                        profileUrl,
                         imageUrl,
                         targets
                 )
@@ -37,9 +43,9 @@ class NotificationTest {
         //when then
         assertAll(
                 () -> assertThat(notification.getReceiverId()).isEqualTo(receiverId),
-                () -> assertThat(notification.getActor().getId()).isEqualTo(actor.getId()),
-                () -> assertThat(notification.getActor().getNickname()).isEqualTo(actor.getNickname()),
-                () -> assertThat(notification.getActor().getProfileUrl()).isEqualTo(actor.getProfileUrl()),
+                () -> assertThat(notification.getProfileUrl()).isEqualTo(profileUrl),
+                () -> assertThat(notification.getTitle()).isEqualTo(title),
+                () -> assertThat(notification.getContent()).isEqualTo(content),
                 () -> assertThat(notification.getTargets())
                         .allSatisfy(target -> {
                                     assertThat(target.getId()).isEqualTo(3L);
@@ -47,7 +53,6 @@ class NotificationTest {
                                 }
                         ),
                 () -> assertThat(notification.getImageUrl()).isEqualTo(imageUrl),
-                () -> assertThat(notification.isValid()).isEqualTo(true),
                 () -> assertThat(notification.isRead()).isEqualTo(false),
                 () -> assertThat(notification.getEventAt()).isEqualTo(eventAt)
         );
@@ -57,8 +62,11 @@ class NotificationTest {
     void markRead() throws Exception {
         //given
         Long receiverId = 1L;
-        Actor actor = Actor.of(2L,"숨겨진 츄", "https://cdn.chooz.site/default_profile.png");
-        List<Target> targets = List.of(Target.of(3L, TargetType.COMMENT));
+        Long actorId = 2L;
+        String title = "숨겨진 츄님이 좋아요를 눌렀어요!";
+        String content = "지금 바로 확인해보세요.";
+        String profileUrl =  "https://cdn.chooz.site/default_profile.png";
+        List<Target> targets = List.of(Target.of(3L, TargetType.POST));
         String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
         LocalDateTime eventAt = LocalDateTime.now();
         NotificationType notificationType = NotificationType.COMMENT_LIKED;
@@ -68,7 +76,10 @@ class NotificationTest {
                 eventAt,
                 NotificationContent.of(
                         receiverId,
-                        actor,
+                        actorId,
+                        title,
+                        content,
+                        profileUrl,
                         imageUrl,
                         targets
                 )
