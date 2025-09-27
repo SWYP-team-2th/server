@@ -93,9 +93,9 @@ public class Notification extends BaseEntity {
 //        }
         return Optional.of(Notification.builder()
                 .receiverId(notificationContent.receiverId())
-                .profileUrl(notificationContent.actorProfileUrl())
-                .title("")
-                .content("")
+                .profileUrl(notificationContent.profileUrl())
+                .title(notificationContent.title())
+                .content(notificationContent.content())
                 .targets(List.copyOf(notificationContent.targets()))
                 .notificationType(notificationType)
                 .imageUrl(notificationContent.imageUrl())

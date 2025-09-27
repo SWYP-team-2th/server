@@ -6,27 +6,34 @@ import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
+import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationContentAssembler {
 
     private final NotificationQueryService notificationQueryService;
+    private final NotificationMessageRenderer renderer;
 
     public NotificationContent forCommentLiked(Long commentId, Long likerId) {
         TargetUserDto commentAuthorDto = notificationQueryService.findUserByCommentId(commentId);
         TargetUserDto targetUserDto = notificationQueryService.findUserById(likerId);
         TargetPostDto targetPostDto = notificationQueryService.findPostByCommentId(commentId);
+        var vars = Map.<String, Object>of("actorName", targetUserDto.nickname());
+        var renderedMessage = renderer.render(NotificationType.COMMENT_LIKED.code(), vars);
         return new NotificationContent(
                 commentAuthorDto.id(),
                 targetUserDto.id(),
-                targetUserDto.nickname(),
+                renderedMessage.title(),
+                renderedMessage.content(),
                 targetUserDto.profileUrl(),
                 targetPostDto.imageUrl(),
                 List.of(Target.of(targetPostDto.id(), TargetType.POST),
@@ -34,19 +41,19 @@ public class NotificationContentAssembler {
                 )
         );
     }
-    public NotificationContent forVoted(Long postId, Long voterId) {
-        TargetUserDto postAuthorDto = notificationQueryService.findUserByPostId(postId);
-        TargetUserDto targetUserDto = notificationQueryService.findUserById(voterId);
-        TargetPostDto targetPostDto = notificationQueryService.findPostById(postId);
-        return new NotificationContent(
-                postAuthorDto.id(),
-                targetUserDto.id(),
-                targetUserDto.nickname(),
-                targetUserDto.profileUrl(),
-                targetPostDto.imageUrl(),
-                List.of(Target.of(targetPostDto.id(), TargetType.POST))
-        );
-    }
+//    public NotificationContent forVoted(Long postId, Long voterId) {
+//        TargetUserDto postAuthorDto = notificationQueryService.findUserByPostId(postId);
+//        TargetUserDto targetUserDto = notificationQueryService.findUserById(voterId);
+//        TargetPostDto targetPostDto = notificationQueryService.findPostById(postId);
+//        return new NotificationContent(
+//                postAuthorDto.id(),
+//                targetUserDto.id(),
+//                targetUserDto.nickname(),
+//                targetUserDto.profileUrl(),
+//                targetPostDto.imageUrl(),
+//                List.of(Target.of(targetPostDto.id(), TargetType.POST))
+//        );
+//    }
 //    public NotificationContent forPostClosed(Long postId) {
 //        TargetUserDto postAuthorDto = notificationQueryDslRepository.getUserByPostId(postId)
 //                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
