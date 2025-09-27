@@ -13,28 +13,24 @@ import java.util.List;
 
 public record NotificationResponse (
         Long id,
-        Long receiverId,
-        Actor actor,
         NotificationType notificationType,
-        List<Target> targets,
+        String profileUrl,
+        String title,
+        String content,
         String imageUrl,
-        boolean isValid,
+        List<Target> targets,
         boolean isRead,
         LocalDateTime eventAt
 )implements CursorDto{
     public static NotificationResponse of (NotificationDto notificationDto){
         return new NotificationResponse(
                 notificationDto.notificationRowDto().id(),
-                notificationDto.notificationRowDto().receiverId(),
-                new Actor(
-                        notificationDto.notificationRowDto().actorId(),
-                        notificationDto.notificationRowDto().actorNickname(),
-                        notificationDto.notificationRowDto().actorProfileUrl()
-                ),
                 notificationDto.notificationRowDto().notificationType(),
-                List.copyOf(notificationDto.targets().stream().map(t -> Target.of(t.id(), t.type())).toList()),
+                notificationDto.notificationRowDto().profileUrl(),
+                notificationDto.notificationRowDto().title(),
+                notificationDto.notificationRowDto().content(),
                 notificationDto.notificationRowDto().imageUrl(),
-                notificationDto.notificationRowDto().isValid(),
+                List.copyOf(notificationDto.targets().stream().map(t -> Target.of(t.id(), t.type())).toList()),
                 notificationDto.notificationRowDto().isRead(),
                 notificationDto.notificationRowDto().eventAt()
         );

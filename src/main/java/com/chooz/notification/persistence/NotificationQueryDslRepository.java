@@ -17,6 +17,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,13 +37,11 @@ public class NotificationQueryDslRepository {
         List<NotificationRowDto> notificationRows = queryFactory
                 .select(new QNotificationRowDto(
                         notification.id,
-                        notification.receiverId,
-                        notification.actor.id,
-                        notification.actor.nickname,
-                        notification.actor.profileUrl,
                         notification.notificationType,
+                        notification.profileUrl,
+                        notification.title,
+                        notification.content,
                         notification.imageUrl,
-                        notification.isValid,
                         notification.isRead,
                         notification.eventAt
                         )

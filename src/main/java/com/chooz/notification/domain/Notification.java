@@ -44,8 +44,14 @@ public class Notification extends BaseEntity {
     @Column(name = "receiver_id", nullable = false)
     private Long receiverId;
 
-    @Embedded
-    private Actor actor;
+    @Column(name = "profile_url", nullable = false)
+    private String profileUrl;
+
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "content", nullable = false)
+    private String content;
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.LAZY)
@@ -87,11 +93,9 @@ public class Notification extends BaseEntity {
 //        }
         return Optional.of(Notification.builder()
                 .receiverId(notificationContent.receiverId())
-                .actor(Actor.of(
-                        notificationContent.actorId(),
-                        notificationContent.actorNickname(),
-                        notificationContent.actorProfileUrl())
-                )
+                .profileUrl(notificationContent.actorProfileUrl())
+                .title("")
+                .content("")
                 .targets(List.copyOf(notificationContent.targets()))
                 .notificationType(notificationType)
                 .imageUrl(notificationContent.imageUrl())

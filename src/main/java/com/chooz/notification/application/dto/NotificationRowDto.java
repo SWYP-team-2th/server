@@ -10,13 +10,11 @@ import java.util.List;
 @QueryProjection
 public record NotificationRowDto(
         Long id,
-        Long receiverId,
-        Long actorId,
-        String actorNickname,
-        String actorProfileUrl,
         NotificationType notificationType,
+        String profileUrl,
+        String title,
+        String content,
         String imageUrl,
-        boolean isValid,
         boolean isRead,
         LocalDateTime eventAt
 ) {}
