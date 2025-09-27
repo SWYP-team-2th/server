@@ -23,9 +23,9 @@ public class DateCloseScheduler {
     private final EventPublisher eventPublisher;
 
     @Transactional
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelay = 1000)
     public void closePostsByDate() {
-        log.info("마감 스케줄링 시작");
+        log.info("마감 스케줄링 시작 | 서버 시간: {}", LocalDateTime.now());
         List<Post> postsNeedToClose = postRepository.findPostsNeedToClose();
         postsNeedToClose.forEach(Post::close);
         postsNeedToClose.forEach(

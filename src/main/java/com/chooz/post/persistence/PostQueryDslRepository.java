@@ -122,7 +122,7 @@ public class PostQueryDslRepository {
                 .select(new QPostWithVoteCount(
                         post,
                         JPAExpressions
-                                .select(vote.userId.countDistinct())
+                                .select(vote.userId.count())
                                 .from(vote)
                                 .where(
                                         vote.postId.eq(post.id),
@@ -172,7 +172,10 @@ public class PostQueryDslRepository {
                                 JPAExpressions
                                         .select(vote.postId)
                                         .from(vote)
-                                        .where(vote.userId.eq(userId))
+                                        .where(
+                                                vote.userId.eq(userId),
+                                                vote.deleted.isFalse()
+                                        )
                         ),
                         cursor(postId, post.id),
                         post.deleted.isFalse()
