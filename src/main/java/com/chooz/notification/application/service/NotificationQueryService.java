@@ -1,9 +1,9 @@
-package com.chooz.notification.application;
+package com.chooz.notification.application.service;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.application.dto.NotificationDto;
+import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
 import com.chooz.notification.domain.NotificationQueryRepository;

@@ -1,25 +1,11 @@
 package com.chooz.notification.application;
 
-import com.chooz.notification.application.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
-import com.chooz.notification.domain.TargetType;
-import com.chooz.post.domain.PollChoice;
-import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.support.IntegrationTest;
-import com.chooz.support.fixture.PostFixture;
-import com.chooz.support.fixture.UserFixture;
-import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.application.VoteService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.test.context.transaction.TestTransaction;
-
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;

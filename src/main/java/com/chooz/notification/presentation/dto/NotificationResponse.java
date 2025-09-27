@@ -1,11 +1,8 @@
 package com.chooz.notification.presentation.dto;
 
 import com.chooz.common.dto.CursorDto;
-import com.chooz.notification.application.dto.NotificationDto;
-import com.chooz.notification.domain.Actor;
-import com.chooz.notification.domain.Notification;
+import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationType;
-import com.chooz.notification.domain.Receiver;
 import com.chooz.notification.domain.Target;
 
 import java.time.LocalDateTime;

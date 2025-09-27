@@ -1,13 +1,10 @@
 package com.chooz.notification.domain;
 
 import com.chooz.common.domain.BaseEntity;
-import com.chooz.notification.application.dto.NotificationContent;
-import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
-import com.chooz.post.domain.CloseType;
+import com.chooz.notification.application.web.dto.NotificationContent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

@@ -1,6 +1,6 @@
 package com.chooz.notification.domain;
 
-import com.chooz.notification.application.dto.NotificationDto;
+import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
 import org.springframework.data.domain.Pageable;

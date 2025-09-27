@@ -1,4 +1,4 @@
-package com.chooz.notification.application.dto;
+package com.chooz.notification.application.web.dto;
 
 
 import com.chooz.notification.domain.TargetType;

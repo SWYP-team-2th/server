@@ -1,12 +1,12 @@
 package com.chooz.notification.persistence;
 
-import com.chooz.notification.application.dto.NotificationDto;
-import com.chooz.notification.application.dto.NotificationRowDto;
+import com.chooz.notification.application.web.dto.NotificationDto;
+import com.chooz.notification.application.web.dto.NotificationRowDto;
 import com.chooz.notification.application.dto.QNotificationRowDto;
 import com.chooz.notification.application.dto.QTargetDto;
 import com.chooz.notification.application.dto.QTargetPostDto;
 import com.chooz.notification.application.dto.QTargetUserDto;
-import com.chooz.notification.application.dto.TargetDto;
+import com.chooz.notification.application.web.dto.TargetDto;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
 import com.chooz.notification.domain.QTarget;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

@@ -3,7 +3,7 @@ package com.chooz.notification.application;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.commentLike.application.CommentLikeService;
-import com.chooz.notification.application.dto.NotificationDto;
+import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.domain.Post;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.test.context.transaction.TestTransaction;
 
 import static org.assertj.core.api.Assertions.assertThat;

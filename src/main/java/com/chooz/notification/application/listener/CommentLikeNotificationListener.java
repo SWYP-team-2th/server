@@ -1,13 +1,12 @@
-package com.chooz.notification.application;
+package com.chooz.notification.application.listener;
 
-import com.chooz.notification.application.dto.NotificationContent;
+import com.chooz.notification.application.NotificationContentAssembler;
+import com.chooz.notification.application.NotificationService;
+import com.chooz.notification.application.web.dto.NotificationContent;
 import com.chooz.notification.domain.Notification;
-import com.chooz.notification.domain.NotificationRepository;
 import com.chooz.notification.domain.NotificationType;
-import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -16,7 +15,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class CommentLikeNotificationListener {
 
-    private final NotificationCommandService notificationCommandService;
+    private final NotificationService notificationService;
     private final NotificationContentAssembler notificationContentAssembler;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -29,6 +28,6 @@ public class CommentLikeNotificationListener {
                  NotificationType.COMMENT_LIKED,
                  commentLikedNotificationEvent.eventAt(),
                  notificationContent
-        ).ifPresent(notificationCommandService::create);
+        ).ifPresent(notificationService::create);
     }
 }

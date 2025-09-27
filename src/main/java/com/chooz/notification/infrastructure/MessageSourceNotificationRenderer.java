@@ -24,9 +24,10 @@ public class MessageSourceNotificationRenderer implements NotificationMessageRen
 
         Object[] args = argsFrom(vars); // 간단 버전: 순서만 합의해서 꺼내 쓰기
         String title = getMessage(titleKey, args);
-        String body  = getMessage(contentKey , args);
+        String content  = getMessage(contentKey , args);
         Validator.validateEmptyString(title);
-        return new RenderedMessage(title, body);
+        Validator.validateEmptyString(content);
+        return new RenderedMessage(title, content);
     }
 
     private String getMessage(String key, Object[] args) {

@@ -1,9 +1,7 @@
 package com.chooz.notification.presentation;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.notification.domain.Actor;
 import com.chooz.notification.domain.NotificationType;
-import com.chooz.notification.domain.Receiver;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.presentation.dto.NotificationResponse;

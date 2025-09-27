@@ -1,11 +1,8 @@
 package com.chooz.notification.application;
 
-import com.chooz.common.exception.BadRequestException;
-import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
-import com.chooz.notification.domain.NotificationQueryRepository;
+import com.chooz.notification.application.web.dto.NotificationContent;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
@@ -14,19 +11,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationContentAssembler {
 
-    private final NotificationQueryService notificationQueryService;
+    private final NotificationService notificationService;
     private final NotificationMessageRenderer renderer;
 
     public NotificationContent forCommentLiked(Long commentId, Long likerId) {
-        TargetUserDto commentAuthorDto = notificationQueryService.findUserByCommentId(commentId);
-        TargetUserDto targetUserDto = notificationQueryService.findUserById(likerId);
-        TargetPostDto targetPostDto = notificationQueryService.findPostByCommentId(commentId);
+        TargetUserDto commentAuthorDto = notificationService.findUserByCommentId(commentId);
+        TargetUserDto targetUserDto = notificationService.findUserById(likerId);
+        TargetPostDto targetPostDto = notificationService.findPostByCommentId(commentId);
         var vars = Map.<String, Object>of("actorName", targetUserDto.nickname());
         var renderedMessage = renderer.render(NotificationType.COMMENT_LIKED.code(), vars);
         return new NotificationContent(
