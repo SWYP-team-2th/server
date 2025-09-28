@@ -1,12 +1,11 @@
 package com.chooz.notification.application;
 
+import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
-import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
-import com.chooz.post.domain.CloseType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -76,8 +75,8 @@ public class NotificationContentAssembler {
         );
     }
     public List<NotificationContent> forPostClosed(Long postId, Long userId) {
-        TargetUserDto postAuthorDto = notificationService.findUserById(userId); //actor
-        List<TargetUserDto> receiverUserDtos = notificationService.findVoteUsersByPostId(postId); //receiver
+        TargetUserDto postAuthorDto = notificationService.findUserById(userId);
+        List<TargetUserDto> receiverUserDtos = notificationService.findVoteUsersByPostId(postId);
         TargetPostDto targetPostDto = notificationService.findPostById(postId);
         var vars = Map.<String, Object>of(
                 "postTitle", targetPostDto.title()

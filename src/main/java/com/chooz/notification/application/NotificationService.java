@@ -1,22 +1,15 @@
 package com.chooz.notification.application;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.common.exception.BadRequestException;
-import com.chooz.common.exception.ErrorCode;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
 import com.chooz.notification.application.service.NotificationCommandService;
 import com.chooz.notification.application.service.NotificationQueryService;
-import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.Notification;
-import com.chooz.notification.domain.NotificationQueryRepository;
-import com.chooz.notification.domain.NotificationRepository;
+import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -50,5 +43,11 @@ public class NotificationService {
     }
     public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
         return notificationQueryService.findVoteUsersByPostId(postId);
+    }
+    public void markRead(Long notificationId) {
+        notificationCommandService.markRead(notificationId);
+    }
+    public NotificationPresentResponse present(Long userId) {
+        return notificationQueryService.present(userId);
     }
 }
