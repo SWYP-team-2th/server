@@ -1,79 +1,107 @@
 package com.chooz.notification.application;
 
-import com.chooz.notification.application.web.dto.NotificationDto;
-import com.chooz.notification.domain.NotificationQueryRepository;
+import com.chooz.notification.application.dto.NotificationContent;
+import com.chooz.notification.application.service.NotificationCommandService;
+import com.chooz.notification.application.service.NotificationQueryService;
+import com.chooz.notification.domain.Notification;
+import com.chooz.notification.domain.NotificationType;
+import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
-import com.chooz.post.domain.PollChoice;
-import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostRepository;
+import com.chooz.notification.presentation.dto.NotificationPresentResponse;
+import com.chooz.notification.presentation.dto.NotificationResponse;
 import com.chooz.support.IntegrationTest;
-import com.chooz.support.fixture.PostFixture;
-import com.chooz.support.fixture.UserFixture;
-import com.chooz.user.domain.User;
-import com.chooz.user.domain.UserRepository;
-import com.chooz.vote.application.VoteService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.transaction.TestTransaction;
 
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class NotificationQueryTest extends IntegrationTest {
+class NotificationQueryServiceTest extends IntegrationTest {
 
     @Autowired
-    UserRepository userRepository;
+    NotificationQueryService notificationQueryService;
 
     @Autowired
-    PostRepository postRepository;
-
-    @Autowired
-    VoteService voteService;
-
-    @Autowired
-    NotificationQueryRepository notificationQueryRepository;
+    NotificationCommandService notificationCommandService;
 
     @Test
     @DisplayName("투표 상태 확인")
-    void markRead() throws Exception {
+    void notifications() throws Exception {
         //given
-        User receiver = userRepository.save(UserFixture.createDefaultUser());
-        User actor = userRepository.save(UserFixture.createDefaultUser());
-        Post post = postRepository.save(PostFixture.createPostBuilder().userId(receiver.getId()).build());
+        Long receiverId = 1L;
+        Long actorId = 2L;
+        String title = "숨겨진 츄님이 좋아요를 눌렀어요!";
+        String content = "지금 바로 확인해보세요.";
+        String profileUrl =  "https://cdn.chooz.site/default_profile.png";
+        List<Target> targets = List.of(Target.of(3L, TargetType.POST));
+        String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
+        LocalDateTime eventAt = LocalDateTime.now();
+        NotificationType notificationType = NotificationType.COMMENT_LIKED;
 
+        Notification notification = Notification.create(
+                notificationType,
+                eventAt,
+                NotificationContent.of(
+                        receiverId,
+                        actorId,
+                        title,
+                        content,
+                        profileUrl,
+                        imageUrl,
+                        targets
+                )
+        ).get();
         //when
-        voteService.vote(
-                actor.getId(),
-                post.getId(),
-                post.getPollChoices().stream().map(PollChoice::getId).limit(1).collect(Collectors.toList()));
-
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
+        notificationCommandService.create(notification);
+        List<NotificationResponse> notifications = notificationQueryService.findNotifications(
+                receiverId,
+                null,
+                10
+        ).data();
 
         //then
-        NotificationDto notification = notificationQueryRepository.findNotifications(
-                receiver.getId(),
-                null,
-                PageRequest.ofSize(10)
-        ).getContent().getFirst();
-
         assertAll(
-                () -> assertThat(notification.notificationRowDto().title()).contains("투표에 참여했어요!"),
-                () -> assertThat(notification.notificationRowDto().content()).contains("확인해보세요."),
-                () -> assertThat(notification.notificationRowDto().profileUrl()).isEqualTo(actor.getProfileUrl()),
-                () -> assertThat(notification.targets())
-                        .hasSize(1)
-                        .anySatisfy(target -> {
-                                    assertThat(target.id()).isEqualTo(1L);
-                                    assertThat(target.type()).isEqualTo(TargetType.POST);
-                                }
-                        ),
-                () -> assertThat(notification.notificationRowDto().imageUrl()).isEqualTo(post.getImageUrl()),
-                () -> assertThat(notification.notificationRowDto().isRead()).isEqualTo(false)
+                () -> assertThat(notifications.size()).isEqualTo(1)
+        );
+    }
+    @Test
+    @DisplayName("투표 상태 확인")
+    void present() throws Exception {
+        //given
+        Long receiverId = 1L;
+        Long actorId = 2L;
+        String title = "숨겨진 츄님이 좋아요를 눌렀어요!";
+        String content = "지금 바로 확인해보세요.";
+        String profileUrl =  "https://cdn.chooz.site/default_profile.png";
+        List<Target> targets = List.of(Target.of(3L, TargetType.POST));
+        String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
+        LocalDateTime eventAt = LocalDateTime.now();
+        NotificationType notificationType = NotificationType.COMMENT_LIKED;
+
+        Notification notification = Notification.create(
+                notificationType,
+                eventAt,
+                NotificationContent.of(
+                        receiverId,
+                        actorId,
+                        title,
+                        content,
+                        profileUrl,
+                        imageUrl,
+                        targets
+                )
+        ).get();
+        //when
+        notificationCommandService.create(notification);
+        NotificationPresentResponse notificationPresentResponse = notificationQueryService.present(receiverId);
+
+        //then
+        assertAll(
+                () -> assertThat(notificationPresentResponse.present()).isTrue()
         );
     }
 }

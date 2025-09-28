@@ -48,8 +48,8 @@ class CommentLikeNotificationListenerTest extends IntegrationTest {
         User actor = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(PostFixture.createPostBuilder().userId(receiver.getId()).build());
         Comment comment =  commentRepository.save(CommentFixture.createCommentBuilder()
-                .userId(receiver.getId())
                 .postId(post.getId())
+                .userId(receiver.getId())
                 .build());
 
         //when

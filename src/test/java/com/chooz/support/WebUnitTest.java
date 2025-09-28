@@ -1,6 +1,8 @@
 package com.chooz.support;
 
 import com.chooz.image.application.ImageService;
+import com.chooz.notification.application.NotificationService;
+import com.chooz.notification.application.service.NotificationCommandService;
 import com.chooz.notification.application.service.NotificationQueryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.chooz.auth.application.AuthService;
@@ -55,5 +57,5 @@ public abstract class WebUnitTest {
     protected DiscordMessageSender discordMessageSender;
 
     @MockitoBean
-    protected NotificationQueryService notificationQueryService;
+    protected NotificationService notificationService;
 }

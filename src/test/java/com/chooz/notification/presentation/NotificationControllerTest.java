@@ -1,9 +1,11 @@
 package com.chooz.notification.presentation;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
+import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
+import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
@@ -11,14 +13,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.payload.JsonFieldType;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +56,7 @@ public class NotificationControllerTest extends RestDocsTest {
                         )
                 )
         );
-        given(notificationQueryService.findNotifications(1L, null, 10)).willReturn(response);
+        given(notificationService.findNotifications(1L, null, 10)).willReturn(response);
 
         //when then
         mockMvc.perform(get("/notifications")
@@ -86,5 +95,36 @@ public class NotificationControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.STRING).description("이벤트 발생 시간")
                         )
                 ));
+    }
+    @Test
+    @WithMockUserInfo
+    @DisplayName("알림 읽기")
+    void markRead() throws Exception {
+        //when then
+        mockMvc.perform(patch("/notifications/{notificationId}", 1)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
+                        pathParameters(parameterWithName("notificationId").description("알림 ID"))
+                ));
+        verify(notificationService, times(1)).markRead(any());
+    }
+    @Test
+    @WithMockUserInfo
+    @DisplayName("알림 상태 확인")
+    void present() throws Exception {
+        NotificationPresentResponse response = NotificationPresentResponse.of(true);
+        given(notificationService.present(1L)).willReturn(response);
+        //when then
+        mockMvc.perform(get("/notifications/present")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
+                        responseFields(fieldWithPath("present").type(JsonFieldType.BOOLEAN).description("알림 상태 여부"))
+                ));
+        verify(notificationService, times(1)).present(any());
     }
 }
