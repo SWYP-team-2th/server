@@ -2,8 +2,10 @@ package com.chooz.notification.application;
 
 import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
+import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.application.DateCloseScheduler;
+import com.chooz.post.application.PostCommandService;
 import com.chooz.post.application.PostVotedEventListener;
 import com.chooz.post.domain.CloseType;
 import com.chooz.post.domain.Post;
@@ -47,6 +49,9 @@ class MyPostClosedNotificationListenerTest extends IntegrationTest {
     @Autowired
     DateCloseScheduler dateCloseScheduler;
 
+    @Autowired
+    PostCommandService postCommandService;
+
     @Test
     @DisplayName("내 투표 마감 알림(참여자 수 마감)")
     void onMyPostClosedByVoter() throws Exception {
@@ -76,7 +81,9 @@ class MyPostClosedNotificationListenerTest extends IntegrationTest {
                 user1.getId(),
                 null,
                 PageRequest.ofSize(10)
-        ).getContent().getFirst();
+        ).getContent().stream().filter(notificationDto ->
+                notificationDto.notificationRowDto().notificationType().equals(NotificationType.MY_POST_CLOSED))
+                .toList().getFirst();
 
         assertAll(
                 () -> assertThat(notification.notificationRowDto().title()).contains("투표가 마감됐습니다!"),
@@ -111,10 +118,12 @@ class MyPostClosedNotificationListenerTest extends IntegrationTest {
 
         //then
         NotificationDto notification = notificationQueryRepository.findNotifications(
-                user.getId(),
-                null,
-                PageRequest.ofSize(10)
-        ).getContent().getFirst();
+                        user.getId(),
+                        null,
+                        PageRequest.ofSize(10)
+                ).getContent().stream().filter(notificationDto ->
+                        notificationDto.notificationRowDto().notificationType().equals(NotificationType.MY_POST_CLOSED))
+                .toList().getFirst();
 
         assertAll(
                 () -> assertThat(notification.notificationRowDto().title()).contains("투표가 마감됐습니다!"),
@@ -129,6 +138,32 @@ class MyPostClosedNotificationListenerTest extends IntegrationTest {
                         ),
                 () -> assertThat(notification.notificationRowDto().imageUrl()).isEqualTo(post.getImageUrl()),
                 () -> assertThat(notification.notificationRowDto().isRead()).isEqualTo(false)
+        );
+    }
+    @Test
+    @DisplayName("내 투표 마감 알림(직접 마감)")
+    void onMyPostClosedBySelf() throws Exception {
+        // given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post post = postRepository.save(PostFixture.createDefaultPost(user.getId()));
+
+        // when
+        postCommandService.close(user.getId(), post.getId());
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        //then
+        List<NotificationDto> notifications = notificationQueryRepository.findNotifications(
+                        user.getId(),
+                        null,
+                        PageRequest.ofSize(10)
+                ).getContent().stream().filter(notificationDto ->
+                        notificationDto.notificationRowDto().notificationType().equals(NotificationType.MY_POST_CLOSED))
+                .toList();
+
+        assertAll(
+                () -> assertThat(notifications).hasSize(0)
         );
     }
 }
