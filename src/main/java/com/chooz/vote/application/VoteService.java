@@ -3,7 +3,6 @@ package com.chooz.vote.application;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.domain.event.VotedNotificationEvent;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.vote.domain.Vote;

@@ -1,4 +1,4 @@
-package com.chooz.notification.domain.event;
+package com.chooz.commentLike.domain.event;
 
 import java.time.LocalDateTime;
 

@@ -1,12 +1,11 @@
 package com.chooz.post.application;
 
 import com.chooz.common.event.EventPublisher;
-import com.chooz.notification.domain.event.PostClosedNotificationEvent;
+import com.chooz.post.application.dto.PostClosedNotificationEvent;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +28,10 @@ public class DateCloseScheduler {
         List<Post> postsNeedToClose = postRepository.findPostsNeedToClose();
         postsNeedToClose.forEach(Post::close);
         postsNeedToClose.forEach(
-                post -> eventPublisher.publish(
-                        new PostClosedNotificationEvent(
-                                post.getId(), post.getCloseOption().getCloseType(), LocalDateTime.now()
+                post -> eventPublisher.publish(new PostClosedNotificationEvent(
+                        post.getId(),
+                        post.getUserId(),
+                        LocalDateTime.now()
                         )
                 )
         );

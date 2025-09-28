@@ -22,7 +22,7 @@ public class MessageSourceNotificationRenderer implements NotificationMessageRen
         String titleKey = code + ".title";
         String contentKey  = code + ".content";
 
-        Object[] args = argsFrom(vars); // 간단 버전: 순서만 합의해서 꺼내 쓰기
+        Object[] args = argsFrom(vars);
         String title = getMessage(titleKey, args);
         String content  = getMessage(contentKey , args);
         Validator.validateEmptyString(title);

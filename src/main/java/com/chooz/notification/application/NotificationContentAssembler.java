@@ -2,7 +2,7 @@ package com.chooz.notification.application;
 
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
-import com.chooz.notification.application.web.dto.NotificationContent;
+import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
@@ -33,34 +33,44 @@ public class NotificationContentAssembler {
                 targetUserDto.profileUrl(),
                 targetPostDto.imageUrl(),
                 List.of(Target.of(targetPostDto.id(), TargetType.POST),
-                        Target.of(targetPostDto.id(), TargetType.COMMENT)
+                        Target.of(commentId, TargetType.COMMENT)
                 )
         );
     }
-//    public NotificationContent forVoted(Long postId, Long voterId) {
-//        TargetUserDto postAuthorDto = notificationQueryService.findUserByPostId(postId);
-//        TargetUserDto targetUserDto = notificationQueryService.findUserById(voterId);
-//        TargetPostDto targetPostDto = notificationQueryService.findPostById(postId);
-//        return new NotificationContent(
-//                postAuthorDto.id(),
-//                targetUserDto.id(),
-//                targetUserDto.nickname(),
-//                targetUserDto.profileUrl(),
-//                targetPostDto.imageUrl(),
-//                List.of(Target.of(targetPostDto.id(), TargetType.POST))
-//        );
-//    }
-//    public NotificationContent forPostClosed(Long postId) {
-//        TargetUserDto postAuthorDto = notificationQueryDslRepository.getUserByPostId(postId)
-//                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
-//        TargetPostDto targetPostDto = notificationQueryDslRepository.getPostById(postId)
-//                .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-//        return new PostClosedContent(
-//                postAuthorDto.nickname(),
-//                postAuthorDto.profileUrl(),
-//                targetPostDto.imageUrl(),
-//                postAuthorDto.id(),
-//                postAuthorDto.nickname()
-//        );
-//    }
+    public NotificationContent forVoted(Long postId, Long voterId) {
+        TargetUserDto postAuthorDto = notificationService.findUserByPostId(postId);
+        TargetUserDto targetUserDto = notificationService.findUserById(voterId);
+        TargetPostDto targetPostDto = notificationService.findPostById(postId);
+        var vars = Map.<String, Object>of(
+                "actorName", targetUserDto.nickname(),
+                "postTitle", targetPostDto.title()
+                );
+        var renderedMessage = renderer.render(NotificationType.POST_VOTED.code(), vars);
+        return new NotificationContent(
+                postAuthorDto.id(),
+                targetUserDto.id(),
+                renderedMessage.title(),
+                renderedMessage.content(),
+                targetUserDto.profileUrl(),
+                targetPostDto.imageUrl(),
+                List.of(Target.of(targetPostDto.id(), TargetType.POST))
+        );
+    }
+    public NotificationContent forMyPostClosed(Long postId, Long receiverId) {
+        TargetUserDto postAuthorDto = notificationService.findUserById(receiverId);
+        TargetPostDto targetPostDto = notificationService.findPostById(postId);
+        var vars = Map.<String, Object>of(
+                "postTitle", targetPostDto.title()
+        );
+        var renderedMessage = renderer.render(NotificationType.MY_POST_CLOSED.code(), vars);
+        return new NotificationContent(
+                postAuthorDto.id(),
+                postAuthorDto.id(),
+                renderedMessage.title(),
+                renderedMessage.content(),
+                postAuthorDto.profileUrl(),
+                targetPostDto.imageUrl(),
+                List.of(Target.of(targetPostDto.id(), TargetType.POST))
+        );
+    }
 }

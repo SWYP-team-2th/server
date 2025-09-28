@@ -1,11 +1,11 @@
 package com.chooz.notification.application.listener;
 
+import com.chooz.commentLike.domain.event.CommentLikedNotificationEvent;
 import com.chooz.notification.application.NotificationContentAssembler;
 import com.chooz.notification.application.NotificationService;
-import com.chooz.notification.application.web.dto.NotificationContent;
+import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationType;
-import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

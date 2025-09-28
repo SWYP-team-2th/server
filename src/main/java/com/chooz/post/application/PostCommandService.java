@@ -3,7 +3,7 @@ package com.chooz.post.application;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.domain.event.PostClosedNotificationEvent;
+import com.chooz.post.application.dto.PostClosedNotificationEvent;
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
@@ -14,7 +14,6 @@ import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
 import com.chooz.thumbnail.domain.Thumbnail;
 import com.chooz.thumbnail.domain.ThumbnailRepository;
-import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,6 @@ public class PostCommandService {
     private final ShareUrlService shareUrlService;
     private final ThumbnailRepository thumbnailRepository;
     private final PostValidator postValidator;
-    private final EventPublisher eventPublisher;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         Post post = createPost(userId, request);
@@ -92,9 +90,6 @@ public class PostCommandService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.closeByAuthor(userId);
-        eventPublisher.publish(
-                new PostClosedNotificationEvent(post.getId(), post.getCloseOption().getCloseType(), LocalDateTime.now())
-        );
     }
 
     @Transactional

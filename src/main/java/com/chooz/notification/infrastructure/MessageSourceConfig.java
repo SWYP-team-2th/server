@@ -8,7 +8,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 @Configuration
 public class MessageSourceConfig {
 
-    @Bean
+    @Bean(name = "messageSource")
     public MessageSource notificationMessageSource() {
         ReloadableResourceBundleMessageSource ms = new ReloadableResourceBundleMessageSource();
         ms.setBasenames("classpath:notification/messages");

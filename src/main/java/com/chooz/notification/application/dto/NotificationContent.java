@@ -1,4 +1,4 @@
-package com.chooz.notification.application.web.dto;
+package com.chooz.notification.application.dto;
 
 import com.chooz.notification.domain.Target;
 import java.util.List;

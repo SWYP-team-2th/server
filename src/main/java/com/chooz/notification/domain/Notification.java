@@ -1,7 +1,7 @@
 package com.chooz.notification.domain;
 
 import com.chooz.common.domain.BaseEntity;
-import com.chooz.notification.application.web.dto.NotificationContent;
+import com.chooz.notification.application.dto.NotificationContent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -82,7 +82,7 @@ public class Notification extends BaseEntity {
             LocalDateTime eventAt,
             NotificationContent notificationContent
     ) {
-        if (checkMine(notificationContent.actorId(), notificationContent.receiverId())) {
+        if (checkMine(notificationContent.actorId(), notificationContent.receiverId(), notificationType)) {
             return Optional.empty();
         }
 //        if(checkMySelfClosePost(notificationType, closeType)){
@@ -102,8 +102,8 @@ public class Notification extends BaseEntity {
                 .eventAt(eventAt)
                 .build());
     }
-    private static boolean checkMine(Long actorId, Long receiverId) {
-        return actorId != null && actorId.equals(receiverId);
+    private static boolean checkMine(Long actorId, Long receiverId, NotificationType notificationType) {
+        return actorId != null && actorId.equals(receiverId) && !NotificationType.isMyPostClosed(notificationType);
     }
 //    private static boolean checkMySelfClosePost(NotificationType notificationType, CloseType closeType) {
 //        return notificationType == NotificationType.MY_POST_CLOSED && closeType == CloseType.SELF;

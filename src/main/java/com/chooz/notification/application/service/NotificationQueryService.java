@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationQueryService {
 
     private final NotificationQueryRepository notificationQueryRepository;
-    private final NotificationQueryRepository notificationQueryDslRepository;
 
     public CursorBasePaginatedResponse<NotificationResponse> findNotifications(Long userId, Long cursor, int size) {
         Slice<NotificationDto> notifications = notificationQueryRepository.findNotifications(userId, cursor, PageRequest.ofSize(size));
@@ -30,23 +29,23 @@ public class NotificationQueryService {
         return notificationQueryRepository.existsByDedupKey(ReceiverId, dedupKey);
     }
     public TargetUserDto findUserByCommentId(Long commentId) {
-        return notificationQueryDslRepository.findUserByCommentId(commentId)
+        return notificationQueryRepository.findUserByCommentId(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
     }
     public TargetUserDto findUserById(Long userId) {
-        return notificationQueryDslRepository.findUserById(userId)
+        return notificationQueryRepository.findUserById(userId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
     }
     public TargetPostDto findPostByCommentId(Long commentId) {
-        return notificationQueryDslRepository.findPostByCommentId(commentId)
+        return notificationQueryRepository.findPostByCommentId(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
     }
     public TargetUserDto findUserByPostId(Long postId) {
-        return notificationQueryDslRepository.findUserByPostId(postId)
+        return notificationQueryRepository.findUserByPostId(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
     }
     public TargetPostDto findPostById(Long postId) {
-        return notificationQueryDslRepository.findPostById(postId)
+        return notificationQueryRepository.findPostById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
     }
 

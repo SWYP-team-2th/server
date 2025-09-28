@@ -6,7 +6,7 @@ import com.chooz.commentLike.presentation.dto.CommentLikeIdResponse;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
-import com.chooz.notification.domain.event.CommentLikedNotificationEvent;
+import com.chooz.commentLike.domain.event.CommentLikedNotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

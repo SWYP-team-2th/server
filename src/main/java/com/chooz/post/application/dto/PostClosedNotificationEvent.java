@@ -1,12 +1,10 @@
-package com.chooz.notification.domain.event;
-
-import com.chooz.post.domain.CloseType;
+package com.chooz.post.application.dto;
 
 import java.time.LocalDateTime;
 
 public record PostClosedNotificationEvent(
         Long postId,
-        CloseType closeType,
+        Long receiverId,
         LocalDateTime eventAt
 ) {}
 

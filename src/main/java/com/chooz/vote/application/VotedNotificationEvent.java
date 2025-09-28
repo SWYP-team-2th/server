@@ -1,4 +1,4 @@
-package com.chooz.notification.domain.event;
+package com.chooz.vote.application;
 
 import java.time.LocalDateTime;
 

@@ -9,4 +9,8 @@ public enum NotificationType {
     private final String code;
     NotificationType(String code) {this.code = code;}
     public String code() {return code;}
+
+    public static boolean isMyPostClosed(NotificationType notificationType) {
+        return NotificationType.valueOf(notificationType.name()).equals(MY_POST_CLOSED);
+    }
 }

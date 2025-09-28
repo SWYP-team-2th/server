@@ -1,14 +1,14 @@
 package com.chooz.notification.persistence;
 
-import com.chooz.notification.application.web.dto.NotificationDto;
-import com.chooz.notification.application.web.dto.NotificationRowDto;
-import com.chooz.notification.application.dto.QNotificationRowDto;
-import com.chooz.notification.application.dto.QTargetDto;
 import com.chooz.notification.application.dto.QTargetPostDto;
 import com.chooz.notification.application.dto.QTargetUserDto;
-import com.chooz.notification.application.web.dto.TargetDto;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
+import com.chooz.notification.application.web.dto.NotificationDto;
+import com.chooz.notification.application.web.dto.NotificationRowDto;
+import com.chooz.notification.application.web.dto.QNotificationRowDto;
+import com.chooz.notification.application.web.dto.QTargetDto;
+import com.chooz.notification.application.web.dto.TargetDto;
 import com.chooz.notification.domain.QTarget;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +82,7 @@ public class NotificationQueryDslRepository {
 
     public Optional<TargetPostDto> findPostByCommentId(Long commentId) {
          return Optional.ofNullable(
-                 queryFactory.select(new QTargetPostDto(post.id, post.imageUrl))
+                 queryFactory.select(new QTargetPostDto(post.id, post.title, post.imageUrl))
                          .from(comment)
                          .join(post).on(post.id.eq(comment.postId))
                          .where(comment.id.eq(commentId))
@@ -117,7 +117,7 @@ public class NotificationQueryDslRepository {
     }
     public Optional<TargetPostDto> findPostById(Long postId) {
         return Optional.ofNullable(
-                queryFactory.select(new QTargetPostDto(post.id, post.imageUrl))
+                queryFactory.select(new QTargetPostDto(post.id, post.title, post.imageUrl))
                         .from(post)
                         .where(post.id.eq(postId))
                         .limit(1)
