@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -50,5 +51,10 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
     @Override
     public boolean existsByDedupKey(Long ReceiverId, String dedupKey) {
         return notificationQueryDslRepository.existsByDedupKey(ReceiverId, dedupKey);
+    }
+
+    @Override
+    public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
+        return notificationQueryDslRepository.findVoteUsersByPostId(postId);
     }
 }

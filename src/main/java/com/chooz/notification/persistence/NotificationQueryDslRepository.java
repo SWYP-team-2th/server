@@ -25,6 +25,7 @@ import static com.chooz.comment.domain.QComment.comment;
 import static com.chooz.notification.domain.QNotification.notification;
 import static com.chooz.post.domain.QPost.post;
 import static com.chooz.user.domain.QUser.user;
+import static com.chooz.vote.domain.QVote.vote;
 
 @Repository
 @RequiredArgsConstructor
@@ -84,7 +85,7 @@ public class NotificationQueryDslRepository {
          return Optional.ofNullable(
                  queryFactory.select(new QTargetPostDto(post.id, post.title, post.imageUrl))
                          .from(comment)
-                         .join(post).on(post.id.eq(comment.postId))
+                         .join(post).on(post.id.eq(comment.postId), post.deleted.eq(false))
                          .where(comment.id.eq(commentId))
                          .limit(1)
                          .fetchFirst());
@@ -110,7 +111,7 @@ public class NotificationQueryDslRepository {
         return Optional.ofNullable(
                 queryFactory.select(new QTargetUserDto(user.id, user.nickname, user.profileUrl))
                         .from(user)
-                        .join(post).on(user.id.eq(post.userId))
+                        .join(post).on(user.id.eq(post.userId), post.deleted.eq(false))
                         .where(post.id.eq(postId))
                         .limit(1)
                         .fetchFirst());
@@ -119,11 +120,14 @@ public class NotificationQueryDslRepository {
         return Optional.ofNullable(
                 queryFactory.select(new QTargetPostDto(post.id, post.title, post.imageUrl))
                         .from(post)
-                        .where(post.id.eq(postId))
+                        .where(
+                                post.id.eq(postId),
+                                post.deleted.eq(false)
+                        )
                         .limit(1)
                         .fetchFirst());
     }
-    boolean existsByDedupKey(Long receiverId, String dedupkey) {
+    public boolean existsByDedupKey(Long receiverId, String dedupkey) {
         Integer one = queryFactory.selectOne()
                         .from(notification)
                         .where(
@@ -132,6 +136,13 @@ public class NotificationQueryDslRepository {
                         )
                         .fetchFirst();
         return one != null;
+    }
+    public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
+        return queryFactory.select(new QTargetUserDto(user.id, user.nickname, user.profileUrl))
+                .from(user)
+                .join(vote).on(user.id.eq(vote.userId), vote.deleted.eq(false))
+                .join(post).on(post.id.eq(vote.postId), post.deleted.eq(false))
+                .fetch();
     }
 
 }

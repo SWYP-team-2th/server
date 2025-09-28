@@ -14,6 +14,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -24,9 +26,6 @@ public class NotificationQueryService {
     public CursorBasePaginatedResponse<NotificationResponse> findNotifications(Long userId, Long cursor, int size) {
         Slice<NotificationDto> notifications = notificationQueryRepository.findNotifications(userId, cursor, PageRequest.ofSize(size));
         return CursorBasePaginatedResponse.of(notifications.map(NotificationResponse::of));
-    }
-    public boolean existsByDedupKey(Long ReceiverId, String dedupKey) {
-        return notificationQueryRepository.existsByDedupKey(ReceiverId, dedupKey);
     }
     public TargetUserDto findUserByCommentId(Long commentId) {
         return notificationQueryRepository.findUserByCommentId(commentId)
@@ -47,6 +46,9 @@ public class NotificationQueryService {
     public TargetPostDto findPostById(Long postId) {
         return notificationQueryRepository.findPostById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+    }
+    public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
+        return notificationQueryRepository.findVoteUsersByPostId(postId);
     }
 
 }

@@ -37,6 +37,7 @@ public class PostVotedEventListener {
             eventPublisher.publish(new PostClosedNotificationEvent(
                     post.getId(),
                     post.getUserId(),
+                    post.getCloseOption().getCloseType(),
                     LocalDateTime.now()
                     )
             );

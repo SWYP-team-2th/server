@@ -6,31 +6,32 @@ import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.post.application.dto.PostClosedNotificationEvent;
-import com.chooz.post.domain.CloseType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
-public class MyPostClosedNotificationListener {
+public class PostClosedNotificationListener {
 
     private final NotificationService notificationService;
     private final NotificationContentAssembler notificationContentAssembler;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onMyPostClosed(PostClosedNotificationEvent postClosedNotificationEvent) {
-        NotificationContent notificationContent = notificationContentAssembler.forMyPostClosed(
+    public void onPostClosed(PostClosedNotificationEvent postClosedNotificationEvent) {
+        List<NotificationContent> notificationContents = notificationContentAssembler.forPostClosed(
                 postClosedNotificationEvent.postId(),
                 postClosedNotificationEvent.userId()
         );
-        if(!postClosedNotificationEvent.closeType().equals(CloseType.SELF)){
+        notificationContents.forEach(notificationContent -> {
             Notification.create(
-                    NotificationType.MY_POST_CLOSED,
+                    NotificationType.POST_CLOSED,
                     postClosedNotificationEvent.eventAt(),
                     notificationContent
-            ).ifPresent(notificationService::create);
-        }
+            ).ifPresent(n -> notificationService.create(n));
+        });
     }
 }

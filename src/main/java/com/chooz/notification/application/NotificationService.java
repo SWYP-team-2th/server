@@ -18,6 +18,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -27,9 +29,6 @@ public class NotificationService {
 
     public CursorBasePaginatedResponse<NotificationResponse> findNotifications(Long userId, Long cursor, int size) {
         return notificationQueryService.findNotifications(userId, cursor, size);
-    }
-    public boolean existsByDedupKey(Long ReceiverId, String dedupKey) {
-        return notificationQueryService.existsByDedupKey(ReceiverId, dedupKey);
     }
     public TargetUserDto findUserByCommentId(Long commentId) {
         return notificationQueryService.findUserByCommentId(commentId);
@@ -48,5 +47,8 @@ public class NotificationService {
     }
     public Notification create(Notification notification) {
         return notificationCommandService.create(notification);
+    }
+    public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
+        return notificationQueryService.findVoteUsersByPostId(postId);
     }
 }

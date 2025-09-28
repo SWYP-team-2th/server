@@ -2,6 +2,7 @@ package com.chooz.post.application;
 
 import com.chooz.common.event.EventPublisher;
 import com.chooz.post.application.dto.PostClosedNotificationEvent;
+import com.chooz.post.domain.CloseType;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class DateCloseScheduler {
                 post -> eventPublisher.publish(new PostClosedNotificationEvent(
                         post.getId(),
                         post.getUserId(),
+                        post.getCloseOption().getCloseType(),
                         LocalDateTime.now()
                         )
                 )

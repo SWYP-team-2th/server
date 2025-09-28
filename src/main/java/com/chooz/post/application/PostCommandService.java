@@ -31,6 +31,7 @@ public class PostCommandService {
     private final ShareUrlService shareUrlService;
     private final ThumbnailRepository thumbnailRepository;
     private final PostValidator postValidator;
+    private final EventPublisher eventPublisher;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         Post post = createPost(userId, request);
@@ -90,6 +91,13 @@ public class PostCommandService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.closeByAuthor(userId);
+        eventPublisher.publish(new PostClosedNotificationEvent(
+                        post.getId(),
+                        post.getUserId(),
+                        post.getCloseOption().getCloseType(),
+                        LocalDateTime.now()
+                )
+        );
     }
 
     @Transactional

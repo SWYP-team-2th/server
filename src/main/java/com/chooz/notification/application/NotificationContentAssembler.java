@@ -6,11 +6,13 @@ import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
+import com.chooz.post.domain.CloseType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +58,8 @@ public class NotificationContentAssembler {
                 List.of(Target.of(targetPostDto.id(), TargetType.POST))
         );
     }
-    public NotificationContent forMyPostClosed(Long postId, Long receiverId) {
-        TargetUserDto postAuthorDto = notificationService.findUserById(receiverId);
+    public NotificationContent forMyPostClosed(Long postId, Long userId) {
+        TargetUserDto postAuthorDto = notificationService.findUserById(userId);
         TargetPostDto targetPostDto = notificationService.findPostById(postId);
         var vars = Map.<String, Object>of(
                 "postTitle", targetPostDto.title()
@@ -72,5 +74,24 @@ public class NotificationContentAssembler {
                 targetPostDto.imageUrl(),
                 List.of(Target.of(targetPostDto.id(), TargetType.POST))
         );
+    }
+    public List<NotificationContent> forPostClosed(Long postId, Long userId) {
+        TargetUserDto postAuthorDto = notificationService.findUserById(userId); //actor
+        List<TargetUserDto> receiverUserDtos = notificationService.findVoteUsersByPostId(postId); //receiver
+        TargetPostDto targetPostDto = notificationService.findPostById(postId);
+        var vars = Map.<String, Object>of(
+                "postTitle", targetPostDto.title()
+        );
+        var renderedMessage = renderer.render(NotificationType.POST_CLOSED.code(), vars);
+        return receiverUserDtos.stream().map(receiver ->
+                new NotificationContent(
+                        receiver.id(),
+                        postAuthorDto.id(),
+                        renderedMessage.title(),
+                        renderedMessage.content(),
+                        postAuthorDto.profileUrl(),
+                        targetPostDto.imageUrl(),
+                        List.of(Target.of(targetPostDto.id(), TargetType.POST))
+                )).collect(Collectors.toList());
     }
 }

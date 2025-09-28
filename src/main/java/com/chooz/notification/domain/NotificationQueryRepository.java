@@ -6,6 +6,7 @@ import com.chooz.notification.application.dto.TargetUserDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface NotificationQueryRepository {
@@ -16,4 +17,5 @@ public interface NotificationQueryRepository {
     Optional<TargetUserDto> findUserByPostId(Long postId);
     Optional<TargetPostDto> findPostById(Long postId);
     boolean existsByDedupKey(Long ReceiverId, String dedupKey);
+    List<TargetUserDto> findVoteUsersByPostId(Long postId);
 }
