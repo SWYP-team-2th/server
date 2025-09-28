@@ -1,6 +1,6 @@
 package com.chooz.notification.domain;
 
-import com.chooz.notification.application.web.dto.NotificationContent;
+import com.chooz.notification.application.dto.NotificationContent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
