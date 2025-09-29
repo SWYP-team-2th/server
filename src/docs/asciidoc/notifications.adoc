@@ -5,3 +5,13 @@
 === `GET` 알림 조회
 
 operation::notification-controller-test/find-notifications[snippets='http-request,curl-request,path-parameters,request-headers,query-parameters,http-response,response-fields']
+
+[[알림-읽기]]
+=== `PATCH` 알림 읽기
+
+operation::notification-controller-test/mark-read[snippets='http-request,curl-request,path-parameters,request-headers']
+
+[[알림-상태-확인]]
+=== `GET` 알림 상태 확인
+
+operation::notification-controller-test/find-notifications[snippets='http-request,curl-request,path-parameters,request-headers,http-response,response-fields']
