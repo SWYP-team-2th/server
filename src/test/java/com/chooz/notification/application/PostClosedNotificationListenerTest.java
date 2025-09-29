@@ -2,7 +2,6 @@ package com.chooz.notification.application;
 
 import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
-import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.application.DateCloseScheduler;
 import com.chooz.post.application.PostCommandService;
@@ -102,7 +101,7 @@ class PostClosedNotificationListenerTest extends IntegrationTest {
         );
     }
     @Test
-    @DisplayName("내 투표 마감 알림(시간 마감)")
+    @DisplayName("투표 마감 알림(시간 마감)")
     void onMyPostClosedByDate() throws Exception {
         // given
         User user = userRepository.save(UserFixture.createDefaultUser());
@@ -146,7 +145,7 @@ class PostClosedNotificationListenerTest extends IntegrationTest {
         );
     }
     @Test
-    @DisplayName("내 투표 마감 알림(직접 마감)")
+    @DisplayName("투표 마감 알림(직접 마감)")
     void onMyPostClosedBySelf() throws Exception {
         // given
         User user = userRepository.save(UserFixture.createDefaultUser());

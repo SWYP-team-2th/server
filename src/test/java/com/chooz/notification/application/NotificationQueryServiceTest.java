@@ -29,7 +29,7 @@ class NotificationQueryServiceTest extends IntegrationTest {
     NotificationCommandService notificationCommandService;
 
     @Test
-    @DisplayName("투표 상태 확인")
+    @DisplayName("알림 조회")
     void notifications() throws Exception {
         //given
         Long receiverId = 1L;
@@ -69,7 +69,7 @@ class NotificationQueryServiceTest extends IntegrationTest {
         );
     }
     @Test
-    @DisplayName("투표 상태 확인")
+    @DisplayName("알림 상태 확인")
     void present() throws Exception {
         //given
         Long receiverId = 1L;
