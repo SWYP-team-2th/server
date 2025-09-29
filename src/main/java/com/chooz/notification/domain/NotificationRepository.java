@@ -1,11 +1,11 @@
 package com.chooz.notification.domain;
 
-import com.chooz.notification.presentation.dto.NotificationPresentResponse;
-
+import java.util.List;
 import java.util.Optional;
 
 public interface NotificationRepository {
     Notification save(Notification notification);
+    void saveAll(List<Notification> notifications);
     Optional<Notification> findNotificationById(Long id);
     boolean existsByReceiverIdAndIsReadFalseAndDeletedFalse(Long userId);
 }

@@ -41,6 +41,9 @@ public class NotificationService {
     public Notification create(Notification notification) {
         return notificationCommandService.create(notification);
     }
+    public void createAll(List<Notification> notifications) {
+        notificationCommandService.createAll(notifications);
+    }
     public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
         return notificationQueryService.findVoteUsersByPostId(postId);
     }

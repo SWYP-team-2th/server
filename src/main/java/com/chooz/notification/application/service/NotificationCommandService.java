@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,25 @@ public class NotificationCommandService {
         return notificationQueryRepository.existsByDedupKey(notification.getReceiverId(), notification.getDedupKey())
                 ? null
                 : notificationRepository.save(notification);
+    }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createAll(List<Notification> notifications) {
+        List<Notification> existsNotifications = notificationQueryRepository.existsDedupKeyByNotifications(notifications);
+        Set<String> existingPairs = getExistingPairs(existsNotifications);
+        List<Notification> toSave = getNotificationsNotDuplicated(notifications, existingPairs);
+        if (!toSave.isEmpty()) {
+            notificationRepository.saveAll(toSave);
+        }
+    }
+    private Set<String> getExistingPairs(List<Notification> existsNotifications) {
+        return existsNotifications.stream()
+                .map(n -> n.getReceiverId() + "|" + n.getDedupKey())
+                .collect(Collectors.toSet());
+    }
+    private List<Notification> getNotificationsNotDuplicated(List<Notification> notifications, Set<String> existingPairs) {
+        return notifications.stream()
+                .filter(n -> !existingPairs.contains(n.getReceiverId() + "|" + n.getDedupKey()))
+                .toList();
     }
     @Transactional
     public void markRead(Long notificationId){

@@ -9,7 +9,9 @@ import com.chooz.notification.application.web.dto.NotificationRowDto;
 import com.chooz.notification.application.web.dto.QNotificationRowDto;
 import com.chooz.notification.application.web.dto.QTargetDto;
 import com.chooz.notification.application.web.dto.TargetDto;
+import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.QTarget;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -133,9 +135,20 @@ public class NotificationQueryDslRepository {
                         .where(
                                 notification.receiverId.eq(receiverId),
                                 notification.dedupKey.eq(dedupkey)
-                        )
-                        .fetchFirst();
+                        ).fetchFirst();
         return one != null;
+    }
+    public List<Notification> existsDedupKeyByNotifications(List<Notification> notifications) {
+        BooleanBuilder builder = new BooleanBuilder();
+        for (Notification n : notifications) {
+            builder.or(
+                    notification.receiverId.eq(n.getReceiverId())
+                            .and(notification.dedupKey.eq(n.getDedupKey()))
+            );
+        }
+        return queryFactory.selectFrom(notification)
+                .where(builder)
+                .fetch();
     }
     public List<TargetUserDto> findVoteUsersByPostId(Long postId) {
         return queryFactory.select(new QTargetUserDto(user.id, user.nickname, user.profileUrl))

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -26,12 +27,13 @@ public class PostClosedNotificationListener {
                 postClosedNotificationEvent.postId(),
                 postClosedNotificationEvent.userId()
         );
-        notificationContents.forEach(notificationContent -> {
-            Notification.create(
-                    NotificationType.POST_CLOSED,
-                    postClosedNotificationEvent.eventAt(),
-                    notificationContent
-            ).ifPresent(n -> notificationService.create(n));
-        });
+        List<Notification> notifications = new ArrayList<>();
+        notificationContents.forEach(notificationContent ->
+                Notification.create(
+                        NotificationType.POST_CLOSED,
+                        postClosedNotificationEvent.eventAt(),
+                        notificationContent
+                ).ifPresent(notifications::add));
+        notificationService.createAll(notifications);
     }
 }

@@ -1,8 +1,9 @@
 package com.chooz.notification.persistence;
 
-import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
+import com.chooz.notification.application.web.dto.NotificationDto;
+import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +52,11 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
     @Override
     public boolean existsByDedupKey(Long ReceiverId, String dedupKey) {
         return notificationQueryDslRepository.existsByDedupKey(ReceiverId, dedupKey);
+    }
+
+    @Override
+    public List<Notification> existsDedupKeyByNotifications(List<Notification> notifications) {
+        return notificationQueryDslRepository.existsDedupKeyByNotifications(notifications);
     }
 
     @Override

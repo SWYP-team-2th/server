@@ -1,6 +1,7 @@
 package com.chooz.notification.application.dto;
 
 import com.chooz.notification.domain.Target;
+
 import java.util.List;
 
 public record NotificationContent (
