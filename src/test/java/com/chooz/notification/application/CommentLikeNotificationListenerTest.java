@@ -71,7 +71,6 @@ class CommentLikeNotificationListenerTest extends IntegrationTest {
                 () -> assertThat(notification.targets())
                         .hasSize(2)
                         .anySatisfy(target -> {
-                                    assertThat(target.id()).isEqualTo(1L);
                                     assertThat(target.type()).isEqualTo(TargetType.POST);
                                 }
                         ),

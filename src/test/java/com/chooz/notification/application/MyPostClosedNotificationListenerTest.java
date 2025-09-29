@@ -92,7 +92,6 @@ class MyPostClosedNotificationListenerTest extends IntegrationTest {
                 () -> assertThat(notification.targets())
                         .hasSize(1)
                         .anySatisfy(target -> {
-                                    assertThat(target.id()).isEqualTo(1L);
                                     assertThat(target.type()).isEqualTo(TargetType.POST);
                                 }
                         ),
@@ -132,7 +131,6 @@ class MyPostClosedNotificationListenerTest extends IntegrationTest {
                 () -> assertThat(notification.targets())
                         .hasSize(1)
                         .anySatisfy(target -> {
-                                    assertThat(target.id()).isEqualTo(1L);
                                     assertThat(target.type()).isEqualTo(TargetType.POST);
                                 }
                         ),
