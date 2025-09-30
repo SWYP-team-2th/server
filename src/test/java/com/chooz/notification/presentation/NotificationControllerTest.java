@@ -1,10 +1,10 @@
 package com.chooz.notification.presentation;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.notification.domain.Actor;
-import com.chooz.notification.domain.Receiver;
+import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
+import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
@@ -12,14 +12,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.payload.JsonFieldType;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,16 +44,18 @@ public class NotificationControllerTest extends RestDocsTest {
                 List.of(
                         new NotificationResponse(
                                 1L,
-                                2L,
-                                new Receiver(1L, "숨겨진 츄"),
-                                new Actor(2L, "공개된 츄", "https://cdn.chooz.site/default_profile.png"),
-                                new Target(3L, TargetType.COMMENT, "https://cdn.chooz.site/thumbnail.png"),
+                                NotificationType.COMMENT_LIKED,
+                                "https://cdn.chooz.site/default_profile.png",
+                                "숨겨진 츄님이 좋아요를 눌렀어요!",
+                                "지금 바로 확인해보세요.",
+                                "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d",
+                                List.of(Target.of(1L, TargetType.POST)),
                                 false,
                                 LocalDateTime.now()
                         )
                 )
         );
-        given(notificationQueryService.findNotifications(1L, null, 10)).willReturn(response);
+        given(notificationService.findNotifications(1L, null, 10)).willReturn(response);
 
         //when then
         mockMvc.perform(get("/notifications")
@@ -65,29 +74,56 @@ public class NotificationControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.ARRAY).description("알림 데이터"),
                                 fieldWithPath("data[].id")
                                         .type(JsonFieldType.NUMBER).description("알림 ID"),
-                                fieldWithPath("data[].postId")
-                                        .type(JsonFieldType.NUMBER).description("게시물 ID"),
-                                fieldWithPath("data[].receiver.id")
-                                        .type(JsonFieldType.NUMBER).description("receiver ID"),
-                                fieldWithPath("data[].receiver.nickname")
-                                        .type(JsonFieldType.STRING).description("receiver 닉네임"),
-                                fieldWithPath("data[].actor.id")
-                                        .type(JsonFieldType.NUMBER).description("actor ID"),
-                                fieldWithPath("data[].actor.nickname")
-                                        .type(JsonFieldType.STRING).description("actor 닉네임"),
-                                fieldWithPath("data[].actor.profileUrl")
-                                        .type(JsonFieldType.STRING).description("actor 프로필 이미지 url"),
-                                fieldWithPath("data[].target.id")
+                                fieldWithPath("data[].notificationType")
+                                        .type(JsonFieldType.STRING).description("알림 유형"),
+                                fieldWithPath("data[].title")
+                                        .type(JsonFieldType.STRING).description("알림 내용(제목)"),
+                                fieldWithPath("data[].content")
+                                        .type(JsonFieldType.STRING).description("알림 내용(내용)"),
+                                fieldWithPath("data[].profileUrl")
+                                        .type(JsonFieldType.STRING).description("알림 프로필 이미지 url"),
+                                fieldWithPath("data[].imageUrl")
+                                        .type(JsonFieldType.STRING).description("알림 썸네일 이미지 url"),
+                                fieldWithPath("data[].targets[].id")
                                         .type(JsonFieldType.NUMBER).description("알림 타겟 ID"),
-                                fieldWithPath("data[].target.type")
+                                fieldWithPath("data[].targets[].type")
                                         .type(JsonFieldType.STRING).description("알림 타겟 유형"),
-                                fieldWithPath("data[].target.imageUrl")
-                                        .type(JsonFieldType.STRING).description("알림 타겟 썸네일 이미지 url"),
                                 fieldWithPath("data[].isRead")
                                         .type(JsonFieldType.BOOLEAN).description("읽음 여부"),
                                 fieldWithPath("data[].eventAt")
                                         .type(JsonFieldType.STRING).description("이벤트 발생 시간")
                         )
                 ));
+    }
+    @Test
+    @WithMockUserInfo
+    @DisplayName("알림 읽기")
+    void markRead() throws Exception {
+        //when then
+        mockMvc.perform(patch("/notifications/{notificationId}", 1)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
+                        pathParameters(parameterWithName("notificationId").description("알림 ID"))
+                ));
+        verify(notificationService, times(1)).markRead(any());
+    }
+    @Test
+    @WithMockUserInfo
+    @DisplayName("알림 상태 확인")
+    void present() throws Exception {
+        NotificationPresentResponse response = NotificationPresentResponse.of(true);
+        given(notificationService.present(1L)).willReturn(response);
+        //when then
+        mockMvc.perform(get("/notifications/present")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(restDocs.document(
+                        requestHeaders(authorizationHeader()),
+                        responseFields(fieldWithPath("present").type(JsonFieldType.BOOLEAN).description("알림 상태 여부"))
+                ));
+        verify(notificationService, times(1)).present(any());
     }
 }

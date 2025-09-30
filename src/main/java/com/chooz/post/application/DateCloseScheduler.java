@@ -1,5 +1,8 @@
 package com.chooz.post.application;
 
+import com.chooz.common.event.EventPublisher;
+import com.chooz.post.application.dto.PostClosedNotificationEvent;
+import com.chooz.post.domain.CloseType;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ import java.util.List;
 public class DateCloseScheduler {
 
     private final PostRepository postRepository;
+    private final EventPublisher eventPublisher;
 
     @Transactional
     @Scheduled(fixedDelay = 1000)
@@ -24,6 +28,15 @@ public class DateCloseScheduler {
         log.info("마감 스케줄링 시작 | 서버 시간: {}", LocalDateTime.now());
         List<Post> postsNeedToClose = postRepository.findPostsNeedToClose();
         postsNeedToClose.forEach(Post::close);
+        postsNeedToClose.forEach(
+                post -> eventPublisher.publish(new PostClosedNotificationEvent(
+                        post.getId(),
+                        post.getUserId(),
+                        post.getCloseOption().getCloseType(),
+                        LocalDateTime.now()
+                        )
+                )
+        );
         log.info("총 {}개 게시글 마감", postsNeedToClose.size());
     }
 }

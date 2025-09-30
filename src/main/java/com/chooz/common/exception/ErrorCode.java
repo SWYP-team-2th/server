@@ -48,6 +48,7 @@ public enum ErrorCode {
     ONLY_SELF_CAN_CLOSE("작성자 마감의 경우, SELF 마감 방식만이 마감 가능합니다."),
     INVALID_ONBOARDING_STEP("유효하지 않은 온보딩 단계."),
     NICKNAME_LENGTH_EXCEEDED("닉네임 길이 초과"),
+    NOTIFICATION_NOT_FOUND("존재하지 않는 알림 입니다."),
 
     //401
     EXPIRED_TOKEN("토큰이 만료됐습니다."),

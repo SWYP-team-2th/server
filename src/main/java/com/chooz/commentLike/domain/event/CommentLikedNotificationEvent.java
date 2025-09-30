@@ -1,8 +1,8 @@
-package com.chooz.notification.domain.event;
+package com.chooz.commentLike.domain.event;
 
 import java.time.LocalDateTime;
 
-public record CommentLikedEvent(
+public record CommentLikedNotificationEvent(
         Long commentId,
         Long commentLikeId,
         Long likerId,

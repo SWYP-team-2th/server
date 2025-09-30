@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Target {
+
     @Column(name = "target_id", nullable = false)
     private Long id;
 
@@ -21,6 +22,7 @@ public class Target {
     @Column(name = "target_type", nullable = false)
     private TargetType type;
 
-    @Column(name = "target_image_url", nullable = false)
-    private String imageUrl;
+    public static Target of(Long id, TargetType type) {
+        return new Target(id, type);
+    }
 }
