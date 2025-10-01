@@ -14,4 +14,4 @@ operation::notification-controller-test/mark-read[snippets='http-request,curl-re
 [[알림-상태-확인]]
 === `GET` 알림 상태 확인
 
-operation::notification-controller-test/find-notifications[snippets='http-request,curl-request,path-parameters,request-headers,http-response,response-fields']
+operation::notification-controller-test/present[snippets='http-request,curl-request,path-parameters,request-headers,http-response,response-fields']
