@@ -40,8 +40,8 @@ public class PostService {
         postCommandService.update(userId, postId, request);
     }
 
-    public PostResponse findById(Long userId, Long postId) {
-        return postQueryService.findById(userId, postId);
+    public PostResponse findById(Long userId, Long postId, String shareKey) {
+        return postQueryService.findById(userId, postId, shareKey);
     }
 
     public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(

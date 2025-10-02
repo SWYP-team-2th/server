@@ -227,4 +227,8 @@ public class Post extends BaseEntity {
         return this.pollOption.getScope().equals(Scope.PUBLIC) ||
                 this.userId.equals(userId);
     }
+
+    public boolean isRevealable(Long userId, String shareUrl) {
+        return isRevealable(userId) || this.shareUrl.equals(shareUrl);
+    }
 }

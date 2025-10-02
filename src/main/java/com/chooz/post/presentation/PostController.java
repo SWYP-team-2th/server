@@ -45,12 +45,13 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> findPostById(
             @PathVariable("postId") Long postId,
+            @RequestParam(value = "shareKey", required = false ) String shareKey,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
         Long userId = Optional.ofNullable(userInfo)
                 .map(UserInfo::userId)
                 .orElse(null);
-        return ResponseEntity.ok(postService.findById(userId, postId));
+        return ResponseEntity.ok(postService.findById(userId, postId, shareKey));
     }
 
     @GetMapping("/shareUrl/{shareUrl}")

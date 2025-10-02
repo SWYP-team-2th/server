@@ -232,16 +232,20 @@ class PostControllerTest extends RestDocsTest {
                 LocalDateTime.of(2025, 2, 13, 12, 0)
         );
         //given
-        given(postService.findById(any(), any()))
+        given(postService.findById(any(), any(), any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}", "1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}", "1")
+                        .param("shareKey", "shareKey"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(restDocs.document(
                         pathParameters(
                                 parameterWithName("postId").description("게시글 Id")
+                        ),
+                        queryParameters(
+                                parameterWithName("shareKey").description("공유 키").optional()
                         ),
                         responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 Id"),

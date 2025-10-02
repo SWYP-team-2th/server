@@ -18,6 +18,7 @@ import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
 import com.chooz.vote.domain.VoteRepository;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,9 +46,12 @@ public class PostQueryService {
         return createPostResponse(userId, post);
     }
 
-    public PostResponse findById(Long userId, Long postId) {
+    public PostResponse findById(Long userId, Long postId, @Nullable String shareKey) {
         Post post = postRepository.findByIdFetchPollChoices(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
+        if (!post.isRevealable(userId, shareKey)) {
+            throw new BadRequestException(ErrorCode.POST_NOT_REVEALABLE);
+        }
         return createPostResponse(userId, post);
     }
 

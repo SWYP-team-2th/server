@@ -3,7 +3,14 @@ package com.chooz.post.application;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.post.domain.*;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollOption;
+import com.chooz.post.domain.PollType;
+import com.chooz.post.domain.Post;
+import com.chooz.post.domain.PostRepository;
+import com.chooz.post.domain.Scope;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
@@ -33,6 +40,8 @@ import static com.chooz.support.fixture.UserFixture.createDefaultUser;
 import static com.chooz.support.fixture.UserFixture.createUserBuilder;
 import static com.chooz.support.fixture.VoteFixture.createDefaultVote;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostQueryServiceTest extends IntegrationTest {
@@ -67,7 +76,7 @@ class PostQueryServiceTest extends IntegrationTest {
         Vote vote = voteRepository.save(VoteFixture.createDefaultVote(user1.getId(), post.getId(), post.getPollChoices().get(0).getId()));
 
         //when
-        PostResponse response = postService.findById(user1.getId(), post.getId());
+        PostResponse response = postService.findById(user1.getId(), post.getId(), "shareKey");
 
         //then
         List<PollChoiceVoteResponse> pollChoices = response.pollChoices();
@@ -89,6 +98,66 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(pollChoices.get(1).imageUrl()).isEqualTo(post.getPollChoices().get(1).getImageUrl()),
                 () -> assertThat(pollChoices.get(1).voteId()).isNull()
         );
+    }
+
+    @Test
+    @DisplayName("게시글 조회 - 공개 범위 PUBLIC")
+    void findById_public() throws Exception {
+        //given
+        User author = userRepository.save(createDefaultUser());
+        User otherUser = userRepository.save(createDefaultUser());
+        String shareKey = "shareKey";
+        String otherKey = "otherKey";
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .shareUrl(shareKey)
+                .userId(author.getId())
+                .pollOption(PostFixture.pollOptionBuilder().scope(Scope.PUBLIC).build())
+                .build());
+
+        //when then
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), shareKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), otherKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), null));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), shareKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), otherKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), null));
+    }
+
+    @Test
+    @DisplayName("게시글 조회 - 공개 범위 PRIVATE")
+    void findById_private() throws Exception {
+        //given
+        User author = userRepository.save(createDefaultUser());
+        User otherUser = userRepository.save(createDefaultUser());
+        String shareKey = "shareKey";
+        String otherKey = "otherKey";
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .shareUrl(shareKey)
+                .userId(author.getId())
+                .pollOption(PostFixture.pollOptionBuilder().scope(Scope.PRIVATE).build())
+                .build());
+
+        //when then
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), shareKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), otherKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), null));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), shareKey));
+        assertThatThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), otherKey))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_NOT_REVEALABLE.getMessage());
+        assertThatThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), null))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_NOT_REVEALABLE.getMessage());
     }
 
     @Test
@@ -256,7 +325,7 @@ class PostQueryServiceTest extends IntegrationTest {
         //유저1 게시글2 투표 후 취소
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post2.getId(), post2.getPollChoices().get(1).getId()));
         voteService.vote(user.getId(), post2.getId(), List.of());
-        
+
         //when
         var response = postService.findVotedPosts(user.getId(), user.getId(), null, 10);
 
@@ -404,7 +473,7 @@ class PostQueryServiceTest extends IntegrationTest {
 
     private List<Post> createPosts(User user, int size) {
         List<Post> posts = new ArrayList<>();
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             Post post = postRepository.save(createDefaultPost(user.getId()));
             posts.add(post);
             thumbnailRepository.save(createDefaultThumbnail(post.getId(), post.getPollChoices().get(0).getId()));
@@ -414,7 +483,7 @@ class PostQueryServiceTest extends IntegrationTest {
 
     private List<Post> createPostsWithScope(User user, Scope scope, int size) {
         List<Post> posts = new ArrayList<>();
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             Post post = createPostBuilder()
                     .userId(user.getId())
                     .pollOption(PollOption.create(PollType.SINGLE, scope, CommentActive.OPEN))
