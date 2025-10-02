@@ -312,7 +312,7 @@ class PostControllerTest extends RestDocsTest {
                         )
                 )
         );
-        given(postService.findUserPosts(1L, null, 10))
+        given(postService.findUserPosts(1L, 1L, null, 10))
                 .willReturn(response);
 
         //when then
@@ -414,7 +414,7 @@ class PostControllerTest extends RestDocsTest {
                         )
                 )
         );
-        given(postService.findVotedPosts(1L, null, 10))
+        given(postService.findVotedPosts(1L, 1L, null, 10))
                 .willReturn(response);
 
         //when then

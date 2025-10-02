@@ -27,19 +27,19 @@ public class MyPagePostManager {
     private final PollChoiceRepository pollChoiceRepository;
     private final RatioCalculator ratioCalculator;
 
-    public CursorBasePaginatedResponse<MyPagePostResponse> getUserPosts(Long userId, Long cursor, Pageable pageable) {
-        Slice<PostWithVoteCount> postSlice = postRepository.findPostsWithVoteCountByUserId(userId, cursor, pageable);
+    public CursorBasePaginatedResponse<MyPagePostResponse> getUserPosts(Long userId, Long myPageUserId, Long cursor, Pageable pageable) {
+        Slice<PostWithVoteCount> postSlice = postRepository.findPostsWithVoteCountByUserId(myPageUserId, cursor, pageable);
 
-        return getMyPageCursoredResponse(postSlice);
+        return getMyPageCursoredResponse(userId, postSlice);
     }
 
-    public CursorBasePaginatedResponse<MyPagePostResponse> getVotedPosts(Long userId, Long cursor, Pageable pageable) {
-        Slice<PostWithVoteCount> postSlice = postRepository.findVotedPostsWithVoteCount(userId, cursor, pageable);
+    public CursorBasePaginatedResponse<MyPagePostResponse> getVotedPosts(Long userId, Long myPageUserId, Long cursor, Pageable pageable) {
+        Slice<PostWithVoteCount> postSlice = postRepository.findVotedPostsWithVoteCount(myPageUserId, cursor, pageable);
 
-        return getMyPageCursoredResponse(postSlice);
+        return getMyPageCursoredResponse(userId, postSlice);
     }
 
-    private CursorBasePaginatedResponse<MyPagePostResponse> getMyPageCursoredResponse(Slice<PostWithVoteCount> postSlice) {
+    private CursorBasePaginatedResponse<MyPagePostResponse> getMyPageCursoredResponse(Long userId, Slice<PostWithVoteCount> postSlice) {
         if (postSlice.isEmpty()) {
             return CursorBasePaginatedResponse.of(new SliceImpl<>(
                     List.of(),
@@ -48,31 +48,16 @@ public class MyPagePostManager {
             ));
         }
 
-        Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId = getMostVotedPollChoiceByPostId(getPostIds(postSlice));
+        List<Long> postIds = getPostIds(postSlice);
+        Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId = getMostVotedPollChoiceByPostId(postIds);
 
-        List<MyPagePostResponse> response = getMyPagePostResponses(postSlice, mostVotedPollChoiceByPostId);
+        List<MyPagePostResponse> response = getMyPagePostResponses(userId, postSlice, mostVotedPollChoiceByPostId);
 
         return CursorBasePaginatedResponse.of(new SliceImpl<>(
                 response,
                 postSlice.getPageable(),
                 postSlice.hasNext()
         ));
-    }
-
-    private List<MyPagePostResponse> getMyPagePostResponses(
-            Slice<PostWithVoteCount> postSlice,
-            Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId
-    ) {
-        return postSlice.getContent().stream()
-                .map(postWithVoteCount -> {
-                    var pollChoiceVoteInfo = mostVotedPollChoiceByPostId.get(postWithVoteCount.post().getId());
-                    var mostVotedPollChoiceInfo = MostVotedPollChoiceDto.of(
-                            pollChoiceVoteInfo,
-                            ratioCalculator.calculate(postWithVoteCount.voteCount(), pollChoiceVoteInfo.voteCounts())
-                    );
-                    return MyPagePostResponse.of(postWithVoteCount, mostVotedPollChoiceInfo);
-                })
-                .toList();
     }
 
     private Map<Long, PollChoiceVoteInfo> getMostVotedPollChoiceByPostId(List<Long> postIds) {
@@ -87,6 +72,25 @@ public class MyPagePostManager {
                                         .orElse(null)
                         )
                 ));
+    }
+
+    private List<MyPagePostResponse> getMyPagePostResponses(
+            Long userId,
+            Slice<PostWithVoteCount> postSlice,
+            Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId
+    ) {
+        return postSlice.getContent()
+                .stream()
+                .filter(postWithVoteCount -> postWithVoteCount.post().isRevealable(userId))
+                .map(postWithVoteCount -> {
+                    var pollChoiceVoteInfo = mostVotedPollChoiceByPostId.get(postWithVoteCount.post().getId());
+                    var mostVotedPollChoiceInfo = MostVotedPollChoiceDto.of(
+                            pollChoiceVoteInfo,
+                            ratioCalculator.calculate(postWithVoteCount.voteCount(), pollChoiceVoteInfo.voteCounts())
+                    );
+                    return MyPagePostResponse.of(postWithVoteCount, mostVotedPollChoiceInfo);
+                })
+                .toList();
     }
 
     private List<Long> getPostIds(Slice<PostWithVoteCount> postSlice) {

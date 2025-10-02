@@ -91,12 +91,22 @@ public class PostQueryService {
                 .orElse(null);
     }
 
-    public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(Long userId, Long cursor, int size) {
-        return myPagePostManager.getUserPosts(userId, cursor, Pageable.ofSize(size));
+    public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(
+            Long userId,
+            Long myPageUserId,
+            Long cursor,
+            int size
+    ) {
+        return myPagePostManager.getUserPosts(userId, myPageUserId, cursor, Pageable.ofSize(size));
     }
 
-    public CursorBasePaginatedResponse<MyPagePostResponse> findVotedPosts(Long userId, Long cursor, int size) {
-        return myPagePostManager.getVotedPosts(userId, cursor, Pageable.ofSize(size));
+    public CursorBasePaginatedResponse<MyPagePostResponse> findVotedPosts(
+            Long userId,
+            Long myPageUserId,
+            Long cursor,
+            int size
+    ) {
+        return myPagePostManager.getVotedPosts(userId, myPageUserId, cursor, Pageable.ofSize(size));
     }
 
     public CursorBasePaginatedResponse<FeedResponse> findFeed(Long userId, Long cursor, int size) {

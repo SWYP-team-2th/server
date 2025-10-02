@@ -44,12 +44,22 @@ public class PostService {
         return postQueryService.findById(userId, postId);
     }
 
-    public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(Long userId, Long cursor, int size) {
-        return postQueryService.findUserPosts(userId, cursor, size);
+    public CursorBasePaginatedResponse<MyPagePostResponse> findUserPosts(
+            Long userId,
+            Long myPageUserId,
+            Long cursor,
+            int size
+    ) {
+        return postQueryService.findUserPosts(userId, myPageUserId, cursor, size);
     }
 
-    public CursorBasePaginatedResponse<MyPagePostResponse> findVotedPosts(Long userId, Long cursor, int size) {
-        return postQueryService.findVotedPosts(userId, cursor, size);
+    public CursorBasePaginatedResponse<MyPagePostResponse> findVotedPosts(
+            Long userId,
+            Long myPageUserId,
+            Long cursor,
+            int size
+    ) {
+        return postQueryService.findVotedPosts(userId, myPageUserId, cursor, size);
     }
 
     public PostResponse findByShareUrl(Long userId, String shareUrl) {

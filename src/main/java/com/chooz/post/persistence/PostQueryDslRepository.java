@@ -93,7 +93,6 @@ public class PostQueryDslRepository {
                 .from(post)
                 .innerJoin(user).on(post.userId.eq(user.id))
                 .where(
-                        post.deleted.isFalse(),
                         post.pollOption.scope.eq(Scope.PUBLIC),
                         cursor(postId, post.id),
                         post.deleted.isFalse()

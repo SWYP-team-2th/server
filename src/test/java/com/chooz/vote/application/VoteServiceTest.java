@@ -51,7 +51,7 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
                         .pollOption(
-                                PostFixture.createPollOptionBuilder()
+                                PostFixture.pollOptionBuilder()
                                         .pollType(PollType.SINGLE)
                                         .build())
                         .build()
@@ -79,7 +79,7 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
                         .pollOption(
-                                PostFixture.createPollOptionBuilder()
+                                PostFixture.pollOptionBuilder()
                                         .pollType(PollType.SINGLE)
                                         .build())
                         .build());
@@ -103,7 +103,7 @@ class VoteServiceTest extends IntegrationTest {
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
-                        .pollOption(PostFixture.createPollOptionBuilder().pollType(PollType.SINGLE).build())
+                        .pollOption(PostFixture.pollOptionBuilder().pollType(PollType.SINGLE).build())
                         .build()
         );
         Long pollChoiceId = post.getPollChoices().getFirst().getId();
@@ -125,7 +125,7 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
                         .pollOption(
-                                PostFixture.createPollOptionBuilder()
+                                PostFixture.pollOptionBuilder()
                                         .pollType(PollType.MULTIPLE)
                                         .build())
                         .build()
@@ -156,7 +156,7 @@ class VoteServiceTest extends IntegrationTest {
                                 PostFixture.createPollChoice(),
                                 PostFixture.createPollChoice())
                         )
-                        .pollOption(PostFixture.createPollOptionBuilder()
+                        .pollOption(PostFixture.pollOptionBuilder()
                                 .pollType(PollType.MULTIPLE)
                                 .build())
                         .build()
@@ -227,7 +227,7 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
                         .pollOption(
-                                PostFixture.createPollOptionBuilder()
+                                PostFixture.pollOptionBuilder()
                                         .pollType(PollType.SINGLE)
                                         .build())
                         .build()
@@ -248,7 +248,7 @@ class VoteServiceTest extends IntegrationTest {
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
                         .pollOption(
-                                PostFixture.createPollOptionBuilder()
+                                PostFixture.pollOptionBuilder()
                                         .pollType(PollType.MULTIPLE)
                                         .build())
                         .build()
@@ -269,7 +269,7 @@ class VoteServiceTest extends IntegrationTest {
         User user = userRepository.save(UserFixture.createDefaultUser());
         Post post = postRepository.save(
                 PostFixture.createPostBuilder()
-                        .pollOption(PostFixture.createPollOptionBuilder().pollType(PollType.MULTIPLE).build())
+                        .pollOption(PostFixture.pollOptionBuilder().pollType(PollType.MULTIPLE).build())
                         .build()
         );
         List<PollChoice> pollChoices = post.getPollChoices();
