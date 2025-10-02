@@ -1,7 +1,7 @@
 package com.chooz.post.application;
 
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.post.presentation.UpdatePostResponse;
+import com.chooz.post.presentation.dto.UpdatePostResponse;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;

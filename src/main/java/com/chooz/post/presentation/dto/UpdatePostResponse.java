@@ -1,12 +1,9 @@
-package com.chooz.post.presentation;
+package com.chooz.post.presentation.dto;
 
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.Status;
-import com.chooz.post.presentation.dto.CloseOptionDto;
-import com.chooz.post.presentation.dto.PollChoiceResponse;
-import com.chooz.post.presentation.dto.PollOptionDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

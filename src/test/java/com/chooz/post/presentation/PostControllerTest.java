@@ -19,6 +19,7 @@ import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PollOptionDto;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
+import com.chooz.post.presentation.dto.UpdatePostResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
 import org.junit.jupiter.api.DisplayName;

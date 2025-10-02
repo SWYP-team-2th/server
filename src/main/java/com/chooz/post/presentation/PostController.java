@@ -9,6 +9,7 @@ import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
+import com.chooz.post.presentation.dto.UpdatePostResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
