@@ -4,14 +4,18 @@ import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.domain.PollChoice;
+import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
+import com.chooz.post.persistence.PostJpaRepository;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.application.VoteService;
+import com.chooz.vote.persistence.VoteJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +33,27 @@ class VotedNotificationListenerTest extends IntegrationTest {
     UserRepository userRepository;
 
     @Autowired
-    PostRepository postRepository;
+    PostJpaRepository postRepository;
+
+    @Autowired
+    VoteJpaRepository voteRepository;
 
     @Autowired
     VoteService voteService;
 
     @Autowired
     NotificationQueryRepository notificationQueryRepository;
+
+    @Autowired
+    PollChoiceRepository pollChoiceRepository;
+
+    @AfterEach
+    void tearDown() {
+        voteRepository.deleteAllInBatch();
+        pollChoiceRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+    }
 
     @Test
     @DisplayName("투표참여 알림")
