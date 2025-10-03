@@ -29,7 +29,7 @@ public class NotificationCommandService {
     }
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createAll(List<Notification> notifications) {
-        List<Notification> existsNotifications = notificationQueryRepository.existsDedupKeyByNotifications(notifications);
+        List<Notification> existsNotifications = notificationQueryRepository.findNotificationsByDedupKey(notifications);
         Set<String> existingPairs = getExistingPairs(existsNotifications);
         List<Notification> toSave = getNotificationsNotDuplicated(notifications, existingPairs);
         if (!toSave.isEmpty()) {

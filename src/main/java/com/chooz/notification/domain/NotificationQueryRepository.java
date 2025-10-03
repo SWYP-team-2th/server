@@ -17,6 +17,6 @@ public interface NotificationQueryRepository {
     Optional<TargetUserDto> findUserByPostId(Long postId);
     Optional<TargetPostDto> findPostById(Long postId);
     boolean existsByDedupKey(Long ReceiverId, String dedupKey);
-    List<Notification> existsDedupKeyByNotifications(List<Notification> notifications);
+    List<Notification> findNotificationsByDedupKey(List<Notification> notifications);
     List<TargetUserDto> findVoteUsersByPostId(Long postId);
 }

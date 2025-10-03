@@ -55,8 +55,8 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
     }
 
     @Override
-    public List<Notification> existsDedupKeyByNotifications(List<Notification> notifications) {
-        return notificationQueryDslRepository.existsDedupKeyByNotifications(notifications);
+    public List<Notification> findNotificationsByDedupKey(List<Notification> notifications) {
+        return notificationQueryDslRepository.findNotificationsByDedupKey(notifications);
     }
 
     @Override
