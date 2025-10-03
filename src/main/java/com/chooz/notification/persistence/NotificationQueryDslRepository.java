@@ -44,6 +44,7 @@ public class NotificationQueryDslRepository {
                         notification.title,
                         notification.content,
                         notification.imageUrl,
+                        notification.isValid,
                         notification.isRead,
                         notification.eventAt
                         )

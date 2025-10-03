@@ -65,7 +65,15 @@ class NotificationQueryServiceTest extends IntegrationTest {
 
         //then
         assertAll(
-                () -> assertThat(notifications.size()).isNotZero()
+                () -> assertThat(notifications.size()).isOne(),
+                () -> assertThat(notifications.getFirst().content()).isEqualTo(content),
+                () -> assertThat(notifications.getFirst().title()).isEqualTo(title),
+                () -> assertThat(notifications.getFirst().profileUrl()).isEqualTo(profileUrl),
+                () -> assertThat(notifications.getFirst().imageUrl()).isEqualTo(imageUrl),
+                () -> assertThat(notifications.getFirst().eventAt()).isEqualTo(eventAt),
+                () -> assertThat(notifications.getFirst().isRead()).isEqualTo(false),
+                () -> assertThat(notifications.getFirst().isValid()).isEqualTo(true)
+
         );
     }
     @Test
