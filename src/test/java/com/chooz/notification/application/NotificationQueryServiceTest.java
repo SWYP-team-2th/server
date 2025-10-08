@@ -11,15 +11,13 @@ import com.chooz.notification.persistence.NotificationJpaRepository;
 import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import com.chooz.support.IntegrationTest;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,7 +81,8 @@ class NotificationQueryServiceTest extends IntegrationTest {
                 () -> assertThat(notifications.getFirst().title()).isEqualTo(title),
                 () -> assertThat(notifications.getFirst().profileUrl()).isEqualTo(profileUrl),
                 () -> assertThat(notifications.getFirst().imageUrl()).isEqualTo(imageUrl),
-                () -> assertThat(notifications.getFirst().eventAt()).isEqualTo(eventAt),
+                () -> assertThat(notifications.getFirst().eventAt().truncatedTo(ChronoUnit.MICROS))
+                        .isEqualTo(eventAt.truncatedTo(ChronoUnit.MICROS)),
                 () -> assertThat(notifications.getFirst().isRead()).isEqualTo(false),
                 () -> assertThat(notifications.getFirst().isValid()).isEqualTo(true)
 
