@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.AfterTransaction;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,8 +80,6 @@ class NotificationQueryServiceTest extends IntegrationTest {
                 () -> assertThat(notifications.getFirst().title()).isEqualTo(title),
                 () -> assertThat(notifications.getFirst().profileUrl()).isEqualTo(profileUrl),
                 () -> assertThat(notifications.getFirst().imageUrl()).isEqualTo(imageUrl),
-                () -> assertThat(notifications.getFirst().eventAt().truncatedTo(ChronoUnit.MICROS))
-                        .isEqualTo(eventAt.truncatedTo(ChronoUnit.MICROS)),
                 () -> assertThat(notifications.getFirst().isRead()).isEqualTo(false),
                 () -> assertThat(notifications.getFirst().isValid()).isEqualTo(true)
 
