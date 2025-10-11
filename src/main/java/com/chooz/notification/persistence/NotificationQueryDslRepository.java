@@ -44,6 +44,7 @@ public class NotificationQueryDslRepository {
                         notification.title,
                         notification.content,
                         notification.imageUrl,
+                        notification.isValid,
                         notification.isRead,
                         notification.eventAt
                         )
@@ -138,7 +139,7 @@ public class NotificationQueryDslRepository {
                         ).fetchFirst();
         return one != null;
     }
-    public List<Notification> existsDedupKeyByNotifications(List<Notification> notifications) {
+    public List<Notification> findNotificationsByDedupKey(List<Notification> notifications) {
         BooleanBuilder builder = new BooleanBuilder();
         for (Notification n : notifications) {
             builder.or(

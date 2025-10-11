@@ -14,6 +14,7 @@ public record NotificationRowDto(
         String title,
         String content,
         String imageUrl,
+        boolean isValid,
         boolean isRead,
         LocalDateTime eventAt
 ) {}

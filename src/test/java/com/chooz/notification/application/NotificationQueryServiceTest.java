@@ -7,14 +7,17 @@ import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationType;
 import com.chooz.notification.domain.Target;
 import com.chooz.notification.domain.TargetType;
+import com.chooz.notification.persistence.NotificationJpaRepository;
 import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import com.chooz.support.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.transaction.AfterTransaction;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +30,14 @@ class NotificationQueryServiceTest extends IntegrationTest {
 
     @Autowired
     NotificationCommandService notificationCommandService;
+
+    @Autowired
+    NotificationJpaRepository notificationJpaRepository;
+
+    @AfterTransaction
+    void clean() {
+        notificationJpaRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("알림 조회")
@@ -65,7 +76,16 @@ class NotificationQueryServiceTest extends IntegrationTest {
 
         //then
         assertAll(
-                () -> assertThat(notifications.size()).isNotZero()
+                () -> assertThat(notifications.size()).isOne(),
+                () -> assertThat(notifications.getFirst().content()).isEqualTo(content),
+                () -> assertThat(notifications.getFirst().title()).isEqualTo(title),
+                () -> assertThat(notifications.getFirst().profileUrl()).isEqualTo(profileUrl),
+                () -> assertThat(notifications.getFirst().imageUrl()).isEqualTo(imageUrl),
+                () -> assertThat(notifications.getFirst().eventAt().truncatedTo(ChronoUnit.MICROS))
+                        .isEqualTo(eventAt.truncatedTo(ChronoUnit.MICROS)),
+                () -> assertThat(notifications.getFirst().isRead()).isEqualTo(false),
+                () -> assertThat(notifications.getFirst().isValid()).isEqualTo(true)
+
         );
     }
     @Test
@@ -98,7 +118,6 @@ class NotificationQueryServiceTest extends IntegrationTest {
         //when
         notificationCommandService.create(notification);
         NotificationPresentResponse notificationPresentResponse = notificationQueryService.present(receiverId);
-
         //then
         assertAll(
                 () -> assertThat(notificationPresentResponse.present()).isTrue()

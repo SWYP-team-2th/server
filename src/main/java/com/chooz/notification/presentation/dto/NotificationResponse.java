@@ -16,6 +16,7 @@ public record NotificationResponse (
         String content,
         String imageUrl,
         List<Target> targets,
+        boolean isValid,
         boolean isRead,
         LocalDateTime eventAt
 )implements CursorDto{
@@ -28,6 +29,7 @@ public record NotificationResponse (
                 notificationDto.notificationRowDto().content(),
                 notificationDto.notificationRowDto().imageUrl(),
                 List.copyOf(notificationDto.targets().stream().map(t -> Target.of(t.id(), t.type())).toList()),
+                notificationDto.notificationRowDto().isValid(),
                 notificationDto.notificationRowDto().isRead(),
                 notificationDto.notificationRowDto().eventAt()
         );

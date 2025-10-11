@@ -50,6 +50,7 @@ public class NotificationControllerTest extends RestDocsTest {
                                 "지금 바로 확인해보세요.",
                                 "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d",
                                 List.of(Target.of(1L, TargetType.POST)),
+                                true,
                                 false,
                                 LocalDateTime.now()
                         )
@@ -88,6 +89,8 @@ public class NotificationControllerTest extends RestDocsTest {
                                         .type(JsonFieldType.NUMBER).description("알림 타겟 ID"),
                                 fieldWithPath("data[].targets[].type")
                                         .type(JsonFieldType.STRING).description("알림 타겟 유형"),
+                                fieldWithPath("data[].isValid")
+                                        .type(JsonFieldType.BOOLEAN).description("유효 알림 여부"),
                                 fieldWithPath("data[].isRead")
                                         .type(JsonFieldType.BOOLEAN).description("읽음 여부"),
                                 fieldWithPath("data[].eventAt")
