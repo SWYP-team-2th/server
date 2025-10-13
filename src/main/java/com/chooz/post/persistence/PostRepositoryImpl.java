@@ -66,13 +66,13 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long postId, Pageable pageable) {
-        return postQueryDslRepository.findPostsWithVoteCountByUserId(userId, postId, pageable);
+    public Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long authorId, Long postId, Pageable pageable) {
+        return postQueryDslRepository.findPostsWithVoteCountByUserId(userId, authorId, postId, pageable);
     }
 
     @Override
-    public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable) {
-        return postQueryDslRepository.findVotedPostsWithVoteCount(userId, postId, pageable);
+    public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long authorId, Long postId, Pageable pageable) {
+        return postQueryDslRepository.findVotedPostsWithVoteCount(userId, authorId, postId, pageable);
     }
 
     @Override

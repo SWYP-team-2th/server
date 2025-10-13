@@ -4,16 +4,16 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
-import com.chooz.post.presentation.dto.UpdatePostResponse;
 import com.chooz.post.presentation.dto.AuthorDto;
-import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PostResponse;
+import com.chooz.post.presentation.dto.UpdatePostResponse;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.Vote;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
