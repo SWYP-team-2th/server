@@ -3,20 +3,17 @@ package com.chooz.post.domain;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.support.fixture.PostFixture;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chooz.support.fixture.PostFixture.SELF_CREATE_OPTION;
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
 import static com.chooz.support.fixture.PostFixture.createPostBuilder;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostTest {
 

@@ -71,10 +71,10 @@ public class MyPagePostManager {
         List<Long> postIds = getPostIds(postSlice);
         Map<Long, PollChoiceVoteInfo> mostVotedPollChoiceByPostId = getMostVotedPollChoiceByPostId(postIds);
 
-        List<MyPagePostResponse> response = getMyPagePostResponses(postSlice, mostVotedPollChoiceByPostId);
+        List<MyPagePostResponse> responses = getMyPagePostResponses(postSlice, mostVotedPollChoiceByPostId);
 
         return CursorBasePaginatedResponse.of(new SliceImpl<>(
-                response,
+                responses,
                 postSlice.getPageable(),
                 postSlice.hasNext()
         ));

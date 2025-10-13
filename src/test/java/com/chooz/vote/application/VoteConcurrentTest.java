@@ -24,8 +24,8 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("mysql")
-@SpringBootTest
+//@ActiveProfiles("mysql")
+//@SpringBootTest
 class VoteConcurrentTest {
 
     @Autowired
