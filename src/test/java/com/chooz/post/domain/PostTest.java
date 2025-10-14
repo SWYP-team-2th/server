@@ -3,19 +3,17 @@ package com.chooz.post.domain;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.support.fixture.PostFixture;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chooz.support.fixture.PostFixture.SELF_CREATE_OPTION;
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
 import static com.chooz.support.fixture.PostFixture.createPostBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostTest {
 
@@ -176,5 +174,57 @@ class PostTest {
         assertThatThrownBy(() -> post.closeByAuthor(userId))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage(ErrorCode.ONLY_SELF_CAN_CLOSE.getMessage());
+    }
+
+    @Test
+    @DisplayName("공개 범위 - public")
+    void isRevealable_public() throws Exception {
+        // given
+        long author = 1L;
+        long otherUser = 2L;
+        String shareKey = "key";
+        Post post = createPostBuilder()
+                .userId(author)
+                .shareUrl(shareKey)
+                .pollOption(PostFixture.pollOptionBuilder().scope(Scope.PUBLIC).build())
+                .build();
+
+        // when
+        boolean res1 = post.isRevealable(author, shareKey);                     //본인, 키 같음
+        boolean res2 = post.isRevealable(author, shareKey + 1);         //본인, 키 다름
+        boolean res3 = post.isRevealable(otherUser, shareKey);                  //다른 유저, 키 같음
+        boolean res4 = post.isRevealable(otherUser, shareKey + 1);      //다른 유저, 키 다름
+
+        // then
+        assertThat(res1).isTrue();
+        assertThat(res2).isTrue();
+        assertThat(res3).isTrue();
+        assertThat(res4).isTrue();
+    }
+
+    @Test
+    @DisplayName("공개 범위 - private")
+    void isRevealable_private() throws Exception {
+        // given
+        long author = 1L;
+        long otherUser = 2L;
+        String shareKey = "key";
+        Post post = createPostBuilder()
+                .userId(author)
+                .shareUrl(shareKey)
+                .pollOption(PostFixture.pollOptionBuilder().scope(Scope.PRIVATE).build())
+                .build();
+
+        // when
+        boolean res1 = post.isRevealable(author, shareKey);                     //본인, 키 같음
+        boolean res2 = post.isRevealable(author, shareKey + 1);         //본인, 키 다름
+        boolean res3 = post.isRevealable(otherUser, shareKey);                  //다른 유저, 키 같음
+        boolean res4 = post.isRevealable(otherUser, shareKey + 1);      //다른 유저, 키 다름
+
+        // then
+        assertThat(res1).isTrue();
+        assertThat(res2).isTrue();
+        assertThat(res3).isTrue();
+        assertThat(res4).isFalse();
     }
 }

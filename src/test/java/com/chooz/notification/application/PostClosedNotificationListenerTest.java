@@ -7,8 +7,10 @@ import com.chooz.post.application.DateCloseScheduler;
 import com.chooz.post.application.PostCommandService;
 import com.chooz.post.application.PostVotedEventListener;
 import com.chooz.post.domain.CloseType;
+import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
+import com.chooz.post.persistence.PostJpaRepository;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
@@ -17,6 +19,8 @@ import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.application.VotedEvent;
 import com.chooz.vote.domain.VoteRepository;
+import com.chooz.vote.persistence.VoteJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +39,13 @@ class PostClosedNotificationListenerTest extends IntegrationTest {
     UserRepository userRepository;
 
     @Autowired
-    PostRepository postRepository;
+    PostJpaRepository postRepository;
 
     @Autowired
-    VoteRepository voteRepository;
+    VoteJpaRepository voteRepository;
+
+    @Autowired
+    PollChoiceRepository pollChoiceRepository;
 
     @Autowired
     NotificationQueryRepository notificationQueryRepository;
@@ -51,6 +58,14 @@ class PostClosedNotificationListenerTest extends IntegrationTest {
 
     @Autowired
     PostCommandService postCommandService;
+
+    @AfterEach
+    void tearDown() {
+        voteRepository.deleteAllInBatch();
+        pollChoiceRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+    }
 
     @Test
     @DisplayName("투표 마감 알림(참여자 수 마감)")

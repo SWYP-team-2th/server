@@ -19,6 +19,7 @@ import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
 import com.chooz.post.presentation.dto.PollOptionDto;
 import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
+import com.chooz.post.presentation.dto.UpdatePostResponse;
 import com.chooz.support.RestDocsTest;
 import com.chooz.support.WithMockUserInfo;
 import org.junit.jupiter.api.DisplayName;
@@ -231,16 +232,20 @@ class PostControllerTest extends RestDocsTest {
                 LocalDateTime.of(2025, 2, 13, 12, 0)
         );
         //given
-        given(postService.findById(any(), any()))
+        given(postService.findById(any(), any(), any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}", "1"))
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts/{postId}", "1")
+                        .param("shareKey", "shareKey"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(restDocs.document(
                         pathParameters(
                                 parameterWithName("postId").description("게시글 Id")
+                        ),
+                        queryParameters(
+                                parameterWithName("shareKey").description("공유 키").optional()
                         ),
                         responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("게시글 Id"),
@@ -312,7 +317,7 @@ class PostControllerTest extends RestDocsTest {
                         )
                 )
         );
-        given(postService.findUserPosts(1L, null, 10))
+        given(postService.findUserPosts(1L, 1L, null, 10))
                 .willReturn(response);
 
         //when then
@@ -414,7 +419,7 @@ class PostControllerTest extends RestDocsTest {
                         )
                 )
         );
-        given(postService.findVotedPosts(1L, null, 10))
+        given(postService.findVotedPosts(1L, 1L, null, 10))
                 .willReturn(response);
 
         //when then

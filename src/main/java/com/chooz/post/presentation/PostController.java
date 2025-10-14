@@ -9,6 +9,7 @@ import com.chooz.post.presentation.dto.PostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.FeedResponse;
+import com.chooz.post.presentation.dto.UpdatePostResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -44,12 +45,13 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> findPostById(
             @PathVariable("postId") Long postId,
+            @RequestParam(value = "shareKey", required = false ) String shareKey,
             @AuthenticationPrincipal UserInfo userInfo
     ) {
         Long userId = Optional.ofNullable(userInfo)
                 .map(UserInfo::userId)
                 .orElse(null);
-        return ResponseEntity.ok(postService.findById(userId, postId));
+        return ResponseEntity.ok(postService.findById(userId, postId, shareKey));
     }
 
     @GetMapping("/shareUrl/{shareUrl}")
@@ -102,20 +104,22 @@ public class PostController {
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<CursorBasePaginatedResponse<MyPagePostResponse>> findMyPosts(
-            @PathVariable("userId") Long userId,
+            @PathVariable("userId") Long myPageUserId,
+            @AuthenticationPrincipal UserInfo userInfo,
             @RequestParam(name = "cursor", required = false) @Min(0) Long cursor,
             @RequestParam(name = "size", required = false, defaultValue = "10") @Min(1) int size
     ) {
-        return ResponseEntity.ok(postService.findUserPosts(userId, cursor, size));
+        return ResponseEntity.ok(postService.findUserPosts(userInfo.userId(), myPageUserId, cursor, size));
     }
 
     @GetMapping("/users/{userId}/voted")
     public ResponseEntity<CursorBasePaginatedResponse<MyPagePostResponse>> findVotedPosts(
-            @PathVariable("userId") Long userId,
+            @PathVariable("userId") Long myPageUserId,
+            @AuthenticationPrincipal UserInfo userInfo,
             @RequestParam(name = "cursor", required = false) @Min(0) Long cursor,
             @RequestParam(name = "size", required = false, defaultValue = "10") @Min(1) int size
     ) {
-        return ResponseEntity.ok(postService.findVotedPosts(userId, cursor, size));
+        return ResponseEntity.ok(postService.findVotedPosts(userInfo.userId(), myPageUserId, cursor, size));
     }
 
     @GetMapping("/feed")

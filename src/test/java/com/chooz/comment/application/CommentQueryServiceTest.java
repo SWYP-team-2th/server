@@ -20,7 +20,6 @@ import com.chooz.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -122,7 +121,7 @@ class CommentQueryServiceTest extends IntegrationTest {
     void findCommentsCloseCommentActive() {
         // given
         User user = userRepository.save(UserFixture.createDefaultUser());
-        PollOption pollOption = PostFixture.createPollOptionBuilder()
+        PollOption pollOption = PostFixture.pollOptionBuilder()
                 .commentActive(CommentActive.CLOSED).build();
         Post post = postRepository.save(PostFixture.createPostBuilder()
                 .userId(user.getId())

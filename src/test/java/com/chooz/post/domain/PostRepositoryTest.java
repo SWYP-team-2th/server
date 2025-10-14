@@ -163,6 +163,7 @@ class PostRepositoryTest extends RepositoryTest {
         // when
         Slice<PostWithVoteCount> result = postRepository.findPostsWithVoteCountByUserId(
                 user1.getId(),
+                user1.getId(),
                 null,
                 PageRequest.of(0, 10)
         );
@@ -188,7 +189,7 @@ class PostRepositoryTest extends RepositoryTest {
         Post post1 = postRepository.save(PostFixture.createDefaultPost(user2.getId()));
         Post post2 = postRepository.save(PostFixture.createDefaultPost(user2.getId()));
         Post post3 = postRepository.save(PostFixture.createDefaultPost(user2.getId()));
-        Post post4 = postRepository.save(PostFixture.createDefaultPost(user3.getId()));
+        Post post4 = postRepository.save(PostFixture.createDefaultPost(user2.getId()));
 
         List<PollChoice> post1Choices = post1.getPollChoices();
         List<PollChoice> post2Choices = post2.getPollChoices();
@@ -215,6 +216,7 @@ class PostRepositoryTest extends RepositoryTest {
         // when
         Slice<PostWithVoteCount> result = postRepository.findVotedPostsWithVoteCount(
                 user1.getId(),
+                user1.getId(),
                 null,
                 PageRequest.of(0, 10)
         );
@@ -229,6 +231,54 @@ class PostRepositoryTest extends RepositoryTest {
                 );
     }
 
+    @Test
+    @DisplayName("본인의 마이페이지를 보는 경우, hasNext가 true여야 함")
+    void findPostsWithVoteCountByUserId_hasNext_true() throws Exception {
+        // given
+        User user1 = userRepository.save(UserFixture.createDefaultUser());
+
+        // 비공개 3개, 공개 9개
+        createPostsWithScope(user1, Scope.PRIVATE, 3);
+        List<Post> publicPosts = createPostsWithScope(user1, Scope.PUBLIC, 9);
+
+        voteRepository.save(VoteFixture.createDefaultVote(user1.getId(), publicPosts.getFirst().getId(), publicPosts.getFirst().getPollChoices().getFirst().getId()));
+
+        // when
+        Slice<PostWithVoteCount> result = postRepository.findPostsWithVoteCountByUserId(
+                user1.getId(),
+                user1.getId(),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        // then
+        assertThat(result.getContent()).hasSize(10);
+        assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("다른 사람의 마이페이지를 보는 경우, hasNext가 false여야 함")
+    void findPostsWithVoteCountByUserId_hasNext_false() throws Exception {
+        // given
+        User user1 = userRepository.save(UserFixture.createDefaultUser());
+        User user2 = userRepository.save(UserFixture.createDefaultUser());
+
+        // 비공개 3개, 공개 9개
+        createPostsWithScope(user1, Scope.PRIVATE, 3);
+        createPostsWithScope(user1, Scope.PUBLIC, 9);
+
+        // when
+        Slice<PostWithVoteCount> result = postRepository.findPostsWithVoteCountByUserId(
+                user2.getId(),
+                user1.getId(),
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        // then
+        assertThat(result.getContent()).hasSize(9);
+        assertThat(result.hasNext()).isFalse();
+    }
 
     private List<Post> createPosts(long userId, int size) {
         List<Post> posts = new ArrayList<>();

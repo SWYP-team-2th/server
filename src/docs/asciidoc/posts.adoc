@@ -9,6 +9,20 @@ operation::post-controller-test/create-post[snippets='http-request,curl-request,
 [[게시글-상세-조회]]
 === `GET` 게시글 상세 조회
 
+공유 키 관련
+|===
+|공개범위(scope)|유저|shareKey 일치 여부|응답 여부
+
+|PUBLIC|작성자|O|O
+|PUBLIC|작성자|X|O
+|PUBLIC|다른 사용자|O|O
+|PUBLIC|다른 사용자|X|O
+|PRIVATE|작성자|O|O
+|PRIVATE|작성자|X|O
+|PRIVATE|다른 사용자|O|O
+|PRIVATE|다른 사용자|X|400에러
+|===
+
 operation::post-controller-test/find-post[snippets='http-request,curl-request,path-parameters,http-response,response-fields']
 
 [[개사굴-공유-url-조회]]

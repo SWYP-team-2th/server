@@ -222,4 +222,13 @@ public class Post extends BaseEntity {
         }
         this.delete();
     }
+
+    public boolean isRevealable(Long userId) {
+        return this.pollOption.getScope().equals(Scope.PUBLIC) ||
+                this.userId.equals(userId);
+    }
+
+    public boolean isRevealable(Long userId, String shareUrl) {
+        return isRevealable(userId) || this.shareUrl.equals(shareUrl);
+    }
 }

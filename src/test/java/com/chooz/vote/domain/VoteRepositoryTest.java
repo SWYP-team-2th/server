@@ -53,7 +53,7 @@ class VoteRepositoryTest extends RepositoryTest {
         Post post = postRepository.save(PostFixture.createPostBuilder()
                 .userId(user1.getId())
                 .pollOption(
-                        PostFixture.createPollOptionBuilder()
+                        PostFixture.pollOptionBuilder()
                                 .pollType(PollType.MULTIPLE)
                                 .build())
                 .build());

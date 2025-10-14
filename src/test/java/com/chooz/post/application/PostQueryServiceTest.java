@@ -3,7 +3,14 @@ package com.chooz.post.application;
 import com.chooz.comment.domain.Comment;
 import com.chooz.comment.domain.CommentRepository;
 import com.chooz.common.dto.CursorBasePaginatedResponse;
-import com.chooz.post.domain.*;
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
+import com.chooz.post.domain.CommentActive;
+import com.chooz.post.domain.PollOption;
+import com.chooz.post.domain.PollType;
+import com.chooz.post.domain.Post;
+import com.chooz.post.domain.PostRepository;
+import com.chooz.post.domain.Scope;
 import com.chooz.post.presentation.dto.FeedResponse;
 import com.chooz.post.presentation.dto.MyPagePostResponse;
 import com.chooz.post.presentation.dto.PollChoiceVoteResponse;
@@ -33,6 +40,8 @@ import static com.chooz.support.fixture.UserFixture.createDefaultUser;
 import static com.chooz.support.fixture.UserFixture.createUserBuilder;
 import static com.chooz.support.fixture.VoteFixture.createDefaultVote;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PostQueryServiceTest extends IntegrationTest {
@@ -67,7 +76,7 @@ class PostQueryServiceTest extends IntegrationTest {
         Vote vote = voteRepository.save(VoteFixture.createDefaultVote(user1.getId(), post.getId(), post.getPollChoices().get(0).getId()));
 
         //when
-        PostResponse response = postService.findById(user1.getId(), post.getId());
+        PostResponse response = postService.findById(user1.getId(), post.getId(), "shareKey");
 
         //then
         List<PollChoiceVoteResponse> pollChoices = response.pollChoices();
@@ -92,6 +101,66 @@ class PostQueryServiceTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("게시글 조회 - 공개 범위 PUBLIC")
+    void findById_public() throws Exception {
+        //given
+        User author = userRepository.save(createDefaultUser());
+        User otherUser = userRepository.save(createDefaultUser());
+        String shareKey = "shareKey";
+        String otherKey = "otherKey";
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .shareUrl(shareKey)
+                .userId(author.getId())
+                .pollOption(PostFixture.pollOptionBuilder().scope(Scope.PUBLIC).build())
+                .build());
+
+        //when then
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), shareKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), otherKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), null));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), shareKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), otherKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), null));
+    }
+
+    @Test
+    @DisplayName("게시글 조회 - 공개 범위 PRIVATE")
+    void findById_private() throws Exception {
+        //given
+        User author = userRepository.save(createDefaultUser());
+        User otherUser = userRepository.save(createDefaultUser());
+        String shareKey = "shareKey";
+        String otherKey = "otherKey";
+        Post post = postRepository.save(PostFixture.createPostBuilder()
+                .shareUrl(shareKey)
+                .userId(author.getId())
+                .pollOption(PostFixture.pollOptionBuilder().scope(Scope.PRIVATE).build())
+                .build());
+
+        //when then
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), shareKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), otherKey));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(author.getId(), post.getId(), null));
+        assertThatNoException()
+                .isThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), shareKey));
+        assertThatThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), otherKey))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_NOT_REVEALABLE.getMessage());
+        assertThatThrownBy(() -> postService.findById(otherUser.getId(), post.getId(), null))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage(ErrorCode.POST_NOT_REVEALABLE.getMessage());
+    }
+
+    @Test
     @DisplayName("유저가 작성한 게시글 조회 - 커서 null인 경우")
     void findUserPosts() throws Exception {
         //given
@@ -100,7 +169,7 @@ class PostQueryServiceTest extends IntegrationTest {
         int size = 10;
 
         //when
-        var response = postService.findUserPosts(user.getId(), null, size);
+        var response = postService.findUserPosts(user.getId(), user.getId(), null, size);
 
         //then
         assertAll(
@@ -119,7 +188,7 @@ class PostQueryServiceTest extends IntegrationTest {
         int size = 10;
 
         //when
-        var response = postService.findUserPosts(user.getId(), posts.get(3).getId(), size);
+        var response = postService.findUserPosts(user.getId(), user.getId(), posts.get(3).getId(), size);
 
         //then
         assertAll(
@@ -150,7 +219,7 @@ class PostQueryServiceTest extends IntegrationTest {
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post2.getId(), post2.getPollChoices().get(0).getId()));
 
         //when
-        var response = postService.findUserPosts(user.getId(), null, 10);
+        var response = postService.findUserPosts(user.getId(), user.getId(), null, 10);
 
         //then
         List<MyPagePostResponse> data = response.data();
@@ -194,7 +263,7 @@ class PostQueryServiceTest extends IntegrationTest {
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
 
         //when
-        var response = postService.findUserPosts(user.getId(), null, 10);
+        var response = postService.findUserPosts(user.getId(), user.getId(), null, 10);
 
         //then
         List<MyPagePostResponse> data = response.data();
@@ -225,7 +294,7 @@ class PostQueryServiceTest extends IntegrationTest {
         int size = 10;
 
         //when
-        var response = postService.findVotedPosts(user.getId(), null, size);
+        var response = postService.findVotedPosts(user.getId(), user.getId(), null, size);
 
         //then
         int 전체_15개에서_맨_마지막_데이터_인덱스 = posts.size() - size;
@@ -256,9 +325,9 @@ class PostQueryServiceTest extends IntegrationTest {
         //유저1 게시글2 투표 후 취소
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post2.getId(), post2.getPollChoices().get(1).getId()));
         voteService.vote(user.getId(), post2.getId(), List.of());
-        
+
         //when
-        var response = postService.findVotedPosts(user.getId(), null, 10);
+        var response = postService.findVotedPosts(user.getId(), user.getId(), null, 10);
 
         //then
         List<MyPagePostResponse> data = response.data();
@@ -294,7 +363,7 @@ class PostQueryServiceTest extends IntegrationTest {
         voteRepository.save(VoteFixture.createDefaultVote(user.getId(), post.getId(), post.getPollChoices().get(0).getId()));
 
         //when
-        var response = postService.findVotedPosts(user.getId(), null, 10);
+        var response = postService.findVotedPosts(user.getId(), user.getId(), null, 10);
 
         //then
         List<MyPagePostResponse> data = response.data();
@@ -310,6 +379,65 @@ class PostQueryServiceTest extends IntegrationTest {
                 () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteCount()).isEqualTo(2),
                 () -> assertThat(data.getFirst().postVoteInfo().mostVotedPollChoice().voteRatio()).isEqualTo("67")
         );
+    }
+
+    @Test
+    @DisplayName("마이페이지 게시글 공개 범위 - 본인인 경우")
+    void scope_author() {
+        //given
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post publicPost = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.pollOptionBuilder()
+                        .scope(Scope.PUBLIC)
+                        .build())
+                .build());
+        Post privatePost = postRepository.save(PostFixture.createPostBuilder()
+                .userId(user.getId())
+                .pollOption(PostFixture.pollOptionBuilder()
+                        .scope(Scope.PRIVATE)
+                        .build())
+                .build());
+        //유저1 본인 게시글 1 2 투표
+        voteRepository.save(VoteFixture.createDefaultVote(user.getId(), publicPost.getId(), publicPost.getPollChoices().get(0).getId()));
+
+        //when
+        var response1 = postService.findVotedPosts(user.getId(), user.getId(), null, 10);
+        var response2 = postService.findUserPosts(user.getId(), user.getId(), null, 10);
+
+        //then
+        assertThat(response1.data()).hasSize(1);
+        assertThat(response2.data()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("마이페이지 게시글 공개 범위 - 다른 사람인 경우")
+    void scope_otherUser() {
+        //given
+        User author = userRepository.save(UserFixture.createDefaultUser());
+        User user = userRepository.save(UserFixture.createDefaultUser());
+        Post publicPost = postRepository.save(PostFixture.createPostBuilder()
+                .userId(author.getId())
+                .pollOption(PostFixture.pollOptionBuilder()
+                        .scope(Scope.PUBLIC)
+                        .build())
+                .build());
+        Post privatePost = postRepository.save(PostFixture.createPostBuilder()
+                .userId(author.getId())
+                .pollOption(PostFixture.pollOptionBuilder()
+                        .scope(Scope.PRIVATE)
+                        .build())
+                .build());
+        //유저1 본인 게시글 1 2 투표
+        voteRepository.save(VoteFixture.createDefaultVote(author.getId(), privatePost.getId(), privatePost.getPollChoices().get(0).getId()));
+
+        //when
+        var response1 = postService.findVotedPosts(user.getId(), author.getId(), null, 10);
+        var response2 = postService.findUserPosts(user.getId(), author.getId(), null, 10);
+
+        //then
+        assertThat(response1.data()).hasSize(0);
+        assertThat(response2.data()).hasSize(1);
     }
 
     @Test
@@ -345,7 +473,7 @@ class PostQueryServiceTest extends IntegrationTest {
 
     private List<Post> createPosts(User user, int size) {
         List<Post> posts = new ArrayList<>();
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             Post post = postRepository.save(createDefaultPost(user.getId()));
             posts.add(post);
             thumbnailRepository.save(createDefaultThumbnail(post.getId(), post.getPollChoices().get(0).getId()));
@@ -355,7 +483,7 @@ class PostQueryServiceTest extends IntegrationTest {
 
     private List<Post> createPostsWithScope(User user, Scope scope, int size) {
         List<Post> posts = new ArrayList<>();
-        for (int i = 0; i < size; i ++) {
+        for (int i = 0; i < size; i++) {
             Post post = createPostBuilder()
                     .userId(user.getId())
                     .pollOption(PollOption.create(PollType.SINGLE, scope, CommentActive.OPEN))

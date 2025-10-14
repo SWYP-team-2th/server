@@ -105,7 +105,7 @@ class VoteValidatorTest {
         // given
         Post post = PostFixture.createPostBuilder()
                 .pollOption(
-                        PostFixture.createPollOptionBuilder()
+                        PostFixture.pollOptionBuilder()
                                 .pollType(PollType.SINGLE)
                                 .build()
                 )
@@ -124,7 +124,7 @@ class VoteValidatorTest {
         // given
         Post post = PostFixture.createPostBuilder()
                 .pollOption(
-                        PostFixture.createPollOptionBuilder()
+                        PostFixture.pollOptionBuilder()
                                 .pollType(PollType.MULTIPLE)
                                 .build()
                 )

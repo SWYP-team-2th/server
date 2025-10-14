@@ -30,9 +30,9 @@ public interface PostRepository {
 
     Optional<CommentActive> findCommentActiveByPostId(Long postId);
 
-    Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long postId, Pageable pageable);
+    Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long authorId, Long postId, Pageable pageable);
 
-    Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable);
+    Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long authorId, Long postId, Pageable pageable);
 
     Optional<Post> findByIdAndUserId(Long postId, Long userId);
 }

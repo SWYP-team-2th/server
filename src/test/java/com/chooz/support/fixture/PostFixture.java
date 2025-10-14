@@ -67,7 +67,7 @@ public class PostFixture {
 
     public static final CloseOption SELF_CREATE_OPTION = new CloseOption(CloseType.SELF, null, null);
 
-    public static PollOption.PollOptionBuilder createPollOptionBuilder() {
+    public static PollOption.PollOptionBuilder pollOptionBuilder() {
         return PollOption.builder()
                 .pollType(PollType.SINGLE)
                 .scope(Scope.PUBLIC)
@@ -75,7 +75,7 @@ public class PostFixture {
     }
 
     public static PollOption multiplePollOption() {
-        return createPollOptionBuilder()
+        return pollOptionBuilder()
                 .pollType(PollType.MULTIPLE)
                 .build();
     }

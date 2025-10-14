@@ -1,16 +1,15 @@
 package com.chooz.post.persistence;
 
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.application.dto.PostWithVoteCount;
 import com.chooz.post.application.dto.QFeedDto;
 import com.chooz.post.application.dto.QPostWithVoteCount;
 import com.chooz.post.domain.Post;
-import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.domain.Scope;
-import com.chooz.user.domain.QUser;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +20,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.chooz.comment.domain.QComment.comment;
-import static com.chooz.post.domain.QPost.*;
-import static com.chooz.user.domain.QUser.*;
+import static com.chooz.post.domain.QPost.post;
+import static com.chooz.user.domain.QUser.user;
 import static com.chooz.vote.domain.QVote.vote;
 
 @Repository
@@ -60,6 +59,7 @@ public class PostQueryDslRepository {
 
     /**
      * 피드 관련 데이터 조회
+     *
      * @param postId
      * @param pageable
      * @return
@@ -93,7 +93,6 @@ public class PostQueryDslRepository {
                 .from(post)
                 .innerJoin(user).on(post.userId.eq(user.id))
                 .where(
-                        post.deleted.isFalse(),
                         post.pollOption.scope.eq(Scope.PUBLIC),
                         cursor(postId, post.id),
                         post.deleted.isFalse()
@@ -112,49 +111,52 @@ public class PostQueryDslRepository {
 
     /**
      * 유저가 작성한 게시글 리스트 조회
+     *
      * @param userId
      * @param postId
      * @param pageable
      * @return
      */
-    public Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long postId, Pageable pageable) {
-        List<PostWithVoteCount> results = queryFactory
-                .select(new QPostWithVoteCount(
-                        post,
-                        JPAExpressions
-                                .select(vote.userId.count())
-                                .from(vote)
-                                .where(
-                                        vote.postId.eq(post.id),
-                                        vote.deleted.isFalse()
-                                )
-                ))
-                .from(post)
-                .where(
-                        post.userId.eq(userId),
-                        cursor(postId, post.id),
-                        post.deleted.isFalse()
-                )
-                .orderBy(post.id.desc())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
-
-        boolean hasNext = isHasNext(pageable, results);
-
-        if (hasNext) {
-            results.removeLast();
-        }
-        return new SliceImpl<>(results, pageable, hasNext);
+    public Slice<PostWithVoteCount> findPostsWithVoteCountByUserId(Long userId, Long authorId, Long postId, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder(
+                post.userId.eq(authorId)
+                        .and(cursor(postId, post.id))
+                        .and(post.deleted.isFalse())
+        );
+        return getPostWithVoteCounts(userId, authorId, pageable, builder);
     }
 
     /**
      * 유저가 투표한 게시글 리스트 조회
+     *
      * @param userId
+     * @param authorId
      * @param postId
      * @param pageable
      * @return
      */
-    public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long postId, Pageable pageable) {
+    public Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long authorId, Long postId, Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder(
+                post.id.in(
+                                JPAExpressions
+                                        .select(vote.postId)
+                                        .from(vote)
+                                        .where(
+                                                vote.userId.eq(authorId),
+                                                vote.deleted.isFalse()
+                                        )
+                        )
+                        .and(cursor(postId, post.id))
+                        .and(post.deleted.isFalse())
+        );
+        return getPostWithVoteCounts(userId, authorId, pageable, builder);
+    }
+
+    private Slice<PostWithVoteCount> getPostWithVoteCounts(Long userId, Long authorId, Pageable pageable, BooleanBuilder builder) {
+        if (!userId.equals(authorId)) {
+            builder.and(post.pollOption.scope.eq(Scope.PUBLIC));
+        }
+
         List<PostWithVoteCount> results = queryFactory
                 .select(new QPostWithVoteCount(
                         post,
@@ -167,19 +169,7 @@ public class PostQueryDslRepository {
                                 )
                 ))
                 .from(post)
-                .where(
-                        post.id.in(
-                                JPAExpressions
-                                        .select(vote.postId)
-                                        .from(vote)
-                                        .where(
-                                                vote.userId.eq(userId),
-                                                vote.deleted.isFalse()
-                                        )
-                        ),
-                        cursor(postId, post.id),
-                        post.deleted.isFalse()
-                )
+                .where(builder)
                 .orderBy(post.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
