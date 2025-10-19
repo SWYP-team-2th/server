@@ -19,9 +19,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.chooz.comment.domain.QComment.comment;
 import static com.chooz.notification.domain.QNotification.notification;
@@ -81,7 +83,7 @@ public class NotificationQueryDslRepository {
                 row -> new NotificationDto(
                         row,
                         targetsByNotificationId.getOrDefault(row.id(), List.of())
-                )).toList();
+                )).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Optional<TargetPostDto> findPostByCommentId(Long commentId) {

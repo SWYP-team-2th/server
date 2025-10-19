@@ -1,5 +1,6 @@
 package com.chooz.notification.application;
 
+import com.chooz.common.dto.CursorBasePaginatedResponse;
 import com.chooz.notification.application.dto.NotificationContent;
 import com.chooz.notification.application.service.NotificationCommandService;
 import com.chooz.notification.application.service.NotificationQueryService;
@@ -83,6 +84,48 @@ class NotificationQueryServiceTest extends IntegrationTest {
                 () -> assertThat(notifications.getFirst().isRead()).isEqualTo(false),
                 () -> assertThat(notifications.getFirst().isValid()).isEqualTo(true)
 
+        );
+    }
+    @Test
+    @DisplayName("알림 10개 이상 조회")
+    void notificationsOver10() throws Exception {
+        //given
+        Long receiverId = 1L;
+        Long actorId = 2L;
+        String title = "숨겨진 츄님이 좋아요를 눌렀어요!";
+        String content = "지금 바로 확인해보세요.";
+        String profileUrl =  "https://cdn.chooz.site/default_profile.png";
+        List<Target> targets = List.of(Target.of(3L, TargetType.POST));
+        String imageUrl = "https://cdn.chooz.site/images/20865b3c-4e2c-454a-81a1-9ca31bbaf77d";
+        LocalDateTime eventAt = LocalDateTime.now();
+        NotificationType notificationType = NotificationType.COMMENT_LIKED;
+        for(long i = 0 ; i < 11 ; i++) {
+            Notification notification = Notification.create(
+                    notificationType,
+                    eventAt,
+                    NotificationContent.of(
+                            receiverId,
+                            actorId + i,
+                            title,
+                            content,
+                            profileUrl,
+                            imageUrl,
+                            targets
+                    )
+            ).get();
+            notificationCommandService.create(notification);
+        }
+        //when
+        CursorBasePaginatedResponse<NotificationResponse> notifications = notificationQueryService.findNotifications(
+                receiverId,
+                null,
+                10
+        );
+
+        //then
+        assertAll(
+                () -> assertThat(notifications.data().size()).isEqualTo(10),
+                () -> assertThat(notifications.hasNext()).isTrue()
         );
     }
     @Test
