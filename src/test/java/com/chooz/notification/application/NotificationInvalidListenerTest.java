@@ -120,7 +120,7 @@ class NotificationInvalidListenerTest extends IntegrationTest {
         commit(() -> postCommandService.close(user.getId(), post.getId()));
 
         //when
-        commit(() -> postCommandService.delete(post.getId(), post.getId()));
+        commit(() -> postCommandService.delete(user.getId(), post.getId()));
 
         //then
         List<NotificationDto> notifications = notificationQueryRepository.findNotifications(
