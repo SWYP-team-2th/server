@@ -8,7 +8,6 @@ import com.chooz.notification.domain.NotificationQueryRepository;
 import com.chooz.notification.domain.TargetType;
 import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PostRepository;
 import com.chooz.post.persistence.PostJpaRepository;
 import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.CommentFixture;
