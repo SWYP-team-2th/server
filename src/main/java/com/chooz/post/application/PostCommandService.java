@@ -1,5 +1,6 @@
 package com.chooz.post.application;
 
+import com.chooz.common.event.DeleteEvent;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
@@ -84,6 +85,7 @@ public class PostCommandService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         post.delete(userId);
+        eventPublisher.publish(DeleteEvent.of(post.getId(), post.getClass().getSimpleName().toUpperCase()));
     }
 
     @Transactional

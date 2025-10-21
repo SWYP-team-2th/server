@@ -6,8 +6,10 @@ import com.chooz.common.exception.ErrorCode;
 import com.chooz.notification.application.dto.TargetPostDto;
 import com.chooz.notification.application.dto.TargetUserDto;
 import com.chooz.notification.application.web.dto.NotificationDto;
+import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationQueryRepository;
 import com.chooz.notification.domain.NotificationRepository;
+import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +58,7 @@ public class NotificationQueryService {
     public NotificationPresentResponse present(Long userId) {
         return NotificationPresentResponse.of(notificationRepository.existsByReceiverIdAndIsReadFalseAndDeletedFalse(userId));
     }
-
+    public List<Notification> findByTargetIdAndType(Long id, TargetType targetType) {
+        return notificationRepository.findByTargetIdAndType(id, targetType);
+    }
 }

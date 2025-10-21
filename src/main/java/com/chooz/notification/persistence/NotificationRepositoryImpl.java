@@ -2,6 +2,7 @@ package com.chooz.notification.persistence;
 
 import com.chooz.notification.domain.Notification;
 import com.chooz.notification.domain.NotificationRepository;
+import com.chooz.notification.domain.TargetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -35,4 +36,8 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         return notificationJpaRepository.existsByReceiverIdAndIsReadFalseAndDeletedFalse(userId);
     }
 
+    @Override
+    public List<Notification> findByTargetIdAndType(Long targetId, TargetType targetType) {
+        return notificationJpaRepository.findByTargetIdAndType(targetId, targetType);
+    }
 }
