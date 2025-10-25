@@ -1,5 +1,7 @@
 package com.chooz.post.domain;
 
+import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +21,8 @@ import static com.chooz.common.util.Validator.validateNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PollChoice {
 
+    private static final int MAX_TITLE_LENGTH = 10;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,6 +36,7 @@ public class PollChoice {
 
     public PollChoice(Long id, Post post, String title, String imageUrl) {
         validateNull(title, imageUrl);
+        validateTitleLength(title);
         this.id = id;
         this.post = post;
         this.title = title;
@@ -45,5 +50,11 @@ public class PollChoice {
     public void setPost(Post post) {
         validateNull(post);
         this.post = post;
+    }
+
+    private void validateTitleLength(String title) {
+        if (title.length() > MAX_TITLE_LENGTH) {
+            throw new BadRequestException(ErrorCode.POLL_CHOICE_TITLE_LENGTH_EXCEEDED);
+        }
     }
 }
