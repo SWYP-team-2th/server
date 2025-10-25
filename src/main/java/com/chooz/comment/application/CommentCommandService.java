@@ -6,6 +6,8 @@ import com.chooz.comment.presentation.dto.CommentIdResponse;
 import com.chooz.comment.presentation.dto.CommentRequest;
 import com.chooz.comment.support.CommentValidator;
 import com.chooz.commentLike.application.CommentLikeCommandService;
+import com.chooz.common.event.DeleteEvent;
+import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.PostRepository;
@@ -26,6 +28,7 @@ public class CommentCommandService {
     private final UserRepository userRepository;
     private final CommentValidator commentValidator;
     private final CommentLikeCommandService commentLikeCommandService;
+    private final EventPublisher eventPublisher;
 
     public CommentIdResponse createComment(Long postId, CommentRequest commentRequest, Long userId) {
         commentValidator.validateContentLength(commentRequest.content());
@@ -51,9 +54,10 @@ public class CommentCommandService {
 
     public void deleteComment(Long postId, Long commentId, Long userId) {
         commentLikeCommandService.deleteCommentLikeByCommentId(commentId);
-        Comment commentForDelete = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.COMMENT_NOT_FOUND));
-        commentValidator.validateCommentAccess(commentForDelete, postId, userId);
-        commentRepository.delete(commentForDelete);
+        commentValidator.validateCommentAccess(comment, postId, userId);
+        commentRepository.delete(comment);
+        eventPublisher.publish(DeleteEvent.of(comment.getId(), comment.getClass().getSimpleName().toUpperCase()));
     }
 }

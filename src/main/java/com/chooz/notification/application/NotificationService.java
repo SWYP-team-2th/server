@@ -6,6 +6,7 @@ import com.chooz.notification.application.dto.TargetUserDto;
 import com.chooz.notification.application.service.NotificationCommandService;
 import com.chooz.notification.application.service.NotificationQueryService;
 import com.chooz.notification.domain.Notification;
+import com.chooz.notification.domain.TargetType;
 import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.notification.presentation.dto.NotificationResponse;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,8 @@ public class NotificationService {
     }
     public NotificationPresentResponse present(Long userId) {
         return notificationQueryService.present(userId);
+    }
+    public List<Notification> findByTargetIdAndType(Long id, TargetType targetType){
+        return notificationQueryService.findByTargetIdAndType(id, targetType);
     }
 }
