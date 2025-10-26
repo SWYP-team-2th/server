@@ -20,6 +20,7 @@ public enum ErrorCode {
     TITLE_IS_REQUIRED("게시글 제목은 필수입니다."),
     TITLE_LENGTH_EXCEEDED("게시글 제목 길이가 초과했습니다."),
     INVALID_POLL_CHOICE_COUNT("투표 선택지 개수가 범위를 벗어났습니다."),
+    POLL_CHOICE_TITLE_LENGTH_EXCEEDED("투표 선택지 제목 길이가 초과했습니다."),
     NOT_POST_AUTHOR("게시글 작성자가 아닙니다."),
     POST_ALREADY_CLOSED("이미 마감된 게시글입니다."),
     FILE_NAME_TOO_LONG("파일 이름이 너무 깁니다."),
