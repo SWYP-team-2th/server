@@ -6,8 +6,6 @@
 
 operation::auth-controller-test/kakao-o-auth-sign-in[snippets='http-request,curl-request,request-fields,http-response,response-cookies,response-fields']
 
-[[게스트-로그인]]
-=== `POST` 게스트 로그인
 
 ```
 1. 리프레시 토큰이 있는 경우
@@ -34,6 +32,6 @@ operation::auth-controller-test/reissue[snippets='http-request,curl-request,requ
 operation::auth-controller-test/sign-out[snippets='http-request,curl-request,request-cookies,request-headers,http-response,response-cookies']
 
 [[회원탈퇴]]
-=== `POST` 회원탈퇴 (미구현)
+=== `POST` 회원탈퇴
 
-operation::auth-controller-test/withdraw[snippets='http-request,curl-request,request-cookies,request-headers,http-response']
+operation::auth-controller-test/withdraw[snippets='http-request,curl-request,request-headers,http-response']

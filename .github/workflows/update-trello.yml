@@ -1,0 +1,67 @@
+name: Update Trello Card on PR Events
+
+on:
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  update-trello-card:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract Issue Number from PR Body
+        id: extract
+        run: |
+          BODY="${{ github.event.pull_request.body }}"
+          ISSUE_NUMBER=$(echo "$BODY" | grep -oE "#[0-9]+" | head -n1 | tr -d '#')
+          echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if No Issue Number Found
+        if: steps.extract.outputs.ISSUE_NUMBER == ''
+        run: echo "No issue number found. Skipping workflow..."
+
+      - name: Add PR Link as Comment to Trello Card
+        if: github.event.action == 'opened' && steps.extract.outputs.ISSUE_NUMBER != ''
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+        run: |
+          CARD_ID="${{ steps.extract.outputs.ISSUE_NUMBER }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_COMMENT=$(echo "PR opened: $PR_URL" | jq -Rs .)
+
+          curl --request POST \
+            --url "https://api.trello.com/1/cards/$CARD_ID/actions/comments" \
+            --header "Content-Type: application/json" \
+            --data "{
+              \"text\": $PR_COMMENT,
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"
+
+      - name: Mark Card as Done when PR is Merged
+        if: github.event.action == 'closed' && github.event.pull_request.merged == true && steps.extract.outputs.ISSUE_NUMBER != ''
+        env:
+          TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+          TRELLO_DONE_LABEL_ID: ${{ secrets.TRELLO_DONE_LABEL_ID }}
+        run: |
+          CARD_ID="${{ steps.extract.outputs.ISSUE_NUMBER }}"
+
+          curl --request POST \
+            --url "https://api.trello.com/1/cards/$CARD_ID/idLabels" \
+            --header "Content-Type: application/json" \
+            --data "{
+              \"value\": \"$TRELLO_DONE_LABEL_ID\",
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"
+
+          curl --request PUT \
+            --url "https://api.trello.com/1/cards/$CARD_ID" \
+            --header "Content-Type: application/json" \
+            --data "{
+              \"dueComplete\": true,
+              \"key\": \"$TRELLO_KEY\",
+              \"token\": \"$TRELLO_TOKEN\"
+            }"

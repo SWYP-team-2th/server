@@ -9,6 +9,20 @@ operation::post-controller-test/create-post[snippets='http-request,curl-request,
 [[게시글-상세-조회]]
 === `GET` 게시글 상세 조회
 
+공유 키 관련
+|===
+|공개범위(scope)|유저|shareKey 일치 여부|응답 여부
+
+|PUBLIC|작성자|O|O
+|PUBLIC|작성자|X|O
+|PUBLIC|다른 사용자|O|O
+|PUBLIC|다른 사용자|X|O
+|PRIVATE|작성자|O|O
+|PRIVATE|작성자|X|O
+|PRIVATE|다른 사용자|O|O
+|PRIVATE|다른 사용자|X|400에러
+|===
+
 operation::post-controller-test/find-post[snippets='http-request,curl-request,path-parameters,http-response,response-fields']
 
 [[개사굴-공유-url-조회]]
@@ -27,19 +41,19 @@ operation::post-controller-test/find-my-post[snippets='http-request,curl-request
 operation::post-controller-test/find-voted-post[snippets='http-request,curl-request,query-parameters,request-headers,http-response,response-fields']
 
 [[게시글-투표-수정]]
-=== `POST` 게시글 노출 변경
-
-operation::post-controller-test/toggle-status-post[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
-
-[[게시글-투표-수정]]
-=== `POST` 게시글 투표 수정 (미구현)
+=== `PUT` 게시글 투표 수정
 
 operation::post-controller-test/update-post[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
+
+[[게시글-투표-수정]]
+=== `GET` 게시글 투표 수정 조회
+
+operation::post-controller-test/find-post_update[snippets='path-parameters,http-response,response-fields']
 
 [[게시글-투표-마감]]
 === `POST` 게시글 투표 마감
 
-operation::post-controller-test/close-post[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
+operation::post-controller-test/close-by-author-post[snippets='http-request,curl-request,path-parameters,request-headers,http-response']
 
 [[게시글-삭제]]
 === `DELETE` 게시글 삭제
