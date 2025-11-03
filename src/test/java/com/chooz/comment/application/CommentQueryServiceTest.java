@@ -6,6 +6,7 @@ import com.chooz.comment.presentation.dto.CommentResponse;
 import com.chooz.commentLike.domain.CommentLike;
 import com.chooz.commentLike.domain.CommentLikeRepository;
 import com.chooz.common.exception.BadRequestException;
+import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.domain.CommentActive;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
@@ -133,7 +134,7 @@ class CommentQueryServiceTest extends IntegrationTest {
         // when & then
         assertThatThrownBy(() -> commentQueryService.findComments(post.getId(), user.getId(), null, 10))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("댓글 기능이 비활성화 되어 있습니다.");
+                .hasMessageContaining(ErrorCode.CLOSE_COMMENT_ACTIVE.getMessage());
     }
 
 
