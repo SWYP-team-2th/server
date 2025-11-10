@@ -1,10 +1,10 @@
 package com.chooz.post.persistence;
 
+import com.chooz.post.application.dto.FeedDto;
 import com.chooz.post.application.dto.PostWithVoteCount;
 import com.chooz.post.domain.CommentActive;
 import com.chooz.post.domain.Post;
 import com.chooz.post.domain.PostRepository;
-import com.chooz.post.application.dto.FeedDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -19,7 +19,6 @@ public class PostRepositoryImpl implements PostRepository {
 
     private final PostJpaRepository postJpaRepository;
     private final PostQueryDslRepository postQueryDslRepository;
-    private final PostRepository postRepository;
 
     @Override
     public Optional<Post> findById(Long postId) {
@@ -88,6 +87,6 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public void delete(Long postId) {
-        postRepository.delete(postId);
+        postJpaRepository.deleteById(postId);
     }
 }
