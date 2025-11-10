@@ -13,8 +13,6 @@ import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.support.fixture.VoteFixture;
-import com.chooz.thumbnail.domain.Thumbnail;
-import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.domain.VoteRepository;
@@ -47,9 +45,6 @@ public class PostCommandServiceTest extends IntegrationTest {
     ShareUrlService shareUrlService;
 
     @Autowired
-    ThumbnailRepository thumbnailRepository;
-
-    @Autowired
     VoteRepository voteRepository;
     
     @Test
@@ -76,7 +71,6 @@ public class PostCommandServiceTest extends IntegrationTest {
 
         //then
         Post post = postRepository.findById(response.postId()).get();
-        Thumbnail thumbnail = thumbnailRepository.findByPostId(post.getId()).get();
         List<PollChoice> pollChoices = post.getPollChoices();
         assertAll(
                 () -> assertThat(post.getDescription()).isEqualTo("description"),
@@ -89,11 +83,7 @@ public class PostCommandServiceTest extends IntegrationTest {
                 () -> assertThat(pollChoices.get(0).getImageUrl()).isEqualTo("http://image1.com"),
                 () -> assertThat(pollChoices.get(0).getTitle()).isEqualTo("title1"),
                 () -> assertThat(pollChoices.get(1).getImageUrl()).isEqualTo("http://image2.com"),
-                () -> assertThat(pollChoices.get(1).getTitle()).isEqualTo("title2"),
-
-                () -> assertThat(thumbnail.getThumbnailUrl()).isEqualTo("http://image1.com"),
-                () -> assertThat(thumbnail.getPostId()).isEqualTo(post.getId()),
-                () -> assertThat(thumbnail.getPollChoiceId()).isEqualTo(pollChoices.get(0).getId())
+                () -> assertThat(pollChoices.get(1).getTitle()).isEqualTo("title2")
         );
     }
 

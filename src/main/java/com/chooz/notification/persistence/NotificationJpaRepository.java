@@ -23,4 +23,6 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, L
             """
     )
     List<Notification> findByTargetIdAndType(@Param("targetId") Long targetId, @Param("targetType") TargetType targetType);
+
+    void deleteAllByReceiverId(Long receiverId);
 }

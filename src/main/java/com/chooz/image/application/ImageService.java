@@ -36,4 +36,8 @@ public class ImageService {
         URI domain = URI.create(imageProperties.endpoint());
         return domain.resolve(filePath).toString();
     }
+
+    public void deleteImage(String assetUrl) {
+        s3Client.deleteImage(assetUrl);
+    }
 }

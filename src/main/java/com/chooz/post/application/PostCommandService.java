@@ -1,20 +1,21 @@
 package com.chooz.post.application;
 
+import com.chooz.comment.application.CommentCommandService;
 import com.chooz.common.event.DeleteEvent;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.image.application.ImageService;
 import com.chooz.post.application.dto.PostClosedNotificationEvent;
 import com.chooz.post.domain.CloseOption;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
-import com.chooz.thumbnail.domain.Thumbnail;
-import com.chooz.thumbnail.domain.ThumbnailRepository;
+import com.chooz.vote.application.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +31,14 @@ public class PostCommandService {
 
     private final PostRepository postRepository;
     private final ShareUrlService shareUrlService;
-    private final ThumbnailRepository thumbnailRepository;
     private final PostValidator postValidator;
+    private final CommentCommandService commentCommandService;
+    private final VoteService voteService;
     private final EventPublisher eventPublisher;
+    private final ImageService imageService;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         Post post = createPost(userId, request);
-        savePostThumbnail(post);
         return new CreatePostResponse(post.getId(), post.getShareUrl());
     }
 
@@ -73,18 +75,14 @@ public class PostCommandService {
                 .collect(Collectors.toList());
     }
 
-    private void savePostThumbnail(Post post) {
-        PollChoice thumbnailPollChoice = post.getPollChoices().getFirst();
-        thumbnailRepository.save(
-                Thumbnail.create(post.getId(), thumbnailPollChoice.getId(), thumbnailPollChoice.getImageUrl())
-        );
-    }
-
     @Transactional
     public void delete(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        post.delete(userId);
+        voteService.delete(postId);
+        commentCommandService.deleteComments(postId);
+        imageService.deleteImage(post.getImageUrl());
+        postRepository.delete(postId);
         eventPublisher.publish(DeleteEvent.of(post.getId(), post.getClass().getSimpleName().toUpperCase()));
     }
 

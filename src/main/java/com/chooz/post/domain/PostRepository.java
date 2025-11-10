@@ -35,4 +35,8 @@ public interface PostRepository {
     Slice<PostWithVoteCount> findVotedPostsWithVoteCount(Long userId, Long authorId, Long postId, Pageable pageable);
 
     Optional<Post> findByIdAndUserId(Long postId, Long userId);
+
+    void deleteAllByUserId(Long userId);
+
+    void delete(Long postId);
 }

@@ -25,7 +25,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-    private static final String DEFAULT_PROFILE_URL = "https://cdn.chooz.site/default_profile.png";
+    public static final String DEFAULT_PROFILE_URL = "https://cdn.chooz.site/default_profile.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

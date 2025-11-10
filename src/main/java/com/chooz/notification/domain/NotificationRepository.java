@@ -9,4 +9,6 @@ public interface NotificationRepository {
     Optional<Notification> findNotificationById(Long id);
     boolean existsByReceiverIdAndIsReadFalseAndDeletedFalse(Long userId);
     List<Notification> findByTargetIdAndType(Long targetId, TargetType targetType);
+
+    void deleteAllByUserId(Long userId);
 }
