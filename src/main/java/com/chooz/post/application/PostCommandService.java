@@ -6,15 +6,13 @@ import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
 import com.chooz.post.application.dto.PostClosedNotificationEvent;
 import com.chooz.post.domain.CloseOption;
+import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PollOption;
 import com.chooz.post.domain.Post;
-import com.chooz.post.domain.PollChoice;
 import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
-import com.chooz.thumbnail.domain.Thumbnail;
-import com.chooz.thumbnail.domain.ThumbnailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +28,11 @@ public class PostCommandService {
 
     private final PostRepository postRepository;
     private final ShareUrlService shareUrlService;
-    private final ThumbnailRepository thumbnailRepository;
     private final PostValidator postValidator;
     private final EventPublisher eventPublisher;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         Post post = createPost(userId, request);
-        savePostThumbnail(post);
         return new CreatePostResponse(post.getId(), post.getShareUrl());
     }
 
@@ -71,13 +67,6 @@ public class PostCommandService {
                         pollChoiceDto.title(), pollChoiceDto.imageUrl()
                 ))
                 .collect(Collectors.toList());
-    }
-
-    private void savePostThumbnail(Post post) {
-        PollChoice thumbnailPollChoice = post.getPollChoices().getFirst();
-        thumbnailRepository.save(
-                Thumbnail.create(post.getId(), thumbnailPollChoice.getId(), thumbnailPollChoice.getImageUrl())
-        );
     }
 
     @Transactional
