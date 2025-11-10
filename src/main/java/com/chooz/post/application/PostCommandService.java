@@ -1,5 +1,6 @@
 package com.chooz.post.application;
 
+import com.chooz.comment.application.CommentCommandService;
 import com.chooz.common.event.DeleteEvent;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
@@ -13,6 +14,7 @@ import com.chooz.post.domain.PostRepository;
 import com.chooz.post.presentation.dto.CreatePostRequest;
 import com.chooz.post.presentation.dto.CreatePostResponse;
 import com.chooz.post.presentation.dto.UpdatePostRequest;
+import com.chooz.vote.application.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,8 @@ public class PostCommandService {
     private final PostRepository postRepository;
     private final ShareUrlService shareUrlService;
     private final PostValidator postValidator;
+    private final CommentCommandService commentCommandService;
+    private final VoteService voteService;
     private final EventPublisher eventPublisher;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
@@ -73,7 +77,9 @@ public class PostCommandService {
     public void delete(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
-        post.delete(userId);
+        voteService.delete(postId);
+        commentCommandService.deleteComments(postId);
+        postRepository.delete(postId);
         eventPublisher.publish(DeleteEvent.of(post.getId(), post.getClass().getSimpleName().toUpperCase()));
     }
 

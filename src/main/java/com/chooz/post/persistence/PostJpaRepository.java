@@ -72,4 +72,8 @@ public interface PostJpaRepository extends JpaRepository<Post, Long> {
     Optional<CommentActive> findCommentActiveByPostId(@Param("postId") Long postId);
 
     Optional<Post> findByIdAndUserIdAndDeletedFalse(Long postId, Long userId);
+
+    void deleteAllByUserId(Long userId);
+
+    List<Post> findAllByUserId(Long userId);
 }

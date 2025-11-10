@@ -19,6 +19,7 @@ public class PostRepositoryImpl implements PostRepository {
 
     private final PostJpaRepository postJpaRepository;
     private final PostQueryDslRepository postQueryDslRepository;
+    private final PostRepository postRepository;
 
     @Override
     public Optional<Post> findById(Long postId) {
@@ -78,5 +79,15 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public Optional<Post> findByIdAndUserId(Long postId, Long userId) {
         return postJpaRepository.findByIdAndUserIdAndDeletedFalse(postId, userId);
+    }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        postJpaRepository.deleteAllByUserId(userId);
+    }
+
+    @Override
+    public void delete(Long postId) {
+        postRepository.delete(postId);
     }
 }

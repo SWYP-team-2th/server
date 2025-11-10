@@ -49,4 +49,8 @@ public class VoteService {
 
         return voteResultReader.getVoteResult(totalVoteList, post);
     }
+
+    public void delete(Long postId) {
+        voteRepository.deleteAllByPostId(postId);
+    }
 }
