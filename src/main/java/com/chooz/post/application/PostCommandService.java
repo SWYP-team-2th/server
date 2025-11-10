@@ -5,6 +5,7 @@ import com.chooz.common.event.DeleteEvent;
 import com.chooz.common.event.EventPublisher;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.image.application.ImageService;
 import com.chooz.post.application.dto.PostClosedNotificationEvent;
 import com.chooz.post.domain.CloseOption;
 import com.chooz.post.domain.PollChoice;
@@ -34,6 +35,7 @@ public class PostCommandService {
     private final CommentCommandService commentCommandService;
     private final VoteService voteService;
     private final EventPublisher eventPublisher;
+    private final ImageService imageService;
 
     public CreatePostResponse create(Long userId, CreatePostRequest request) {
         Post post = createPost(userId, request);
@@ -79,6 +81,7 @@ public class PostCommandService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.POST_NOT_FOUND));
         voteService.delete(postId);
         commentCommandService.deleteComments(postId);
+        imageService.deleteImage(post.getImageUrl());
         postRepository.delete(postId);
         eventPublisher.publish(DeleteEvent.of(post.getId(), post.getClass().getSimpleName().toUpperCase()));
     }
