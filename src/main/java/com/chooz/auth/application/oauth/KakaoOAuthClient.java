@@ -1,6 +1,7 @@
 package com.chooz.auth.application.oauth;
 
 import com.chooz.auth.application.oauth.dto.KakaoAuthResponse;
+import com.chooz.auth.application.oauth.dto.KakaoUnlinkResponse;
 import com.chooz.auth.application.oauth.dto.KakaoUserInfoResponse;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,4 +19,10 @@ public interface KakaoOAuthClient {
 
     @GetExchange("https://kapi.kakao.com/v2/user/me")
     KakaoUserInfoResponse fetchUserInfo(@RequestHeader(name = AUTHORIZATION) String bearerToken);
+
+    @PostExchange(url = "https://kapi.kakao.com/v1/user/unlink", contentType = APPLICATION_FORM_URLENCODED_VALUE)
+    KakaoUnlinkResponse unlink(
+            @RequestHeader(name = AUTHORIZATION) String bearerToken,
+            @RequestParam("params") MultiValueMap<String, String> params
+    );
 }
