@@ -6,6 +6,7 @@ import com.chooz.auth.domain.SocialAccount;
 import com.chooz.auth.domain.SocialAccountRepository;
 import com.chooz.common.exception.BadRequestException;
 import com.chooz.common.exception.ErrorCode;
+import com.chooz.image.application.S3Client;
 import com.chooz.notification.domain.NotificationRepository;
 import com.chooz.post.application.PostCommandService;
 import com.chooz.post.persistence.PostJpaRepository;
@@ -25,6 +26,7 @@ public class WithdrawHandler {
     private final NotificationRepository notificationRepository;
     private final PostCommandService postCommandService;
     private final OAuthService oAuthService;
+    private final S3Client s3Client;
 
     public void withdraw(Long userId) {
         User user = userRepository.findById(userId)
@@ -38,6 +40,9 @@ public class WithdrawHandler {
             socialAccountRepository.deleteByUserId(userId);
             oAuthService.withdraw(socialAccount.getSocialId());
         });
+        if (!User.DEFAULT_PROFILE_URL.equals(user.getProfileUrl())) {
+            s3Client.deleteImage(user.getProfileUrl());
+        }
         userRepository.delete(user);
     }
 }
