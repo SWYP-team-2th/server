@@ -72,4 +72,4 @@ jobs:
           script_stop: true
           script: |
             sudo fuser -k -n tcp 8080 || true
-            nohup java -Xms256m -Xmx742m -Dspring.profiles.active=prod -jar /home/ubuntu/chooz-prod.jar >> /home/ubuntu/output.log 2>&1 &
+            nohup java -Xms256m -Xmx742m -Dspring.profiles.active=prod -jar /home/ubuntu/chooz-prod.jar 2>&1 &
