@@ -40,4 +40,9 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     public List<Notification> findByTargetIdAndType(Long targetId, TargetType targetType) {
         return notificationJpaRepository.findByTargetIdAndType(targetId, targetType);
     }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        notificationJpaRepository.deleteAllByReceiverId(userId);
+    }
 }

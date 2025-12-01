@@ -19,7 +19,6 @@ import com.chooz.support.IntegrationTest;
 import com.chooz.support.fixture.PostFixture;
 import com.chooz.support.fixture.UserFixture;
 import com.chooz.support.fixture.VoteFixture;
-import com.chooz.thumbnail.domain.ThumbnailRepository;
 import com.chooz.user.domain.User;
 import com.chooz.user.domain.UserRepository;
 import com.chooz.vote.application.VoteService;
@@ -35,7 +34,6 @@ import java.util.List;
 import static com.chooz.support.fixture.CommentFixture.createDefaultComment;
 import static com.chooz.support.fixture.PostFixture.createDefaultPost;
 import static com.chooz.support.fixture.PostFixture.createPostBuilder;
-import static com.chooz.support.fixture.ThumbnailFixture.createDefaultThumbnail;
 import static com.chooz.support.fixture.UserFixture.createDefaultUser;
 import static com.chooz.support.fixture.UserFixture.createUserBuilder;
 import static com.chooz.support.fixture.VoteFixture.createDefaultVote;
@@ -61,8 +59,6 @@ class PostQueryServiceTest extends IntegrationTest {
     @Autowired
     CommentRepository commentRepository;
 
-    @Autowired
-    ThumbnailRepository thumbnailRepository;
     @Autowired
     private VoteService voteService;
 
@@ -476,7 +472,6 @@ class PostQueryServiceTest extends IntegrationTest {
         for (int i = 0; i < size; i++) {
             Post post = postRepository.save(createDefaultPost(user.getId()));
             posts.add(post);
-            thumbnailRepository.save(createDefaultThumbnail(post.getId(), post.getPollChoices().get(0).getId()));
         }
         return posts;
     }

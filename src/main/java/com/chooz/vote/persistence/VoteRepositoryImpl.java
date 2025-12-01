@@ -38,4 +38,9 @@ public class VoteRepositoryImpl implements VoteRepository {
     public long countVoterByPostId(Long postId) {
         return voteQueryDslRepository.countVoterByPostId(postId);
     }
+
+    @Override
+    public void deleteAllByPostId(Long postId) {
+        voteRepository.deleteAllByPostId(postId);
+    }
 }

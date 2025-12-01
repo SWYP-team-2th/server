@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 public class OAuthService {
 
     private static final String BEARER = "Bearer ";
+    private static final String KAKAO_AK = "KakaoAK ";
 
     private final KakaoOAuthConfig kakaoOAuthConfig;
     private final KakaoOAuthClient kakaoOAuthClient;
@@ -41,6 +42,24 @@ public class OAuthService {
         params.add("redirect_uri", redirectUri);
         params.add("code", authCode);
         params.add("client_secret", kakaoOAuthConfig.clientSecret());
+        return params;
+    }
+
+    public void withdraw(String socialId) {
+        try {
+            kakaoOAuthClient.unlink(
+                    KAKAO_AK + kakaoOAuthConfig.adminKey(),
+                    unlinkRequestParams(socialId)
+            );
+        } catch (Exception e) {
+            log.warn("회원 탈퇴 실패", e);
+        }
+    }
+
+    private MultiValueMap<String, String> unlinkRequestParams(String socialId) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("target_id_type", "user_id");
+        params.add("target_id", socialId);
         return params;
     }
 }
