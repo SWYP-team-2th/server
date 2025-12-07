@@ -32,8 +32,8 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public boolean existsByReceiverIdAndIsReadFalseAndDeletedFalse(Long userId) {
-        return notificationJpaRepository.existsByReceiverIdAndIsReadFalseAndDeletedFalse(userId);
+    public boolean existsByReceiverIdAndIsReadFalseAndDeletedFalseAndIsValidTrue(Long userId) {
+        return notificationJpaRepository.existsByReceiverIdAndIsReadFalseAndDeletedFalseAndIsValidTrue(userId);
     }
 
     @Override
