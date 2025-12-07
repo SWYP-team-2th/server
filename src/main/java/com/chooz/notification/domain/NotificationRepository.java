@@ -7,7 +7,7 @@ public interface NotificationRepository {
     Notification save(Notification notification);
     void saveAll(List<Notification> notifications);
     Optional<Notification> findNotificationById(Long id);
-    boolean existsByReceiverIdAndIsReadFalseAndDeletedFalse(Long userId);
+    boolean existsByReceiverIdAndIsReadFalseAndDeletedFalseAndIsValidTrue(Long userId);
     List<Notification> findByTargetIdAndType(Long targetId, TargetType targetType);
 
     void deleteAllByUserId(Long userId);
