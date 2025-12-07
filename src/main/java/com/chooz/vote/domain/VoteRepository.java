@@ -14,4 +14,5 @@ public interface VoteRepository {
 
     long countVoterByPostId(Long postId);
 
+    void deleteAllByPostId(Long postId);
 }

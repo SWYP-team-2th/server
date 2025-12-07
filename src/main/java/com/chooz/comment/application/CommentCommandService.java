@@ -60,4 +60,9 @@ public class CommentCommandService {
         commentRepository.delete(comment);
         eventPublisher.publish(DeleteEvent.of(comment.getId(), comment.getClass().getSimpleName().toUpperCase()));
     }
+
+    public void deleteComments(Long postId) {
+        commentLikeCommandService.deleteCommentLikeByCommentId(postId);
+        commentRepository.deleteAllByPostId(postId);
+    }
 }
