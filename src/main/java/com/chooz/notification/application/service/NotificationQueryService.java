@@ -56,7 +56,7 @@ public class NotificationQueryService {
         return notificationQueryRepository.findVoteUsersByPostId(postId);
     }
     public NotificationPresentResponse present(Long userId) {
-        return NotificationPresentResponse.of(notificationRepository.existsByReceiverIdAndIsReadFalseAndDeletedFalse(userId));
+        return NotificationPresentResponse.of(notificationRepository.existsByReceiverIdAndIsReadFalseAndDeletedFalseAndIsValidTrue(userId));
     }
     public List<Notification> findByTargetIdAndType(Long id, TargetType targetType) {
         return notificationRepository.findByTargetIdAndType(id, targetType);

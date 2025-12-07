@@ -6,6 +6,7 @@ import com.chooz.comment.domain.CommentRepository;
 import com.chooz.commentLike.application.CommentLikeService;
 import com.chooz.notification.application.web.dto.NotificationDto;
 import com.chooz.notification.domain.NotificationQueryRepository;
+import com.chooz.notification.presentation.dto.NotificationPresentResponse;
 import com.chooz.post.application.PostCommandService;
 import com.chooz.post.domain.PollChoiceRepository;
 import com.chooz.post.domain.Post;
@@ -60,6 +61,9 @@ class NotificationInvalidListenerTest extends IntegrationTest {
     @Autowired
     PostCommandService postCommandService;
 
+    @Autowired
+    NotificationService notificationQueryService;
+
     @AfterEach
     void tearDown() {
         voteRepository.deleteAllInBatch();
@@ -99,8 +103,11 @@ class NotificationInvalidListenerTest extends IntegrationTest {
                 null,
                 PageRequest.ofSize(10)
         ).getContent();
+        NotificationPresentResponse notificationPresentResponse = notificationQueryService.present(receiver.getId());
         assertAll(
-                () -> assertThat(notifications.size()).isZero()
+                () -> assertThat(notifications.size()).isZero(),
+                () -> assertThat(notificationPresentResponse.present()).isFalse()
+
         );
     }
     @Test
@@ -128,9 +135,11 @@ class NotificationInvalidListenerTest extends IntegrationTest {
                 null,
                 PageRequest.ofSize(10)
         ).getContent();
+        NotificationPresentResponse notificationPresentResponse = notificationQueryService.present(user.getId());
 
         assertAll(
-                () -> assertThat(notifications.size()).isZero()
+                () -> assertThat(notifications.size()).isZero(),
+                () -> assertThat(notificationPresentResponse.present()).isFalse()
         );
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationJpaRepository extends JpaRepository<Notification, Long> {
-    boolean existsByReceiverIdAndIsReadFalseAndDeletedFalse(Long userId);
+    boolean existsByReceiverIdAndIsReadFalseAndDeletedFalseAndIsValidTrue(Long userId);
     @Query("""
             SELECT distinct n
             FROM Notification n
